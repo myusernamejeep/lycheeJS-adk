@@ -1,0 +1,102 @@
+
+# Those definitions should be consistent with the main Makefile
+ANDROID_ARCHES = android_ia32 android_arm
+MODES = release debug
+
+# Generates all combinations of ANDROID ARCHES and MODES,
+# e.g. "android_ia32.release" or "android_arm.release"
+ANDROID_BUILDS = $(foreach mode,$(MODES), \
+                   $(addsuffix .$(mode),$(ANDROID_ARCHES)))
+
+HOST_OS = $(shell uname -s | sed -e 's/Linux/linux/;s/Darwin/mac/')
+ifeq ($(HOST_OS), linux)
+  TOOLCHAIN_DIR = linux-x86
+else
+  ifeq ($(HOST_OS), mac)
+    TOOLCHAIN_DIR = darwin-x86
+  else
+    $(error Host platform "${HOST_OS}" is not supported)
+  endif
+endif
+
+
+CFLAGS=-Wall -O3 -funroll-loops -Iinclude/
+LDFLAGS=-lz -lm
+
+
+ifeq ($(ARCH), android_arm)
+  TOOLCHAIN_ARCH = arm-linux-androideabi-4.4.3
+  CFLAGS += -I$(ANDROID_NDK_ROOT)/platforms/android-9/arch-arm/usr/include
+  CFLAGS += -march=armv7-a -mtune=cortex-a8 -mfpu=vfp3
+  export LD_LIBRARY_PATH = $(ANDROID_NDK_ROOT)/platforms/android-9/arch-arm/usr/lib
+else
+  ifeq ($(ARCH), android_ia32)
+    TOOLCHAIN_ARCH = x86-4.4.3
+    CFLAGS += -I$(ANDROID_NDK_ROOT)/platforms/android-9/arch-x86/usr/include
+    export LD_LIBRARY_PATH = $(ANDROID_NDK_ROOT)/platforms/android-9/arch-x86/usr/lib
+  else
+    $(error Target architecture "${ARCH}" is not supported)
+  endif
+endif
+
+
+TOOLCHAIN_PATH = ${ANDROID_NDK_ROOT}/toolchains/${TOOLCHAIN_ARCH}/prebuilt
+ANDROID_TOOLCHAIN ?= ${TOOLCHAIN_PATH}/${TOOLCHAIN_DIR}
+ifeq ($(wildcard $(ANDROID_TOOLCHAIN)),)
+  $(error Cannot find Android toolchain in "${ANDROID_TOOLCHAIN}")
+endif
+
+
+AR=$(ANDROID_TOOLCHAIN)/bin/*-ar
+RANLIB=$(ANDROID_TOOLCHAIN)/bin/*-ranlib
+CC=$(ANDROID_TOOLCHAIN)/bin/*-gcc
+
+
+HEADERS = include/png.h \
+	include/pngconf.h \
+	include/pnglibconf.h \
+	include/pngpriv.h \
+	include/pngstruct.h \
+	include/pnginfo.h \
+	include/pngdebug.h
+
+OBJECTS = $(OUTDIR)/png.o \
+	$(OUTDIR)/pngset.o \
+	$(OUTDIR)/pngget.o \
+	$(OUTDIR)/pngrutil.o \
+	$(OUTDIR)/pngtrans.o \
+	$(OUTDIR)/pngwutil.o \
+	$(OUTDIR)/pngread.o \
+	$(OUTDIR)/pngrio.o \
+	$(OUTDIR)/pngwio.o \
+	$(OUTDIR)/pngwrite.o \
+	$(OUTDIR)/pngrtran.o \
+	$(OUTDIR)/pngwtran.o \
+	$(OUTDIR)/pngmem.o \
+	$(OUTDIR)/pngerror.o \
+	$(OUTDIR)/pngpread.o
+ 
+
+debug: $(HEADERS)
+
+release: $(HEADERS)
+	rm -rf $(OUTDIR)
+	mkdir $(OUTDIR)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/png.o src/png.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/pngset.o src/pngset.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/pngget.o src/pngget.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/pngrutil.o src/pngrutil.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/pngtrans.o src/pngtrans.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/pngwutil.o src/pngwutil.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/pngread.o src/pngread.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/pngrio.o src/pngrio.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/pngwio.o src/pngwio.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/pngwrite.o src/pngwrite.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/pngrtran.o src/pngrtran.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/pngwtran.o src/pngwtran.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/pngmem.o src/pngmem.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/pngerror.o src/pngerror.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/pngpread.o src/pngpread.c $(LDFLAGS)
+	$(AR) rc $(OUTDIR)/libpng.a $(OBJECTS)
+	$(RANLIB) $(OUTDIR)/libpng.a
+ 

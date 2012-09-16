@@ -1,0 +1,899 @@
+#!/bin/bash
+#
+# lycheeJS-ADK
+# (App Development Kit)
+#
+# Copyright (c) 2012 by Christoph Martens
+#
+# This Open-Source version is released under
+# the terms of GNU General Public License
+# version 3
+#
+# Please see the LICENSE.txt included with this
+# distribution for further details.
+#
+
+DEBUG_MODE=0;
+
+
+LYCHEEJS_GIT_URL="git://github.com/martensms/lycheeJS.git";
+LYCHEEJS_ZIP_URL="https://github.com/martensms/lycheeJS/zipball/master";
+
+
+ADK_PATH=$(cd "$(dirname "$0")"; pwd);
+ANDROID_NDK_PATH=$ADK_PATH/external/android-ndk;
+
+ANDROID_SDK_PATH=$ADK_PATH/external/android-sdk;
+V8_PATH=$ADK_PATH/external/v8;
+V8GL_PATH=$ADK_PATH/v8gl;
+PNG_PATH=$ADK_PATH/external/libpng;
+UNAME_P=$(uname -p);
+
+
+# This is only used in case of issue reporting
+# Please do not remove this, it allows easier debugging of your problem.
+if [ "$1" == "clean" ]
+then
+	echo -e "" > $ADK_PATH/log;
+fi;
+
+echo -e "ADK call: $0 $1 $2 $3 $4" >> $ADK_PATH/log;
+echo -e "Environment: "$(uname -a) >> $ADK_PATH/log;
+echo -e "g++ Version: "$(g++ --version | sed -n 1p) >> $ADK_PATH/log;
+echo -e "\n" >> $ADK_PATH/log;
+
+
+
+usage() {
+
+cat <<EOF
+
+lycheeJS ADK (App Development Kit) v0.5
+
+This program comes with ABSOLUT NO WARRANTY;
+This is free software, and you are welcome to redistribute it under certain conditions;
+See the LICENSE.txt for details.
+
+
+Recommended development environment: Ubuntu 12.04 64Bit
+
+The ADK allows native platform builds of your JavaScript game using the
+lycheeJS game engine stack. Please follow the guidelines in lycheeJS
+to allow proper builds and avoid futile errors.
+
+
+Usage: $0 <task> [ <options> ]
+
+
+Tasks:
+    help              Shows this help message
+    setup             (Re)Installs all required dependencies and libraries
+    build             Builds an application
+    clean             Cleans all previous builds
+    clean-android     Cleans all previous builds on Android mobiles.
+    debug             Starts debugger and debugs your build (also on mobiles)
+
+
+Build Usage:
+
+$0 build <platform> <path>
+$0 build <platform> <path> --debug
+
+
+<platform> is the targeted platform.
+    linux, web, android-arm, android-x86
+    (TODO: windows, windows-metro, windows-steam, osx-app)
+
+<path> is the path to your game folder.
+    This folder should include an init.js which initializes the code and should
+    be included in your HTML5 / web build.
+
+    Take a look at the game examples in lycheeJS itself for best practices.
+
+
+Examples:
+
+$0 setup
+$0 clean
+$0 build linux ./external/lycheeJS/game/boilerplate
+$0 clean android-arm
+$0 build android-arm ./external/lycheeJS/game/boilerplate
+$0 debug android-arm
+
+
+EOF
+
+}
+
+check_success() {
+
+	if [ ! "$?" -eq "0" ]
+	then
+
+		if [ "$1" != "" ]
+		then
+			check_success_buildstep "FAILURE" "$1";
+		else
+			check_success_buildstep "FAILURE" "Sub-Process exited with exit code $?";
+		fi;
+
+	fi;
+
+}
+
+# check_success_buildstep "FAILURE" "message"
+# check_success_buildstep "SUCCESS" "message"
+check_success_buildstep() {
+
+	if [ "$1" == "SUCCESS" ]
+	then
+		echo -e "done.";
+	else
+		echo -e "failed. ($2)";
+		finish 1;
+	fi;
+
+}
+
+# finish 1
+finish() {
+
+	if [ $1 -eq 1 ]
+	then
+
+		echo -e "\n\nERROR: It seems as the lycheeJS-ADK had a problem.\n\n";
+		echo -e "If this error occurs though following the guidelines,";
+		echo -e "please report an issue at https://github.com/martensms/lycheeJS-adk/issues";
+		echo -e "and attach the ./log file to it. Thanks!";
+
+	fi;
+
+	exit $1;
+
+}
+
+# clean "linux"
+# clean "android-arm"
+clean() {
+
+	echo -e "\n\n~ ~ ~ clean($1) ~ ~ ~\n" >> $ADK_PATH/log;
+
+	cd $ADK_PATH;
+
+	if [ "$1" != "" ]
+	then
+		rm -rf "./out/$1" >> $ADK_PATH/log 2>&1;
+		check_success;
+	else
+		rm -rf "./out" >> $ADK_PATH/log 2>&1;
+		check_success;
+	fi;
+
+
+	check_success_buildstep "SUCCESS";
+
+}
+
+# clean_android "ms.martensms.v8gl"
+clean_android() {
+
+	echo -e "\n\n~ ~ ~ clean_android($1) ~ ~ ~\n" >> $ADK_PATH/log;
+
+	$ANDROID_SDK_PATH/platform-tools/adb uninstall $1 >> $ADK_PATH/log 2>&1;
+	check_success;
+
+	check_success_buildstep "SUCCESS";
+
+}
+
+# install_dependencies "/usr/bin/aptitude"
+install_dependencies() {
+
+	echo -e "\n\n~ ~ ~ install_dependencies($1) ~ ~ ~\n" >> $ADK_PATH/log;
+
+	echo -e "Package Manager: $1\n" >> $ADK_PATH/log;
+
+	cd $ADK_PATH;
+
+	install_command="sudo $1 -y install
+	wget git unzip
+	ant openjdk-7-jdk
+	build-essential g++ gcc-multilib
+	freeglut3-dev libgl1-mesa-dev libglu1-mesa-dev";
+
+	echo -e "$install_command\n" >> $ADK_PATH/log;
+	$install_command >> $ADK_PATH/log 2>&1;
+	check_success;
+
+
+	check_success_buildstep "SUCCESS";
+
+}
+
+# install_lycheeJS "git"
+# install_lycheeJS "zip"
+install_lycheeJS() {
+
+	echo -e "\n\n~ ~ ~ install_lycheeJS($1) ~ ~ ~\n" >> $ADK_PATH/log;
+
+	cd $ADK_PATH;
+
+	echo -e "Preparing folder structure:\n" >> $ADK_PATH/log;
+
+	if [ -d "external/lycheeJS" ]
+	then
+		rm -rf "external/lycheeJS";
+		check_success;
+	fi;
+
+
+	# prepare folder structure
+	if [ ! -d "external/lycheeJS" ]
+	then
+		mkdir "external/lycheeJS" >> $ADK_PATH/log 2>&1;
+		check_success;
+	fi;
+
+	if [ ! -d ".temp" ]
+	then
+		mkdir ".temp" >> $ADK_PATH/log 2>&1;
+		check_success;
+	fi;
+
+	echo -e "done.\n" >> $ADK_PATH/log;
+
+
+	if [ "$1" == "zip" ]
+	then
+
+		echo -e "Downloading zip file:\n" >> $ADK_PATH/log;
+		wget -O .temp/lycheeJS.zip $LYCHEEJS_ZIP_URL >> $ADK_PATH/log 2>&1;
+		check_success "Could not download zip file (wget)";
+		echo -e "done.\n" >> $ADK_PATH/log;
+
+
+		echo -e "Extracting zip file:\n" >> $ADK_PATH/log;
+		unzip .temp/lycheeJS.zip -d $ADK_PATH/.temp >> $ADK_PATH/log 2>&1;
+		check_success "Could not extract zip file (unzip)";
+		mv $ADK_PATH/.temp/martensms-lycheeJS-*/* $ADK_PATH/external/lycheeJS >> $ADK_PATH/log 2>&1;
+		check_success "Could not move extracted files to external/lycheeJS";
+
+	elif [ "$1" == "git" ]
+	then
+
+		echo -e "Cloning lycheeJS git repository:\n" >> $ADK_PATH/log;
+		git clone $LYCHEEJS_GIT_URL external/lycheeJS >> $ADK_PATH/log 2>&1;
+		check_success "Could not clone repository (git)";
+
+	fi;
+
+
+	check_success_buildstep "SUCCESS";
+
+}
+
+# build_libpng x64.release
+# build_libpng android_arm.release
+build_libpng() {
+
+	echo -e "\n\n~ ~ ~ build_libpng($1) ~ ~ ~\n" >> $ADK_PATH/log;
+
+	cd $PNG_PATH;
+
+	if [ "$1" == "android_arm.release" ] || [ "$1" == "android_ia32.release" ]
+	then
+		export ANDROID_NDK_ROOT=$ANDROID_NDK_PATH;
+	fi;
+
+	make $1 >> $ADK_PATH/log 2>&1;
+	check_success;
+
+
+	check_success_buildstep "SUCCESS";
+
+}
+
+# build_v8 x64.release
+build_v8() {
+
+	echo -e "\n\n~ ~ ~ build_v8($1) ~ ~ ~\n" >> $ADK_PATH/log;
+
+	cd $V8_PATH >> $ADK_PATH/log 2>&1;
+
+	export ANDROID_NDK_ROOT=$ANDROID_NDK_PATH;
+	export snapshot=off;
+	make $1 >> $ADK_PATH/log 2>&1;
+	check_success;
+
+
+	check_success_buildstep "SUCCESS";
+
+}
+
+# prepare_v8gl android_arm.release
+prepare_v8gl() {
+
+	echo -e "\n\n~ ~ ~ prepare_v8gl($1) ~ ~ ~\n" >> $ADK_PATH/log;
+
+	cd $V8GL_PATH >> $ADK_PATH/log 2>&1;
+
+	export LYCHEEJS_ROOT=$ADK_PATH/external/lycheeJS;
+	export LIBPNG_PATH=$PNG_PATH/out/$1;
+	export LIBV8_PATH=$V8_PATH/out/$1/obj.target/tools/gyp;
+
+	# TODO: Evaluate if there can be subtargets without building
+	# them in Makefiles, e.g. make dependencies x64.release
+	export build=$1;
+
+	make dependencies >> $ADK_PATH/log 2>&1;
+	check_success;
+
+
+	check_success_buildstep "SUCCESS";
+
+}
+
+clean_v8gl_android() {
+
+	cd $ADK_PATH/v8gl;
+
+	if [ -d "./bin" ]
+	then
+		rm -rf "./bin" >> $ADK_PATH/log 2>&1;
+		check_success;
+	fi;
+
+	if [ -d "./libs" ]
+	then
+		rm -rf "./libs" >> $ADK_PATH/log 2>&1;
+		check_success;
+	fi;
+
+	if [ -d "./obj" ]
+	then
+		rm -rf "./obj" >> $ADK_PATH/log 2>&1;
+		check_success;
+	fi;
+
+}
+
+# build_v8gl_android "android_arm.release" "APK-Name" "V8ADK"
+build_v8gl_android() {
+
+	echo -e "Preparing folder structure\n" >> $ADK_PATH/log;
+
+	clean_v8gl_android;
+
+
+	echo -e "Compiling via Android NDK\n" >> $ADK_PATH/log;
+
+	cd $ADK_PATH/v8gl >> $ADK_PATH/log 2>&1;
+	check_success;
+
+	export V=1;
+	export NDK_LOG=1;
+
+	$ANDROID_NDK_PATH/ndk-build >> $ADK_PATH/log 2>&1;
+	check_success;
+
+	export ANDROID_HOME=$ANDROID_SDK_PATH;
+	ant debug >> $ADK_PATH/log 2>&1;
+	check_success;
+
+	ant release >> $ADK_PATH/log 2>&1;
+	check_success;
+
+	cd $ADK_PATH;
+	if [ ! -d "./out/$2" ]
+	then
+		mkdir "./out/$2" 2>&1;
+		check_success;
+	fi;
+
+
+	mv $ADK_PATH/v8gl/bin/AndroidManifest.xml $ADK_PATH/out/$2/AndroidManifest.xml 2>&1;
+	mv $ADK_PATH/v8gl/bin/$3-debug.apk $ADK_PATH/out/$2/$3-debug.apk 2>&1;
+	mv $ADK_PATH/v8gl/bin/$3-release-unsigned.apk $ADK_PATH/out/$2/$3-release-unsigned.apk 2>&1;
+	check_success;
+
+
+	clean_v8gl_android;
+
+
+	check_success_buildstep "SUCCESS";
+
+}
+
+# build_v8gl "x64.release"
+build_v8gl() {
+
+	echo -e "\n\n~ ~ ~ build_v8gl($1) ~ ~ ~\n" >> $ADK_PATH/log;
+
+	cd $ADK_PATH/v8gl;
+
+	if [ "$1" == "android_arm.release" ] || [ "$1" == 'android_ia32.release' ]
+	then
+		export ANDROID_NDK_ROOT=$ANDROID_NDK_PATH;
+	fi;
+
+
+	make $1 >> $ADK_PATH/log 2>&1;
+	check_success;
+
+	check_success_buildstep "SUCCESS";
+
+}
+
+# build_game "x64.release" "android_arm.release" "android-arm" "/abs/to/game" 1
+build_game() {
+
+	echo -e "\n\n~ ~ ~ build_game($1 $2 $3 $4 $5) ~ ~ ~\n" >> $ADK_PATH/log;
+
+	v8adk_platform=$1;
+	v8gl_platform=$2;
+	build_arch=$3;
+	game_in=$4;
+	game_out=$ADK_PATH/out/$build_arch;
+	use_v8gl=$5;
+
+
+	cd $ADK_PATH;
+
+	if [ -d "$game_out" ]
+	then
+		rm -rf "$game_out" >> $ADK_PATH/log 2>&1;
+		check_success;
+	fi;
+
+	if [ -d ".temp" ]
+	then
+		rm -rf ".temp" >> $ADK_PATH/log 2>&1;
+		check_success;
+	fi;
+
+	mkdir ".temp" >> $ADK_PATH/log 2>&1;
+	check_success;
+
+
+	if [ -d "$ADK_PATH/template/$build_arch" ]
+	then
+		cp -R "$ADK_PATH/template/$build_arch" "$ADK_PATH/.temp" >> $ADK_PATH/log 2>&1;
+		mkdir -p $ADK_PATH/.temp/$build_arch/asset >> $ADK_PATH/log 2>&1;
+		mkdir -p $ADK_PATH/.temp/$build_arch/js >> $ADK_PATH/log 2>&1;
+		check_success;
+	else
+		check_success_buildstep "FAILURE" "No Game Template available for $build_arch";
+	fi;
+
+
+	$V8GL_PATH/out/$v8adk_platform/v8adk "export-bash" $game_in/init.js > $ADK_PATH/.temp/game-env.adk;
+	check_success;
+
+
+	if [ "$use_v8gl" == "1" ]
+	then
+		$V8GL_PATH/out/$v8adk_platform/v8adk "rewrite-v8gl" $game_in/init.js > $ADK_PATH/.temp/$build_arch/init.js;
+	else
+		$V8GL_PATH/out/$v8adk_platform/v8adk "rewrite" $game_in/init.js > $ADK_PATH/.temp/$build_arch/init.js;
+	fi;
+	check_success;
+
+
+	. $ADK_PATH/.temp/game-env.adk;
+	check_success;
+
+
+	declare -A game_bases;
+	declare -A game_tags;
+
+	echo -e "game in: $game_in" >> $ADK_PATH/log;
+	echo -e "game out: $game_out" >> $ADK_PATH/log;
+	echo -e "game environment:" >> $ADK_PATH/log;
+
+	for i in "${!env_bases[@]}"
+	do
+		game_bases[$i]=$(cd $game_in; cd "${env_bases[$i]}"; pwd;);
+		echo -e "\tbase $i: ${game_bases[$i]}" >> $ADK_PATH/log;
+	done;
+
+	for i in "${!env_tags[@]}"
+	do
+		game_tags[$i]="${env_tags[$i]}";
+		echo -e "\ttag $i: ${game_tags[$i]}" >> $ADK_PATH/log;
+	done;
+
+
+	cd $ADK_PATH;
+
+	mkdir -p $game_out;
+	check_success;
+
+	for id in "${!game_bases[@]}"
+	do
+		cp -R "${game_bases[$id]}" $ADK_PATH/.temp/$build_arch/js/$id >> $ADK_PATH/log 2>&1;
+		check_success;
+	done;
+
+	if [ -d $game_in/asset ]
+	then
+		cp -R $game_in/asset/* $ADK_PATH/.temp/$build_arch/asset >> $ADK_PATH/log 2>&1;
+		check_success;
+	fi;
+
+
+	#
+	# BUILD the Game with the Template dependent stuff
+	#
+
+	if [ "$ADK_PATH/.temp/$build_arch/.adk.sh" ]
+	then
+
+		export game_path=$game_in;
+		export v8gl_path=$V8GL_PATH/out/$1;
+
+
+		cd $ADK_PATH/.temp/$build_arch;
+
+		$ADK_PATH/.temp/$build_arch/.adk.sh setup >> $ADK_PATH/log 2>&1;
+		check_success;
+
+		$ADK_PATH/.temp/$build_arch/.adk.sh build >> $ADK_PATH/log 2>&1;
+		check_success;
+
+		$ADK_PATH/.temp/$build_arch/.adk.sh package >> $ADK_PATH/log 2>&1;
+		check_success;
+
+		$ADK_PATH/.temp/$build_arch/.adk.sh clean >> $ADK_PATH/log 2>&1;
+		check_success;
+
+	else
+		rm "$ADK_PATH/.temp/game-env.adk" >> $ADK_PATH/log 2>&1;
+	fi;
+
+	mv "$ADK_PATH/.temp/$build_arch" "$ADK_PATH/out/";
+
+
+	check_success_buildstep "SUCCESS";
+
+}
+
+# debug_android "android-arm" "V8GL" "ms.martens.v8gl"
+debug_android() {
+
+	echo -e "Debugging via Android ADB and DDMS:\n" >> $ADK_PATH/log;
+
+
+	cd $ADK_PATH;
+	$ANDROID_SDK_PATH/platform-tools/adb install $ADK_PATH/out/$1/$2-debug.apk >> $ADK_PATH/log 2>&1;
+	check_success;
+
+	$ANDROID_SDK_PATH/platform-tools/adb shell am start -n "$3/android.app.NativeActivity" >> $ADK_PATH/log 2>&1;
+	check_success;
+
+	check_success_buildstep "SUCCESS";
+
+}
+
+debug() {
+
+	echo -e "\n\n~ ~ ~ debug($1 $2 $3) ~ ~ ~\n" >> $ADK_PATH/log;
+
+	if [ "$1" == "android-arm" ] || [ "$1" == "android-x86" ]
+	then
+		debug_android "$1" "$2" "$3";
+		return;
+	fi;
+
+
+	echo -e "Debugging via native environment:\n" >> $ADK_PATH/log;
+
+
+	cd $ADK_PATH;
+
+	if [ -f "./out/$1/start.sh" ]
+	then
+		./out/$1/start.sh;
+	else
+		check_success_buildstep "FAILURE" "Build is not available. (out/$1/start.sh)";
+	fi;
+
+	check_success_buildstep "SUCCESS";
+
+}
+
+case "$1" in
+	help)
+		usage;
+		exit;
+		;;
+	setup)
+
+		echo -e "\nSetting Up...";
+
+		if [ -f /usr/bin/aptitude ]
+		then
+			apt="/usr/bin/aptitude";
+		elif [ -f /usr/bin/apt-get ]
+		then
+			apt="/usr/bin/apt-get";
+		else
+			apt="";
+		fi;
+
+
+		if [ "$apt" != "" ]
+		then
+
+			echo -e "\nInstalling dependencies... ($apt)";
+			install_dependencies "$apt";
+
+
+			echo -e "\nInstalling lycheeJS...";
+
+			while [ "$answer" != "yes" -a "$answer" != "no" ]
+			do
+				echo -n -e "WARNING: This will undo all modifications in external/lycheeJS. Continue [ yes/no ]? ";
+				read answer;
+			done;
+ 
+			if [ "$answer" == "yes" ]
+			then
+
+				while [ "$answer" != "git" -a "$answer" != "zip" ]
+				do
+					echo -n -e "Use git repository (for active development) or download zip file [ git/zip ]? ";
+					read answer;
+				done;
+
+
+				install_lycheeJS "$answer";
+
+			else
+				echo -e "skipped.";
+			fi;
+
+		else
+			echo -e "failed. (no Ubuntu/Debian environment or aptitude is missing)";
+			exit;
+		fi;
+
+
+
+		exit;
+		;;
+	build)
+
+		if [ "$4" == "--debug" ]
+		then
+			DEBUG_MODE=1;
+		fi;
+
+
+		if [ "$UNAME_P" == "x86_64" ]
+		then
+			V8_PLATFORM="x64.release";
+			V8_HOST_PLATFORM="x64.release";
+		elif [ "$UNAME_P" == "i686" ]
+		then
+			V8_PLATFORM="ia32.release";
+			V8_HOST_PLATFORM="ia32.release";
+		else
+			echo -e "No valid architecture detected ($UNAME_P).";
+			exit 1;
+		fi;
+
+
+		if [ "$2" == "dummy" ]
+		then
+
+			V8_PLATFORM="x64.release";
+			_BUILD_ARCH=$2;
+			_BUILD_V8=1;
+			_BUILD_V8ADK=1;
+			_BUILD_V8GL=1;
+			_BUILD_GAME=0;
+
+		elif [ "$2" == "android-arm" ]
+		then
+
+			V8_PLATFORM="android_arm.release";
+			_BUILD_ARCH=$2;
+			_BUILD_V8=1;
+			_BUILD_V8ADK=1;
+			_BUILD_V8GL=1;
+			_BUILD_GAME=1;
+
+		elif [ "$2" == "android-x86" ]
+		then
+
+			V8_PLATFORM="android_ia32.release";
+			_BUILD_ARCH=$2;
+			_BUILD_V8=1;
+			_BUILD_V8ADK=1;
+			_BUILD_V8GL=0;
+			_BUILD_GAME=0;
+
+		elif [ "$2" == "linux" ]
+		then
+
+			_BUILD_ARCH=$2;
+			_BUILD_V8=1;
+			_BUILD_V8ADK=1;
+			_BUILD_V8GL=1;
+			_BUILD_GAME=1;
+
+		elif [ "$2" == "web" ]
+		then
+
+			_BUILD_ARCH=$2;
+			_BUILD_V8=1;
+			_BUILD_V8ADK=1;
+			_BUILD_V8GL=0;
+			_BUILD_GAME=1;
+
+		else
+			echo -e "No valid <platform> given.";
+			exit 1;
+		fi
+
+
+		if [ "$3" != "" -a -d "$3" -a -f "$3/init.js" ]
+		then
+			GAME_IN=$(cd "$3"; pwd);
+			cd $ADK_PATH;
+		else
+			echo -e "No valid game <path> given.";
+			exit 1;
+		fi;
+
+
+		GAME_PLATFORM=$2;
+		GAME_OUT=$ADK_PATH/out/$GAME_PLATFORM;
+
+
+
+		#
+		# BUILD V8
+		#
+
+		if [ "$_BUILD_V8" == "1" ]
+		then
+			echo -e "\nBuilding V8... ($V8_PLATFORM)";
+			build_v8 "$V8_PLATFORM";
+		fi;
+
+		if [ "$_BUILD_V8ADK" == "1" ] && [ "$V8_PLATFORM" != "$V8_HOST_PLATFORM" ]
+		then
+			echo -e "\nBuilding V8... ($V8_HOST_PLATFORM)";
+			build_v8 "$V8_HOST_PLATFORM";
+		fi;
+
+
+
+		#
+		# BUILD LIBPNG
+		#
+
+		if [ "$_BUILD_V8ADK" == "1" ] || [ "$V8_PLATFORM" != "$V8_HOST_PLATFORM" ]
+		then
+			echo -e "\nBuilding LIBPNG... ($V8_HOST_PLATFORM)";
+			build_libpng $V8_HOST_PLATFORM;
+		fi;
+
+		if [ "$_BUILD_V8GL" == "1" ]
+		then
+			echo -e "\nBuilding LIBPNG... ($V8_PLATFORM)";
+			build_libpng $V8_PLATFORM;
+		fi;
+
+
+
+
+		#
+		# BUILD V8GL and V8ADK
+		#
+
+		if [ "$_BUILD_V8ADK" == "1" ] || [ "$V8_PLATFORM" != "$V8_HOST_PLATFORM" ]
+		then
+			echo -e "\nPreparing V8ADK... ($V8_HOST_PLATFORM)";
+			prepare_v8gl $V8_HOST_PLATFORM;
+		fi;
+
+		if [ "$_BUILD_V8GL" == "1" ]
+		then
+			echo -e "\nPreparing V8GL... ($V8_PLATFORM)";
+			prepare_v8gl "$V8_PLATFORM";
+		fi;
+
+		if [ "$_BUILD_V8ADK" == "1" ] || [ "$V8_PLATFORM" != "$V8_HOST_PLATFORM" ]
+		then
+			echo -e "\nBuilding V8GL and V8ADK... ($V8_HOST_PLATFORM)";
+			build_v8gl "$V8_HOST_PLATFORM";
+		fi;
+
+		if [ "$_BUILD_V8GL" == "1" ]
+		then
+			echo -e "\nBuilding V8GL and V8ADK... ($V8_PLATFORM)";
+			build_v8gl "$V8_PLATFORM";
+		fi;
+
+
+
+		#
+		# BUILD GAME
+		#
+
+		if [ "$_BUILD_GAME" == "1" ]
+		then
+			echo -e "\nBuilding Game... ($GAME_IN > $GAME_OUT)";
+			build_game "$V8_HOST_PLATFORM" "$V8_PLATFORM" "$GAME_PLATFORM" "$GAME_IN" $_BUILD_V8GL;
+		fi;
+
+
+		exit;
+		;;
+
+	clean-android)
+
+		answer="";
+		echo -e "";
+
+		while [ "$answer" != "yes" -a "$answer" != "no" ]
+		do
+			echo -n -e "WARNING: This will remove the ms.martens.v8gl package from your Android device. Continue [ yes/no ]? ";
+			read answer;
+		done;
+		
+		if [ "$answer" == "yes" ]
+		then
+
+			echo -e "\nCleaning up Android Device...";
+			clean_android "ms.martens.v8gl";
+
+		fi;
+
+		exit;
+		;;
+
+	clean)
+
+
+
+		while [ "$answer" != "yes" -a "$answer" != "no" ]
+		do
+			echo -n -e "WARNING: This will remove previous builds in \"./out/$2\". Continue [ yes/no ]? ";
+			read answer;
+		done;
+
+		if [ "$answer" == "yes" ]
+		then
+			echo -e "\nCleaning up...";
+			clean "$2";
+		fi;
+
+		exit;
+		;;
+
+	debug)
+
+		echo -e "\nDebugging...";
+
+		if [ "$2" == "linux" ] || [ "$2" == "android-arm" ] || [ "$2" == "android-x86" ]
+		then
+
+			_BUILD_ARCH=$2;
+
+			debug "$_BUILD_ARCH" "V8GL" "ms.martens.v8gl";
+
+		fi;
+
+
+		exit;
+		;;
+
+esac;
+
+
+
+usage;
+
