@@ -689,7 +689,6 @@ case "$1" in
 			V8_PLATFORM="x64.release";
 			_BUILD_ARCH=$2;
 			_BUILD_V8=1;
-			_BUILD_V8ADK=1;
 			_BUILD_V8GL=1;
 			_BUILD_GAME=0;
 
@@ -699,7 +698,6 @@ case "$1" in
 			V8_PLATFORM="android_arm.release";
 			_BUILD_ARCH=$2;
 			_BUILD_V8=1;
-			_BUILD_V8ADK=1;
 			_BUILD_V8GL=1;
 			_BUILD_GAME=1;
 
@@ -709,8 +707,7 @@ case "$1" in
 			V8_PLATFORM="android_ia32.release";
 			_BUILD_ARCH=$2;
 			_BUILD_V8=1;
-			_BUILD_V8ADK=1;
-			_BUILD_V8GL=0;
+			_BUILD_V8GL=1;
 			_BUILD_GAME=0;
 
 		elif [ "$2" == "linux" ]
@@ -718,7 +715,6 @@ case "$1" in
 
 			_BUILD_ARCH=$2;
 			_BUILD_V8=1;
-			_BUILD_V8ADK=1;
 			_BUILD_V8GL=1;
 			_BUILD_GAME=1;
 
@@ -727,8 +723,7 @@ case "$1" in
 
 			_BUILD_ARCH=$2;
 			_BUILD_V8=1;
-			_BUILD_V8ADK=1;
-			_BUILD_V8GL=0;
+			_BUILD_V8GL=1;
 			_BUILD_GAME=1;
 
 		else
@@ -756,16 +751,16 @@ case "$1" in
 		# BUILD V8
 		#
 
+		if [ "$_BUILD_V8GL" == "1" ] && [ "$V8_PLATFORM" != "$V8_HOST_PLATFORM" ]
+		then
+			echo -e "\nBuilding V8... ($V8_HOST_PLATFORM)";
+			build_v8 "$V8_HOST_PLATFORM";
+		fi;
+
 		if [ "$_BUILD_V8" == "1" ]
 		then
 			echo -e "\nBuilding V8... ($V8_PLATFORM)";
 			build_v8 "$V8_PLATFORM";
-		fi;
-
-		if [ "$_BUILD_V8ADK" == "1" ] && [ "$V8_PLATFORM" != "$V8_HOST_PLATFORM" ]
-		then
-			echo -e "\nBuilding V8... ($V8_HOST_PLATFORM)";
-			build_v8 "$V8_HOST_PLATFORM";
 		fi;
 
 
@@ -774,7 +769,7 @@ case "$1" in
 		# BUILD LIBPNG
 		#
 
-		if [ "$_BUILD_V8ADK" == "1" ] || [ "$V8_PLATFORM" != "$V8_HOST_PLATFORM" ]
+		if [ "$_BUILD_V8GL" == "1" ] && [ "$V8_PLATFORM" != "$V8_HOST_PLATFORM" ]
 		then
 			echo -e "\nBuilding LIBPNG... ($V8_HOST_PLATFORM)";
 			build_libpng $V8_HOST_PLATFORM;
@@ -788,33 +783,30 @@ case "$1" in
 
 
 
-
 		#
 		# BUILD V8GL and V8ADK
 		#
 
-		if [ "$_BUILD_V8ADK" == "1" ] || [ "$V8_PLATFORM" != "$V8_HOST_PLATFORM" ]
+		if [ "$_BUILD_V8GL" == "1" ] && [ "$V8_PLATFORM" != "$V8_HOST_PLATFORM" ]
 		then
-			echo -e "\nPreparing V8ADK... ($V8_HOST_PLATFORM)";
+
+			echo -e "\nPreparing V8GL and V8ADK... ($V8_HOST_PLATFORM)";
 			prepare_v8gl $V8_HOST_PLATFORM;
-		fi;
 
-		if [ "$_BUILD_V8GL" == "1" ]
-		then
-			echo -e "\nPreparing V8GL... ($V8_PLATFORM)";
-			prepare_v8gl "$V8_PLATFORM";
-		fi;
-
-		if [ "$_BUILD_V8ADK" == "1" ] || [ "$V8_PLATFORM" != "$V8_HOST_PLATFORM" ]
-		then
 			echo -e "\nBuilding V8GL and V8ADK... ($V8_HOST_PLATFORM)";
 			build_v8gl "$V8_HOST_PLATFORM";
+
 		fi;
 
 		if [ "$_BUILD_V8GL" == "1" ]
 		then
+
+			echo -e "\nPreparing V8GL and V8ADK... ($V8_PLATFORM)";
+			prepare_v8gl "$V8_PLATFORM";
+
 			echo -e "\nBuilding V8GL and V8ADK... ($V8_PLATFORM)";
 			build_v8gl "$V8_PLATFORM";
+
 		fi;
 
 
