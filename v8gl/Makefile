@@ -10,6 +10,8 @@ ARCH = $(basename $@)
 BUILDS = $(foreach mode,$(MODES),$(addsuffix .$(mode),$(ARCHES)))
 ANDROID_BUILDS = $(foreach mode,$(MODES), $(addsuffix .$(mode),$(ANDROID_ARCHES)))
 
+AR=ar
+RANLIB=ranlib
 CC=g++
 
 STATIC_INCLUDES = -I../external/libpng/include \
@@ -32,8 +34,7 @@ V8ADK_CFLAGS = -D__V8ADK__
 V8ADK_HEADER_FILES = src/v8adk/v8gl.h \
 	src/v8adk/path.h
 
-V8ADK_SRC_FILES = src/v8adk/main.cpp \
-	src/v8adk/v8gl.cpp \
+V8ADK_SRC_FILES = src/v8adk/v8gl.cpp \
 	src/v8adk/path.cpp
 
 V8ADK_SHARED_LIBRARIES =
@@ -52,8 +53,7 @@ V8GL_HEADER_FILES = src/v8gl/v8gl.h \
 	src/binding/glu.h \
 	src/binding/glut.h
 
-V8GL_SRC_FILES = src/v8gl/main.cpp \
-	src/v8gl/v8gl.cpp \
+V8GL_SRC_FILES = src/v8gl/v8gl.cpp \
 	src/v8gl/path.cpp \
 	src/binding/gl/glbind.cpp \
 	src/binding/glu.cpp \
@@ -89,6 +89,9 @@ OUTDIR = ./out/$@
 
 clean:
 	rm -rf ./out/
+	rm -rf ./lib/
+	rm ./src/js/interval.h
+	rm ./src/js/timeout.h
 
 all: $(MODES)
 
@@ -105,15 +108,27 @@ dependencies: must-set-LYCHEEJS_ROOT must-set-LIBPNG_PATH must-set-LIBV8_PATH
 	cp $(LIBPNG_PATH)/libpng.a $(V8GL_ROOT)/lib/$(LIB_ARCH)/libpng.a
 	cp $(LIBV8_PATH)/libv8_base.a $(V8GL_ROOT)/lib/$(LIB_ARCH)/libv8_base.a
 	cp $(LIBV8_PATH)/libv8_nosnapshot.a $(V8GL_ROOT)/lib/$(LIB_ARCH)/libv8_nosnapshot.a
+	cd src/ && xxd -i "js/interval.js" "js/interval.h"
+	cd src/ && xxd -i "js/timeout.js" "js/timeout.h"
 
 
 $(BUILDS): $(HEADER_FILES)
-	rm -rf $(OUTDIR)
-	mkdir -p $(OUTDIR)
-	cd src/ && xxd -i "js/interval.js" "js/interval.h"
-	cd src/ && xxd -i "js/timeout.js" "js/timeout.h"
-	$(CC) -Wall $(V8ADK_CFLAGS) $(STATIC_INCLUDES) $(V8ADK_SRC_FILES) -o $(OUTDIR)/v8adk $(V8ADK_LDFLAGS)
-	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) $(V8GL_SRC_FILES) -o $(OUTDIR)/v8gl $(V8GL_LDFLAGS)
+	$(CC) -Wall $(V8ADK_CFLAGS) $(STATIC_INCLUDES) src/v8adk/main.cpp $(V8ADK_SRC_FILES) -o $(OUTDIR)/v8adk $(V8ADK_LDFLAGS)
+	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/v8gl/main.cpp $(V8GL_SRC_FILES) -o $(OUTDIR)/v8gl $(V8GL_LDFLAGS)
+	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/v8gl/v8gl.cpp -c -o $(OUTDIR)/v8gl_v8gl.o
+	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/v8gl/path.cpp -c -o $(OUTDIR)/v8gl_path.o
+	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/binding/gl/glbind.cpp -c -o $(OUTDIR)/binding_gl.o
+	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/binding/glu.cpp -c -o $(OUTDIR)/binding_glu.o
+	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/binding/glut.cpp -c -o $(OUTDIR)/binding_glut.o
+	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/console.cpp -c -o $(OUTDIR)/api_console.o
+	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/script.cpp -c -o $(OUTDIR)/api_script.o
+	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/text.cpp -c -o $(OUTDIR)/api_text.o
+	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/texture.cpp -c -o $(OUTDIR)/api_texture.o
+	$(AR) rc $(OUTDIR)/libv8gl.a $(OUTDIR)/v8gl_v8gl.o $(OUTDIR)/v8gl_path.o \
+	$(OUTDIR)/binding_gl.o $(OUTDIR)/binding_glu.o $(OUTDIR)/binding_glut.o \
+	$(OUTDIR)/api_console.o $(OUTDIR)/api_script.o $(OUTDIR)/api_text.o $(OUTDIR)/api_texture.o
+	$(RANLIB) $(OUTDIR)/libv8gl.a
+
 
 must-set-LYCHEEJS_ROOT:
 ifndef LYCHEEJS_ROOT
