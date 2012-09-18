@@ -14,8 +14,8 @@
 		#include <OpenGL/OpenGL.h>
 	#elif __ANDROID__
 		#define GL_GLEXT_PROTOTYPES
-		#include <GLES/gl.h>
-		#include <GLES/glext.h>
+		#include <GLES2/gl2.h>
+		#include <GLES2/gl2ext.h>
 	#else
 		#define GL_GLEXT_PROTOTYPES
 		#include <GL/gl.h>
