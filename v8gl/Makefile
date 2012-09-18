@@ -113,6 +113,8 @@ dependencies: must-set-LYCHEEJS_ROOT must-set-LIBPNG_PATH must-set-LIBV8_PATH
 
 
 $(BUILDS): $(HEADER_FILES)
+	rm -rf $(OUTDIR)
+	mkdir -p $(OUTDIR)
 	$(CC) -Wall $(V8ADK_CFLAGS) $(STATIC_INCLUDES) src/v8adk/main.cpp $(V8ADK_SRC_FILES) -o $(OUTDIR)/v8adk $(V8ADK_LDFLAGS)
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/v8gl/main.cpp $(V8GL_SRC_FILES) -o $(OUTDIR)/v8gl $(V8GL_LDFLAGS)
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/v8gl/v8gl.cpp -c -o $(OUTDIR)/v8gl_v8gl.o
