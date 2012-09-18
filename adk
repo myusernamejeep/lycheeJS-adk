@@ -20,14 +20,13 @@ LYCHEEJS_GIT_URL="git://github.com/martensms/lycheeJS.git";
 LYCHEEJS_ZIP_URL="https://github.com/martensms/lycheeJS/zipball/master";
 
 
+UNAME_P=$(uname -p);
 ADK_PATH=$(cd "$(dirname "$0")"; pwd);
 ANDROID_NDK_PATH=$ADK_PATH/external/android-ndk;
-
 ANDROID_SDK_PATH=$ADK_PATH/external/android-sdk;
 V8_PATH=$ADK_PATH/external/v8;
 V8GL_PATH=$ADK_PATH/v8gl;
 PNG_PATH=$ADK_PATH/external/libpng;
-UNAME_P=$(uname -p);
 
 
 # This is only used in case of issue reporting
@@ -333,77 +332,6 @@ prepare_v8gl() {
 
 }
 
-clean_v8gl_android() {
-
-	cd $ADK_PATH/v8gl;
-
-	if [ -d "./bin" ]
-	then
-		rm -rf "./bin" >> $ADK_PATH/log 2>&1;
-		check_success;
-	fi;
-
-	if [ -d "./libs" ]
-	then
-		rm -rf "./libs" >> $ADK_PATH/log 2>&1;
-		check_success;
-	fi;
-
-	if [ -d "./obj" ]
-	then
-		rm -rf "./obj" >> $ADK_PATH/log 2>&1;
-		check_success;
-	fi;
-
-}
-
-# build_v8gl_android "android_arm.release" "APK-Name" "V8ADK"
-build_v8gl_android() {
-
-	echo -e "Preparing folder structure\n" >> $ADK_PATH/log;
-
-	clean_v8gl_android;
-
-
-	echo -e "Compiling via Android NDK\n" >> $ADK_PATH/log;
-
-	cd $ADK_PATH/v8gl >> $ADK_PATH/log 2>&1;
-	check_success;
-
-	export V=1;
-	export NDK_LOG=1;
-
-	$ANDROID_NDK_PATH/ndk-build >> $ADK_PATH/log 2>&1;
-	check_success;
-
-	export ANDROID_HOME=$ANDROID_SDK_PATH;
-	ant debug >> $ADK_PATH/log 2>&1;
-	check_success;
-
-	ant release >> $ADK_PATH/log 2>&1;
-	check_success;
-
-	cd $ADK_PATH;
-	if [ ! -d "./out/$2" ]
-	then
-		mkdir "./out/$2" 2>&1;
-		check_success;
-	fi;
-
-
-	mv $ADK_PATH/v8gl/bin/AndroidManifest.xml $ADK_PATH/out/$2/AndroidManifest.xml 2>&1;
-	mv $ADK_PATH/v8gl/bin/$3-debug.apk $ADK_PATH/out/$2/$3-debug.apk 2>&1;
-	mv $ADK_PATH/v8gl/bin/$3-release-unsigned.apk $ADK_PATH/out/$2/$3-release-unsigned.apk 2>&1;
-	check_success;
-
-
-	clean_v8gl_android;
-
-
-	check_success_buildstep "SUCCESS";
-
-}
-
 # build_v8gl "x64.release"
 build_v8gl() {
 
@@ -414,6 +342,7 @@ build_v8gl() {
 	if [ "$1" == "android_arm.release" ] || [ "$1" == 'android_ia32.release' ]
 	then
 		export ANDROID_NDK_ROOT=$ANDROID_NDK_PATH;
+		export ANDROID_HOME=$ANDROID_SDK_PATH;
 	fi;
 
 
@@ -530,6 +459,8 @@ build_game() {
 
 		export game_path=$game_in;
 		export v8gl_path=$V8GL_PATH/out/$1;
+		export libpng_path=$PNG_PATH/out/$1;
+		export libv8_path=$V8_PATH/out/$1/obj.target/tools/gyp;
 
 
 		cd $ADK_PATH/.temp/$build_arch;
@@ -742,7 +673,19 @@ case "$1" in
 		fi;
 
 
+
+		#
+		# TODO: Find a better solution for sharing templates
+		# between multiple architectures (android-arm, android-x86)
+		#
+
 		GAME_PLATFORM=$2;
+
+		if [ "$GAME_PLATFORM" == "android-arm" ] || [ "$GAME_PLATFORM" == "android-x86" ]
+		then
+			GAME_PLATFORM="android";
+		fi;
+
 		GAME_OUT=$ADK_PATH/out/$GAME_PLATFORM;
 
 
