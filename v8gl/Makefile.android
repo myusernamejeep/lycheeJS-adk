@@ -29,25 +29,25 @@ STATIC_LIBRARIES = lib/$(ARCH)/libpng.a \
 	lib/$(ARCH)/libv8_base.a \
 	lib/$(ARCH)/libv8_nosnapshot.a
 
-SHARED_LIBRARIES = -lglut -lGLU -lGL -lpthread -lz -lm
+SHARED_LIBRARIES = -lpthread -lz -lm -lGLESv2
 
 
 ifeq ($(ARCH), android_arm)
   TOOLCHAIN_ARCH = arm-linux-androideabi-4.4.3
-  STATIC_INCLUDES += -I$(ANDROID_NDK_ROOT)/platforms/android-9/arch-arm/usr/include
+  STATIC_INCLUDES += -I$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/include
   STATIC_INCLUDES += -I$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/include
   STATIC_INCLUDES += -I$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/armeabi-v7a/include
   STATIC_LIBRARIES += $(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/armeabi-v7a/libgnustl_static.a
   CFLAGS += -march=armv7-a -mtune=cortex-a8 -mfpu=vfp3
-  export LD_LIBRARY_PATH = $(ANDROID_NDK_ROOT)/platforms/android-9/arch-arm/usr/lib
+  export LD_LIBRARY_PATH = $(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/lib
 else
   ifeq ($(ARCH), android_ia32)
     TOOLCHAIN_ARCH = x86-4.4.3
-    STATIC_INCLUDES += -I$(ANDROID_NDK_ROOT)/platforms/android-9/arch-x86/usr/include
+    STATIC_INCLUDES += -I$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86/usr/include
     STATIC_INCLUDES += -I$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/include
     STATIC_INCLUDES += -I$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/x86/include
     STATIC_LIBRARIES += $(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/x86/libgnustl_static.a
-    export LD_LIBRARY_PATH = $(ANDROID_NDK_ROOT)/platforms/android-9/arch-x86/usr/lib
+    export LD_LIBRARY_PATH = $(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86/usr/lib
   else
     $(error Target architecture "${ARCH}" is not supported)
   endif
@@ -70,20 +70,18 @@ CC=$(ANDROID_TOOLCHAIN)/bin/*-g++
 
 HEADERS = src/v8gl/v8gl.h \
 	src/v8gl/path.h \
-	src/binding/gl/glbind.h \
-	src/binding/glu.h \
-	src/binding/glut.h \
+	src/binding/gles.h \
 	src/api/console.h \
+	src/api/navigator.h \
 	src/api/script.h \
 	src/api/text.h \
 	src/api/texture.h
 
 OBJECTS = $(OUTDIR)/v8gl_v8gl.o \
 	$(OUTDIR)/v8gl_path.o \
-	$(OUTDIR)/binding_gl.o \
-	$(OUTDIR)/binding_glu.o \
-	$(OUTDIR)/binding_glut.o \
+	$(OUTDIR)/binding_gles.o \
 	$(OUTDIR)/api_console.o \
+	$(OUTDIR)/api_navigator.o \
 	$(OUTDIR)/api_script.o \
 	$(OUTDIR)/api_text.o \
 	$(OUTDIR)/api_texture.o
@@ -102,10 +100,9 @@ release: $(HEADERS)
 	mkdir $(OUTDIR)
 	$(CC) $(CFLAGS) -c -o $(OUTDIR)/v8gl_v8gl.o src/v8gl/v8gl.cpp $(LDFLAGS)
 	$(CC) $(CFLAGS) -c -o $(OUTDIR)/v8gl_path.o src/v8gl/path.cpp $(LDFLAGS)
-	$(CC) $(CFLAGS) -c -o $(OUTDIR)/binding_gl.o src/binding/gl/glbind.cpp $(LDFLAGS)
-	$(CC) $(CFLAGS) -c -o $(OUTDIR)/binding_glu.o src/binding/glu.cpp $(LDFLAGS)
-	$(CC) $(CFLAGS) -c -o $(OUTDIR)/binding_glut.o src/binding/glut.cpp $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/binding_gles.o src/binding/gles.cpp $(LDFLAGS)
 	$(CC) $(CFLAGS) -c -o $(OUTDIR)/api_console.o src/api/console.cpp $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/api_navigator.o src/api/navigator.cpp $(LDFLAGS)
 	$(CC) $(CFLAGS) -c -o $(OUTDIR)/api_script.o src/api/script.cpp $(LDFLAGS)
 	$(CC) $(CFLAGS) -c -o $(OUTDIR)/api_text.o src/api/text.cpp $(LDFLAGS)
 	$(CC) $(CFLAGS) -c -o $(OUTDIR)/api_texture.o src/api/texture.cpp $(LDFLAGS)

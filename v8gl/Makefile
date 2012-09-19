@@ -71,6 +71,7 @@ HEADER_FILES = src/api/console.h \
 	src/api/texture.h
 
 SRC_FILES = src/api/console.cpp \
+	src/api/navigator.cpp \
 	src/api/script.cpp \
 	src/api/text.cpp \
 	src/api/texture.cpp
@@ -123,12 +124,14 @@ $(BUILDS): $(HEADER_FILES)
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/binding/glu.cpp -c -o $(OUTDIR)/binding_glu.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/binding/glut.cpp -c -o $(OUTDIR)/binding_glut.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/console.cpp -c -o $(OUTDIR)/api_console.o
+	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/navigator.cpp -c -o $(OUTDIR)/api_navigator.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/script.cpp -c -o $(OUTDIR)/api_script.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/text.cpp -c -o $(OUTDIR)/api_text.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/texture.cpp -c -o $(OUTDIR)/api_texture.o
 	$(AR) rc $(OUTDIR)/libv8gl.a $(OUTDIR)/v8gl_v8gl.o $(OUTDIR)/v8gl_path.o \
 	$(OUTDIR)/binding_gl.o $(OUTDIR)/binding_glu.o $(OUTDIR)/binding_glut.o \
-	$(OUTDIR)/api_console.o $(OUTDIR)/api_script.o $(OUTDIR)/api_text.o $(OUTDIR)/api_texture.o
+	$(OUTDIR)/api_console.o $(OUTDIR)/api_navigator.o $(OUTDIR)/api_script.o \
+	$(OUTDIR)/api_text.o $(OUTDIR)/api_texture.o
 	$(RANLIB) $(OUTDIR)/libv8gl.a
 
 
