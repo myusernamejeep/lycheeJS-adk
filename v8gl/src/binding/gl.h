@@ -54,6 +54,16 @@ namespace binding {
 			static v8::Handle<v8::Value> handleCreateShader(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleCullFace(const v8::Arguments& args);
 
+			static v8::Handle<v8::Value> handleDeleteLists(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleDeleteProgram(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleDeleteQueries(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleDeleteShader(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleDepthFunc(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleDepthMask(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleDepthRange(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleDetachShader(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleDrawArrays(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleDrawBuffer(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleDisable(const v8::Arguments& args);
 
 			static v8::Handle<v8::Value> handleEnable(const v8::Arguments& args);

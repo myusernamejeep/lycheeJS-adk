@@ -16,6 +16,16 @@
  * http://www.opengl.org/sdk/docs/man/
  *
  *
+ * NEXT TODO:
+ * gl.drawBuffers()
+ * gl.drawElements()
+ * gl.drawPixels()
+ * gl.drawRangeElements()
+ *
+ *
+ * TODO (Integration with V8GL APIs):
+ * gl.deleteTextures()
+ *
  * Missing Bindings:
  *
  * - gl.bindBuffer()
@@ -36,6 +46,8 @@
  * - gl.copyColorSubTable()
  * - gl.copyConvolutionFilter1D()
  * - gl.copyConvolutionFilter2D()
+ * - gl.deleteBuffers()
+ * - gl.drawBuffers()
  *
  *
  * Incomplete Bindings (TODO):
@@ -745,6 +757,158 @@ namespace binding {
 	 * SECTION D
 	 */
 
+	v8::Handle<v8::Value> GL::handleDeleteLists(const v8::Arguments& args) {
+
+		if (args.Length() == 2) {
+
+			unsigned int list = args[0]->IntegerValue();
+			int range = args[1]->IntegerValue();
+
+			glDeleteLists((GLuint) list, (GLsizei) range);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleDeleteProgram(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			unsigned int program = args[0]->IntegerValue();
+
+			glDeleteProgram((GLuint) program);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleDeleteQueries(const v8::Arguments& args) {
+
+		if (args.Length() == 2) {
+
+			int n = args[0]->IntegerValue();
+
+			v8::Handle<v8::Array> ids_arr = v8::Handle<v8::Array>::Cast(args[1]);
+			GLuint* ids = new GLuint[ids_arr->Length()];
+
+			for (unsigned i = 0; i < ids_arr->Length(); i++) {
+				ids[i] = (GLuint) ids_arr->Get(v8::Integer::New(i))->Uint32Value();
+			}
+
+			glDeleteQueries((GLsizei) n, (const GLuint*) ids);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleDeleteShader(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			unsigned int shader = args[0]->Uint32Value();
+
+			glDeleteShader((GLuint) shader);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleDepthFunc(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			int func = args[0]->IntegerValue();
+
+			glDepthFunc((GLenum) func);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleDepthMask(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			unsigned int flag = args[0]->Uint32Value();
+
+			glDepthMask((GLboolean) flag);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleDepthRange(const v8::Arguments& args) {
+
+		if (args.Length() == 2) {
+
+			double nearVal = args[0]->NumberValue();
+			double farVal  = args[1]->NumberValue();
+
+			glDepthRange((GLclampd) nearVal, (GLclampd) farVal);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleDetachShader(const v8::Arguments& args) {
+
+		if (args.Length() == 2) {
+
+			unsigned int program = args[0]->Uint32Value();
+			unsigned int shader  = args[1]->Uint32Value();
+
+			glDetachShader((GLuint) program, (GLuint) shader);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleDrawArrays(const v8::Arguments& args) {
+
+		if (args.Length() == 3) {
+
+			int mode  = args[0]->IntegerValue();
+			int first = args[1]->IntegerValue();
+			int count = args[2]->IntegerValue();
+
+			glDrawArrays((GLenum) mode, (GLint) first, (GLsizei) count);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleDrawBuffer(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			int mode = args[0]->IntegerValue();
+
+			glDrawBuffer((GLenum) mode);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
 	v8::Handle<v8::Value> GL::handleDisable(const v8::Arguments& args) {
 
 		if (args.Length() == 1) {
@@ -1068,12 +1232,21 @@ namespace binding {
 		 * SECTION D
 		 */
 
-		gltpl->Set(v8::String::NewSymbol("BLEND"), v8::Uint32::New(GL_BLEND), v8::ReadOnly);
-		gltpl->Set(v8::String::NewSymbol("DEPTH_TEST"), v8::Uint32::New(GL_DEPTH_TEST), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("deleteLists"),      v8::FunctionTemplate::New(GL::handleDeleteLists));
+		gltpl->Set(v8::String::NewSymbol("deleteProgram"),    v8::FunctionTemplate::New(GL::handleDeleteProgram));
+		gltpl->Set(v8::String::NewSymbol("deleteQueries"),    v8::FunctionTemplate::New(GL::handleDeleteQueries));
+		gltpl->Set(v8::String::NewSymbol("deleteShader"),     v8::FunctionTemplate::New(GL::handleDeleteShader));
+		gltpl->Set(v8::String::NewSymbol("depthFunc"),        v8::FunctionTemplate::New(GL::handleDepthFunc));
+		gltpl->Set(v8::String::NewSymbol("depthMask"),        v8::FunctionTemplate::New(GL::handleDepthMask));
+		gltpl->Set(v8::String::NewSymbol("depthRange"),       v8::FunctionTemplate::New(GL::handleDepthRange));
+		gltpl->Set(v8::String::NewSymbol("detachShader"),     v8::FunctionTemplate::New(GL::handleDetachShader));
+		gltpl->Set(v8::String::NewSymbol("drawArrays"),       v8::FunctionTemplate::New(GL::handleDrawArrays));
+		gltpl->Set(v8::String::NewSymbol("drawBuffer"),       v8::FunctionTemplate::New(GL::handleDrawBuffer));
+		gltpl->Set(v8::String::NewSymbol("BLEND"),            v8::Uint32::New(GL_BLEND), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("DEPTH_TEST"),       v8::Uint32::New(GL_DEPTH_TEST), v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("COLOR_BUFFER_BIT"), v8::Uint32::New(GL_COLOR_BUFFER_BIT), v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("DEPTH_BUFFER_BIT"), v8::Uint32::New(GL_DEPTH_BUFFER_BIT), v8::ReadOnly);
-
-		gltpl->Set(v8::String::NewSymbol("disable"),             v8::FunctionTemplate::New(GL::handleDisable));
+		gltpl->Set(v8::String::NewSymbol("disable"),          v8::FunctionTemplate::New(GL::handleDisable));
 
 		/*
 		 * SECTION E
