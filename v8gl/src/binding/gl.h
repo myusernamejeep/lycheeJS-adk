@@ -19,8 +19,6 @@ namespace binding {
 			static v8::Handle<v8::Value> handleAttachShader(const v8::Arguments& args);
 
 			static v8::Handle<v8::Value> handleBegin(const v8::Arguments& args);
-
-
 			static v8::Handle<v8::Value> handleBeginQuery(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleBindBuffer(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleBindTexture(const v8::Arguments& args);
@@ -40,9 +38,30 @@ namespace binding {
 			static v8::Handle<v8::Value> handleClearStencil(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleClientActiveTexture(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleClipPlane(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleColor3f(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleColor3fv(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleColor3i(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleColor3iv(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleColor4f(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleColor4fv(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleColor4i(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleColor4iv(const v8::Arguments& args);
+
+			static v8::Handle<v8::Value> handleDisable(const v8::Arguments& args);
+
+			static v8::Handle<v8::Value> handleEnable(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleEnd(const v8::Arguments& args);
+
+			static v8::Handle<v8::Value> handleLoadIdentity(const v8::Arguments& args);
 
 			static v8::Handle<v8::Value> handleMatrixMode(const v8::Arguments& args);
+
+			static v8::Handle<v8::Value> handleOrtho(const v8::Arguments& args);
+
+			static v8::Handle<v8::Value> handleTexCoord2f(const v8::Arguments& args);
+
+			static v8::Handle<v8::Value> handleVertex2f(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleVertex2i(const v8::Arguments& args);
 
 		public:
 

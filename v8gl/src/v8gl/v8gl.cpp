@@ -12,7 +12,7 @@
 
 #else
 
-	#include "../binding/gl/glbind.h"
+	#include "../binding/gl.h"
 	#include "../binding/glu.h"
 	#include "../binding/glut.h"
 
@@ -47,6 +47,7 @@ namespace v8gl {
 
 #ifdef __ANDROID__
 
+		// GLES/GLUES/GLUT Bindings
 		global->Set(v8::String::New("gl"), binding::GLES::generate());
 
 		// TODO: GLUES port and freeglut android port
@@ -56,9 +57,8 @@ namespace v8gl {
 #else
 
 		// GL/GLU/GLUT Bindings
-		v8::Handle<v8::ObjectTemplate> Gl = GlFactory::createGl();
-		global->Set(v8::String::New("gl"), Gl);
-		global->Set(v8::String::New("glu"), binding::GLU::generate());
+		global->Set(v8::String::New("gl"),   binding::GL::generate());
+		global->Set(v8::String::New("glu"),  binding::GLU::generate());
 		global->Set(v8::String::New("glut"), binding::GLUT::generate(pargc, argv));
 
 #endif
@@ -81,16 +81,6 @@ namespace v8gl {
 
 		context->AllowCodeGenerationFromStrings(false);
 
-#ifndef __ANDROID__
-// FIXME: This crap needs to be all removed.
-
-		v8::HandleScope scope;
-		context->Enter();
-		GlFactory::self_ = v8::Persistent<v8::Object>::New(Gl->NewInstance());
-		context->Exit();
-
-// END of removal
-#endif
 
 		return context;
 
