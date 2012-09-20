@@ -18,14 +18,27 @@
  *
  * Missing Bindings:
  *
- * - gl.bindBuffer() needs evaluation if it is usable on Android.
+ * - gl.bindBuffer()
  * - gl.bufferData()
  * - gl.bufferSubData()
+ * - gl.colorTable()
+ * - gl.colorTableParameter
+ * - gl.colorSubTable()
+ * - gl.compressedTexImage1D
+ * - gl.compressedTexImage2D
+ * - gl.compressedTexImage3D
+ * - gl.compressedTexSubImage1D
+ * - gl.compressedTexSubImage2D
+ * - gl.compressedTexSubImage3D
+ * - gl.convolutionFilter1D
+ * - gl.convolutionFilter2D
+ * - gl.copyColorTable()
+ * - gl.copyColorSubTable()
+ * - gl.copyConvolutionFilter1D()
+ * - gl.copyConvolutionFilter2D()
  *
- * - gl.callLists()
  *
- *
- * Incomplete Bindings (TODO)
+ * Incomplete Bindings (TODO):
  *
  * - gl.bindAttribLocation()
  *
@@ -36,8 +49,9 @@
 namespace binding {
 
 	/*
-	 * Section A
+	 * SECTION A
 	 */
+
 	v8::Handle<v8::Value> GL::handleAccum(const v8::Arguments& args) {
 
 		if (args.Length() == 2) {
@@ -152,7 +166,7 @@ namespace binding {
 
 
 	/*
-	 * Section B
+	 * SECTION B
 	 */
 
 	v8::Handle<v8::Value> GL::handleBegin(const v8::Arguments& args) {
@@ -333,7 +347,7 @@ namespace binding {
 
 
 	/*
-	 * Section C
+	 * SECTION C
 	 */
 
 	v8::Handle<v8::Value> GL::handleCallList(const v8::Arguments& args) {
@@ -624,10 +638,111 @@ namespace binding {
 
 	}
 
+	v8::Handle<v8::Value> GL::handleColorMask(const v8::Arguments& args) {
+
+		if (args.Length() == 4) {
+
+			unsigned int red   = args[0]->Uint32Value();
+			unsigned int green = args[1]->Uint32Value();
+			unsigned int blue  = args[2]->Uint32Value();
+			unsigned int alpha = args[3]->Uint32Value();
+
+			glColorMask((GLboolean) red, (GLboolean) green, (GLboolean) blue, (GLboolean) alpha);
+
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleColorMaterial(const v8::Arguments& args) {
+
+		if (args.Length() == 2) {
+
+			int face = args[0]->IntegerValue();
+			int mode = args[0]->IntegerValue();
+
+			glColorMaterial((GLenum) face, (GLenum) mode);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleCompileShader(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			unsigned int shader = args[0]->Uint32Value();
+
+			glCompileShader((GLuint) shader);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleCopyPixels(const v8::Arguments& args) {
+
+		if (args.Length() == 5) {
+
+			int x      = args[0]->IntegerValue();
+			int y      = args[1]->IntegerValue();
+			int width  = args[2]->IntegerValue();
+			int height = args[3]->IntegerValue();
+			int type   = args[4]->IntegerValue();
+
+			glCopyPixels(
+				(GLint) x, (GLint) y,
+				(GLsizei) width, (GLsizei) height,
+				(GLenum) type
+			);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleCreateProgram(const v8::Arguments& args) {
+		return v8::Uint32::New(glCreateProgram());
+	}
+
+	v8::Handle<v8::Value> GL::handleCreateShader(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			int shaderType = args[0]->IntegerValue();
+
+			return v8::Uint32::New(glCreateShader((GLenum) shaderType));
+
+		}
+
+		return v8::Null();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleCullFace(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			int mode = args[0]->IntegerValue();
+
+			glCullFace((GLenum) mode);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
 
 
 	/*
-	 * Section D
+	 * SECTION D
 	 */
 
 	v8::Handle<v8::Value> GL::handleDisable(const v8::Arguments& args) {
@@ -647,7 +762,7 @@ namespace binding {
 
 
 	/*
-	 * Section E
+	 * SECTION E
 	 */
 
 	v8::Handle<v8::Value> GL::handleEnable(const v8::Arguments& args) {
@@ -677,7 +792,7 @@ namespace binding {
 
 
 	/*
-	 * Section L
+	 * SECTION L
 	 */
 
 	v8::Handle<v8::Value> GL::handleLoadIdentity(const v8::Arguments& args) {
@@ -692,7 +807,7 @@ namespace binding {
 
 
 	/*
-	 * Section M
+	 * SECTION M
 	 */
 
 	v8::Handle<v8::Value> GL::handleMatrixMode(const v8::Arguments& args) {
@@ -741,7 +856,7 @@ namespace binding {
 
 
 	/*
-	 * Section T
+	 * SECTION T
 	 */
 
 	v8::Handle<v8::Value> GL::handleTexCoord2f(const v8::Arguments& args) {
@@ -762,7 +877,7 @@ namespace binding {
 
 
 	/*
-	 * Section V
+	 * SECTION V
 	 */
 
 	v8::Handle<v8::Value> GL::handleVertex2f(const v8::Arguments& args) {
@@ -810,7 +925,7 @@ namespace binding {
 
 
 		/*
-		 * Section A
+		 * SECTION A
 		 */
 
 		gltpl->Set(v8::String::NewSymbol("accum"),               v8::FunctionTemplate::New(GL::handleAccum));
@@ -829,7 +944,7 @@ namespace binding {
 		gltpl->Set(v8::String::NewSymbol("attachShader"),        v8::FunctionTemplate::New(GL::handleAttachShader));
 
 		/*
-		 * Section B
+		 * SECTION B
 		 */
 
 		gltpl->Set(v8::String::NewSymbol("POINTS"),                   v8::Uint32::New(GL_POINTS),         v8::ReadOnly);
@@ -880,7 +995,7 @@ namespace binding {
 		gltpl->Set(v8::String::NewSymbol("blendFuncSeparate"),        v8::FunctionTemplate::New(GL::handleBlendFuncSeparate));
 
 		/*
-		 * Section C
+		 * SECTION C
 		 */
 
 		gltpl->Set(v8::String::NewSymbol("callList"),     v8::FunctionTemplate::New(GL::handleCallList));
@@ -932,6 +1047,22 @@ namespace binding {
 		gltpl->Set(v8::String::NewSymbol("color4fv"),            v8::FunctionTemplate::New(GL::handleColor4fv));
 		gltpl->Set(v8::String::NewSymbol("color4i"),             v8::FunctionTemplate::New(GL::handleColor4i));
 		gltpl->Set(v8::String::NewSymbol("color4iv"),            v8::FunctionTemplate::New(GL::handleColor4iv));
+		gltpl->Set(v8::String::NewSymbol("colorMask"),           v8::FunctionTemplate::New(GL::handleColorMask));
+		gltpl->Set(v8::String::NewSymbol("compileShader"),       v8::FunctionTemplate::New(GL::handleCompileShader));
+		gltpl->Set(v8::String::NewSymbol("COLOR"),               v8::Uint32::New(GL_COLOR),   v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("DEPTH"),               v8::Uint32::New(GL_DEPTH),   v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL"),             v8::Uint32::New(GL_STENCIL), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("copyPixels"),          v8::FunctionTemplate::New(GL::handleCopyPixels));
+		gltpl->Set(v8::String::NewSymbol("createProgram"),       v8::FunctionTemplate::New(GL::handleCreateProgram));
+		gltpl->Set(v8::String::NewSymbol("FRAGMENT_SHADER"),     v8::Uint32::New(GL_FRAGMENT_SHADER), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("VERTEX_SHADER"),       v8::Uint32::New(GL_VERTEX_SHADER),   v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("createShader"),        v8::FunctionTemplate::New(GL::handleCreateShader));
+
+		gltpl->Set(v8::String::NewSymbol("FRONT"),               v8::Uint32::New(GL_FRONT),          v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("BACK"),                v8::Uint32::New(GL_BACK),           v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("FRONT_AND_BACK"),      v8::Uint32::New(GL_FRONT_AND_BACK), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("CULL_FACE"),           v8::Uint32::New(GL_CULL_FACE),      v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("cullFace"),            v8::FunctionTemplate::New(GL::handleCullFace));
 
 		/*
 		 * SECTION D
@@ -958,13 +1089,12 @@ namespace binding {
 		gltpl->Set(v8::String::NewSymbol("loadIdentity"),        v8::FunctionTemplate::New(GL::handleLoadIdentity));
 
 		/*
-		 * Section M
+		 * SECTION M
 		 */
 
 		gltpl->Set(v8::String::NewSymbol("MODELVIEW"),   v8::Uint32::New(GL_MODELVIEW),   v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("PROJECTION"),  v8::Uint32::New(GL_PROJECTION),  v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("TEXTURE"),     v8::Uint32::New(GL_TEXTURE),     v8::ReadOnly);
-		gltpl->Set(v8::String::NewSymbol("COLOR"),       v8::Uint32::New(GL_COLOR),       v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("MATRIX_MODE"), v8::Uint32::New(GL_MATRIX_MODE), v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("matrixMode"),  v8::FunctionTemplate::New(GL::handleMatrixMode));
 

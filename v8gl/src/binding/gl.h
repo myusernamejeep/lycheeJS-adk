@@ -46,6 +46,13 @@ namespace binding {
 			static v8::Handle<v8::Value> handleColor4fv(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleColor4i(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleColor4iv(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleColorMask(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleColorMaterial(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleCompileShader(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleCopyPixels(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleCreateProgram(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleCreateShader(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleCullFace(const v8::Arguments& args);
 
 			static v8::Handle<v8::Value> handleDisable(const v8::Arguments& args);
 
