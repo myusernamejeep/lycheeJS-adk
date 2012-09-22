@@ -19,7 +19,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := v8_base
+LOCAL_MODULE    := libv8_base
 LOCAL_SRC_FILES := ../lib/libv8_base.a
 
 include $(PREBUILT_STATIC_LIBRARY)
@@ -30,7 +30,7 @@ include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := v8_nosnapshot
+LOCAL_MODULE    := libv8_nosnapshot
 LOCAL_SRC_FILES := ../lib/libv8_nosnapshot.a
 
 include $(PREBUILT_STATIC_LIBRARY)
@@ -47,31 +47,37 @@ LOCAL_SRC_FILES := ../lib/libpng.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 
-# $(call import-module, libpng);
 
-
-# V8GL
+# V8GL library
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE     := v8gl-runtime
+LOCAL_MODULE    := libv8gl
+LOCAL_SRC_FILES := ../lib/libv8gl.a
+
+include $(PREBUILT_STATIC_LIBRARY)
+
+
+# Android Runtime
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE     := runtime
 
 LOCAL_SRC_FILES  := main.c \
-	../src/v8gl/v8gl.cpp \
-	../src/v8gl/path.cpp \
-	../src/api/console.cpp \
-	../src/api/script.cpp \
-	../src/api/text.cpp
+	wrapper.cpp
 
-LOCAL_C_INCLUDES := ../external/v8/include \
-	../external/libpng/include
+LOCAL_C_INCLUDES := ../lib/include/libpng \
+	../lib/include/libv8 \
+	../lib/include/libv8gl
 
-LOCAL_CPPFLAGS   := -D__ANDROID__
-LOCAL_LDLIBS     := -llog -landroid -lEGL -lGLESv1_CM -lGLESv2
-LOCAL_STATIC_LIBRARIES := android_native_app_glue v8_base v8_nosnapshot libpng
-
+# LOCAL_CPPFLAGS   := -D__ANDROID__
 # LOCAL_EXPORT_CPPFLAGS := -D__ANDROID__
+LOCAL_LDLIBS     := -llog -landroid -lEGL -lGLESv2
+LOCAL_STATIC_LIBRARIES := android_native_app_glue libpng libv8_base libv8_nosnapshot libv8gl
+
 
 include $(BUILD_SHARED_LIBRARY)
 
 $(call import-module,android/native_app_glue)
+

@@ -462,6 +462,30 @@ build_game() {
 		export libpng_path=$PNG_PATH/out/$1;
 		export libv8_path=$V8_PATH/out/$1/obj.target/tools/gyp;
 
+		mkdir -p $ADK_PATH/.temp/$build_arch/lib;
+		check_success;
+
+		cp $PNG_PATH/out/$1/*.a $ADK_PATH/.temp/$build_arch/lib/ >> $ADK_PATH/log 2>&1;
+		check_success;
+		mkdir -p $ADK_PATH/.temp/$build_arch/lib/include/libpng >> $ADK_PATH/log 2>&1;
+		check_success;
+		cp $PNG_PATH/include/*.h $ADK_PATH/.temp/$build_arch/lib/include/libpng >> $ADK_PATH/log 2>&1;
+		check_success;
+
+		cp $V8_PATH/out/$1/obj.target/tools/gyp/*.a $ADK_PATH/.temp/$build_arch/lib/ >> $ADK_PATH/log 2>&1;
+		check_success;
+		mkdir -p $ADK_PATH/.temp/$build_arch/lib/include/libv8 >> $ADK_PATH/log 2>&1;
+		check_success;
+		cp $V8_PATH/include/*.h $ADK_PATH/.temp/$build_arch/lib/include/libv8 >> $ADK_PATH/log 2>&1;
+		check_success;
+
+		cp $V8GL_PATH/out/$1/*.a $ADK_PATH/.temp/$build_arch/lib/ >> $ADK_PATH/log 2>&1;
+		check_success;
+		mkdir -p $ADK_PATH/.temp/$build_arch/lib/include/libv8gl >> $ADK_PATH/log 2>&1;
+		check_success;
+		cp $V8GL_PATH/include/*.h $ADK_PATH/.temp/$build_arch/lib/include/libv8gl >> $ADK_PATH/log 2>&1;
+		check_success;
+
 
 		cd $ADK_PATH/.temp/$build_arch;
 

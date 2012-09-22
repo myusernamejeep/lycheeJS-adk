@@ -57,11 +57,14 @@ case "$1" in
 
 		echo -e "\nSetting Up...";
 
+			mkdir ./assets;
 
+			mv asset assets;
+			mv init.js assets;
+			mv js assets;
 
 
 		echo -e "Done.";
-
 
 		exit;
 		;;
@@ -100,23 +103,23 @@ case "$1" in
 
 		echo -e "\nCleaning Up...";
 
-			if [ -d "./bin" ]
-			then
-				rm -rf "./bin";
-				check_success;
-			fi;
-
-			if [ -d "./libs" ]
-			then
-				rm -rf "./libs";
-				check_success;
-			fi;
-
-			if [ -d "./obj" ]
-			then
-				rm -rf "./obj";
-				check_success;
-			fi;
+#			if [ -d "./bin" ]
+#			then
+#				rm -rf "./bin";
+#				check_success;
+#			fi;
+#
+#			if [ -d "./libs" ]
+#			then
+#				rm -rf "./libs";
+#				check_success;
+#			fi;
+#
+#			if [ -d "./obj" ]
+#			then
+#				rm -rf "./obj";
+#				check_success;
+#			fi;
 
 		echo -e "Done.";
 
