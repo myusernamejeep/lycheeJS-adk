@@ -173,18 +173,6 @@ clean() {
 
 }
 
-# clean_android "ms.martensms.v8gl"
-clean_android() {
-
-	echo -e "\n\n~ ~ ~ clean_android($1) ~ ~ ~\n" >> $ADK_PATH/log;
-
-	$ANDROID_SDK_PATH/platform-tools/adb uninstall $1 >> $ADK_PATH/log 2>&1;
-	check_success;
-
-	check_success_buildstep "SUCCESS";
-
-}
-
 # install_dependencies "/usr/bin/aptitude"
 install_dependencies() {
 
@@ -358,6 +346,12 @@ build_game() {
 
 	echo -e "\n\n~ ~ ~ build_game($1 $2 $3 $4 $5) ~ ~ ~\n" >> $ADK_PATH/log;
 
+	if [ "$1" == "android_arm.release" ] || [ "$1" == "android_ia32.release" ]
+	then
+		export ANDROID_NDK_ROOT=$ANDROID_NDK_PATH;
+		export ANDROID_HOME=$ANDROID_SDK_PATH;
+	fi;
+
 	v8adk_platform=$1;
 	v8gl_platform=$2;
 	build_arch=$3;
@@ -512,45 +506,36 @@ build_game() {
 
 }
 
-# debug_android "android-arm" "V8GL" "ms.martens.v8gl"
-debug_android() {
-
-	echo -e "Debugging via Android ADB and DDMS:\n" >> $ADK_PATH/log;
-
-
-	cd $ADK_PATH;
-	$ANDROID_SDK_PATH/platform-tools/adb install $ADK_PATH/out/$1/$2-debug.apk >> $ADK_PATH/log 2>&1;
-	check_success;
-
-	$ANDROID_SDK_PATH/platform-tools/adb shell am start -n "$3/android.app.NativeActivity" >> $ADK_PATH/log 2>&1;
-	check_success;
-
-	check_success_buildstep "SUCCESS";
-
-}
-
 debug() {
 
-	echo -e "\n\n~ ~ ~ debug($1 $2 $3) ~ ~ ~\n" >> $ADK_PATH/log;
+	echo -e "\n\n~ ~ ~ debug($1) ~ ~ ~\n" >> $ADK_PATH/log;
 
 	if [ "$1" == "android-arm" ] || [ "$1" == "android-x86" ]
 	then
-		debug_android "$1" "$2" "$3";
-		return;
+		build_arch="android";
+		export ANDROID_NDK_ROOT=$ANDROID_NDK_PATH;
+		export ANDROID_HOME=$ANDROID_SDK_PATH;
+	else
+		build_arch="$1";
 	fi;
 
 
-	echo -e "Debugging via native environment:\n" >> $ADK_PATH/log;
-
+	echo -e "Debugging...\n" >> $ADK_PATH/log;
 
 	cd $ADK_PATH;
 
-	if [ -f "./out/$1/start.sh" ]
+	if [ -d "out/$build_arch" ] && [ -f "out/$build_arch/.adk.sh" ]
 	then
-		./out/$1/start.sh;
+
+		cd ./out/$build_arch;
+
+		.adk.sh debug >> $ADK_PATH/log 2>&1;
+		check_success;
+
 	else
-		check_success_buildstep "FAILURE" "Build is not available. (out/$1/start.sh)";
+		check_success_buildstep "FAILURE" "Debugging is not supported by Build Template.";
 	fi;
+
 
 	check_success_buildstep "SUCCESS";
 
@@ -788,28 +773,6 @@ case "$1" in
 			build_game "$V8_HOST_PLATFORM" "$V8_PLATFORM" "$GAME_PLATFORM" "$GAME_IN" $_BUILD_V8GL;
 		fi;
 
-
-		exit;
-		;;
-
-	clean-android)
-
-		answer="";
-		echo -e "";
-
-		while [ "$answer" != "yes" -a "$answer" != "no" ]
-		do
-			echo -n -e "WARNING: This will remove the ms.martens.v8gl package from your Android device. Continue [ yes/no ]? ";
-			read answer;
-		done;
-		
-		if [ "$answer" == "yes" ]
-		then
-
-			echo -e "\nCleaning up Android Device...";
-			clean_android "ms.martens.v8gl";
-
-		fi;
 
 		exit;
 		;;

@@ -15,43 +15,7 @@
 
 
 
-usage() {
-
-cat <<EOF
-
-Template Integration Script for the lycheeJS ADK (App Development Kit) v0.5
-
-Usage: $0 <task>
-
-
-Each Template Integration Script has to offer the following tasks:
-
-    setup             Setup everything and import required libraries
-    build             Starts the build process
-    package           Starts the packaging process
-    clean             Cleans the folder up
-
-
-Usage:
-
-$0 prepare
-$0 build
-$0 package
-$0 cleanup
-
-EOF
-
-}
-
-
-
 case "$1" in
-	help)
-
-		usage;
-
-		exit;
-		;;
 
 	setup)
 
@@ -72,6 +36,13 @@ case "$1" in
 		;;
 
 	clean)
+		exit;
+		;;
+
+	debug)
+
+		gdb --args ./start;
+
 		exit;
 		;;
 

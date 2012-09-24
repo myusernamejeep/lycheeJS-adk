@@ -15,43 +15,7 @@
 
 
 
-usage() {
-
-cat <<EOF
-
-Template Integration Script for the lycheeJS ADK (App Development Kit) v0.5
-
-Usage: $0 <task>
-
-
-Each Template Integration Script has to offer the following tasks:
-
-    setup             Setup everything and import required libraries
-    build             Starts the build process
-    package           Starts the packaging process
-    clean             Cleans the folder up
-
-
-Usage:
-
-$0 prepare
-$0 build
-$0 package
-$0 cleanup
-
-EOF
-
-}
-
-
-
 case "$1" in
-	help)
-
-		usage;
-
-		exit;
-		;;
 
 	setup)
 
@@ -120,6 +84,19 @@ case "$1" in
 #				rm -rf "./obj";
 #				check_success;
 #			fi;
+
+		echo -e "Done.";
+
+		exit;
+		;;
+
+	debug)
+
+		echo -e "\nDebugging...";
+
+			$ANDROID_HOME/platform-tools/adb uninstall "ms.martens.v8gl";
+			$ANDROID_HOME/platform-tools/adb install V8GL-debug.apk;
+			$ANDROID_HOME/platform-tools/adb shell am start -n "ms.martens.v8gl/android.app.NativeActivity";
 
 		echo -e "Done.";
 
