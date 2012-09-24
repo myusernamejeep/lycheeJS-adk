@@ -71,6 +71,7 @@ CC=$(ANDROID_TOOLCHAIN)/bin/*-g++
 HEADERS = src/v8gl/v8gl.h \
 	src/v8gl/path.h \
 	src/binding/gles.h \
+	src/api/arraybuffer.h \
 	src/api/console.h \
 	src/api/navigator.h \
 	src/api/script.h \
@@ -80,6 +81,7 @@ HEADERS = src/v8gl/v8gl.h \
 OBJECTS = $(OUTDIR)/v8gl_v8gl.o \
 	$(OUTDIR)/v8gl_path.o \
 	$(OUTDIR)/binding_gles.o \
+	$(OUTDIR)/api_arraybuffer.o \
 	$(OUTDIR)/api_console.o \
 	$(OUTDIR)/api_navigator.o \
 	$(OUTDIR)/api_script.o \
@@ -101,6 +103,7 @@ release: $(HEADERS)
 	$(CC) $(CFLAGS) -c -o $(OUTDIR)/v8gl_v8gl.o src/v8gl/v8gl.cpp $(LDFLAGS)
 	$(CC) $(CFLAGS) -c -o $(OUTDIR)/v8gl_path.o src/v8gl/path.cpp $(LDFLAGS)
 	$(CC) $(CFLAGS) -c -o $(OUTDIR)/binding_gles.o src/binding/gles.cpp $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/api_arraybuffer.o src/api/arraybuffer.cpp $(LDFLAGS)
 	$(CC) $(CFLAGS) -c -o $(OUTDIR)/api_console.o src/api/console.cpp $(LDFLAGS)
 	$(CC) $(CFLAGS) -c -o $(OUTDIR)/api_navigator.o src/api/navigator.cpp $(LDFLAGS)
 	$(CC) $(CFLAGS) -c -o $(OUTDIR)/api_script.o src/api/script.cpp $(LDFLAGS)

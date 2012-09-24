@@ -19,6 +19,7 @@
 #endif
 
 
+#include "../api/arraybuffer.h"
 #include "../api/console.h"
 #include "../api/navigator.h"
 #include "../api/script.h"
@@ -77,9 +78,10 @@ namespace v8gl {
 
 
 		// Dynamic APIs
-		context->Global()->Set(v8::String::New("Script"),  api::Script::generate()->GetFunction(),  v8::ReadOnly);
-		context->Global()->Set(v8::String::New("Text"),    api::Text::generate()->GetFunction(),    v8::ReadOnly);
-		context->Global()->Set(v8::String::New("Texture"), api::Texture::generate()->GetFunction(), v8::ReadOnly);
+		context->Global()->Set(v8::String::New("ArrayBuffer"), api::ArrayBuffer::generate()->GetFunction(), v8::ReadOnly);
+		context->Global()->Set(v8::String::New("Script"),      api::Script::generate()->GetFunction(),      v8::ReadOnly);
+		context->Global()->Set(v8::String::New("Text"),        api::Text::generate()->GetFunction(),        v8::ReadOnly);
+		context->Global()->Set(v8::String::New("Texture"),     api::Texture::generate()->GetFunction(),     v8::ReadOnly);
 
 
 		context->Exit();

@@ -14,13 +14,10 @@ namespace api {
 		public:
 
 			// Disallowing copy constructor
-			ArrayBuffer(const api::Text &cpy);
+			ArrayBuffer(const api::ArrayBuffer &cpy);
 
+			static void makeWeak(v8::Persistent<v8::Value> object, void* data);
 			static v8::Handle<v8::Value> handleNew(const v8::Arguments& args);
-			static v8::Handle<v8::Value> handleLoad(const v8::Arguments& args);
-			static char* load(char* filename);
-
-			static v8::Handle<v8::Value> handleToString(const v8::Arguments& args);
 
 			static v8::Handle<v8::FunctionTemplate> generate(void);
 
