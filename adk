@@ -529,7 +529,7 @@ debug() {
 
 		cd ./out/$build_arch;
 
-		.adk.sh debug >> $ADK_PATH/log 2>&1;
+		./.adk.sh debug >> $ADK_PATH/log 2&>1;
 		check_success;
 
 	else

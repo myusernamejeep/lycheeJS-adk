@@ -21,7 +21,7 @@
 		instance.load = function() {};
 
 		// Allowed
-		instance.onload = function() {};
+		instance.onload = function() { !!(global.TestSuite) };
 
 		console.log("instance.load.toString(): " + instance.load.toString());
 		console.log("instance.onload.toString(): " + instance.onload.toString());

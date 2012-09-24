@@ -34,12 +34,14 @@ namespace api {
 			static v8::Handle<v8::Value> handleNew(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleLoad(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleGenerate(const v8::Arguments& args);
-			static png_byte *load(char* filename, int &width, int &height);
+
 #ifndef V8ADK
+
 			static GLuint generate(int width, int height, GLvoid* data);
+
 #endif
 
-			static v8::Handle<v8::Value> handleToString(const v8::Arguments& args);
+			static png_byte *load(char* filename, int &width, int &height);
 
 			static v8::Handle<v8::FunctionTemplate> generate(void);
 

@@ -956,6 +956,17 @@ namespace binding {
 
 
 	/*
+	 * SECTION F
+	 */
+
+	v8::Handle<v8::Value> GL::handleFlush(const v8::Arguments& args) {
+		glFlush();
+		return v8::Undefined();
+	}
+
+
+
+	/*
 	 * SECTION L
 	 */
 
@@ -1252,14 +1263,20 @@ namespace binding {
 		 * SECTION E
 		 */
 
-		gltpl->Set(v8::String::NewSymbol("enable"),              v8::FunctionTemplate::New(GL::handleEnable));
-		gltpl->Set(v8::String::NewSymbol("end"),                 v8::FunctionTemplate::New(GL::handleEnd));
+		gltpl->Set(v8::String::NewSymbol("enable"), v8::FunctionTemplate::New(GL::handleEnable));
+		gltpl->Set(v8::String::NewSymbol("end"),    v8::FunctionTemplate::New(GL::handleEnd));
+
+		/*
+		 * SECTION F
+		 */
+
+		gltpl->Set(v8::String::NewSymbol("flush"), v8::FunctionTemplate::New(GL::handleFlush));
 
 		/*
 		 * SECTION L
 		 */
 
-		gltpl->Set(v8::String::NewSymbol("loadIdentity"),        v8::FunctionTemplate::New(GL::handleLoadIdentity));
+		gltpl->Set(v8::String::NewSymbol("loadIdentity"), v8::FunctionTemplate::New(GL::handleLoadIdentity));
 
 		/*
 		 * SECTION M

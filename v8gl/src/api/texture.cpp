@@ -27,17 +27,24 @@
 namespace api {
 
 
-	Texture::Texture(const Texture &cpy) {
-	}
+	Texture::Texture(const Texture &cpy) { }
 
-
+	v8::Persistent<v8::FunctionTemplate> _texture_tpl;
 
 	v8::Handle<v8::FunctionTemplate> Texture::generate() {
 
-		v8::Local<v8::FunctionTemplate> tpl = v8::FunctionTemplate::New(handleNew);
-		tpl->SetClassName(v8::String::New("Texture"));
+		_texture_tpl = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(handleNew));
+		_texture_tpl->SetClassName(v8::String::New("Texture"));
 
-		return tpl;
+		v8::Local<v8::ObjectTemplate> instance_tpl = _texture_tpl->InstanceTemplate();
+
+		instance_tpl->SetInternalFieldCount(1);
+		instance_tpl->Set(v8::String::New("load"),     v8::FunctionTemplate::New(handleLoad),     v8::ReadOnly);
+		instance_tpl->Set(v8::String::New("onload"),   v8::FunctionTemplate::New());
+		instance_tpl->Set(v8::String::New("generate"), v8::FunctionTemplate::New(handleGenerate), v8::ReadOnly);
+
+
+		return _texture_tpl;
 
 	}
 
@@ -49,28 +56,20 @@ namespace api {
 			return scope.Close(v8::ThrowException(v8::Exception::TypeError(v8::String::New("V8GL object constructor cannot be called as a function."))));
 		}
 
-		if (args.Length() != 1) {
+		if (args.Length() != 1 || !args[0]->IsString()) {
 			return scope.Close(v8::ThrowException(v8::Exception::SyntaxError(v8::String::New("Usage: new Texture(url)"))));
 		}
+
 
 		v8::String::Utf8Value value(args[0]);
 		char* url = *value;
 
 
-		v8::Local<v8::ObjectTemplate> instanceTemplate = v8::ObjectTemplate::New();
-		instanceTemplate->SetInternalFieldCount(1);
+		v8::Local<v8::Object> instance = args.This();
 
-		instanceTemplate->Set(v8::String::New("load"), v8::FunctionTemplate::New(handleLoad), v8::ReadOnly);
-		instanceTemplate->Set(v8::String::New("generate"), v8::FunctionTemplate::New(handleGenerate), v8::ReadOnly);
-		instanceTemplate->Set(v8::String::New("onload"), v8::FunctionTemplate::New());
-
-		instanceTemplate->Set(v8::String::New("toString"), v8::FunctionTemplate::New(handleToString), v8::ReadOnly);
-
-		v8::Local<v8::Object> instance = instanceTemplate->NewInstance();
-
-		instance->Set(v8::String::New("url"), v8::String::New(url));
-		instance->Set(v8::String::New("id"), v8::Null());
-		instance->Set(v8::String::New("width"), v8::Null());
+		instance->Set(v8::String::New("url"),    v8::String::New(url));
+		instance->Set(v8::String::New("id"),     v8::Null());
+		instance->Set(v8::String::New("width"),  v8::Null());
 		instance->Set(v8::String::New("height"), v8::Null());
 
 
@@ -78,61 +77,54 @@ namespace api {
 
 	}
 
-	v8::Handle<v8::Value> Texture::handleToString(const v8::Arguments& args) {
-		return v8::String::New("[object Texture]");
-	}
-
 	v8::Handle<v8::Value> Texture::handleLoad(const v8::Arguments& args) {
 
 		v8::HandleScope scope;
-		v8::Local<v8::Object> thisObj = args.This();
-
-		if (thisObj.IsEmpty()) {
-			return scope.Close(v8::Null());
-		}
+		v8::Local<v8::Object> self = args.This();
 
 
-		v8::Local<v8::String> property = v8::String::New("url");
-		if (thisObj->Has(property)) {
-
-			v8::String::Utf8Value value(thisObj->Get(property));
-			char* url = v8gl::Path::getReal((char*) *value);
+		if (!self.IsEmpty()) {
+		
+			v8::String::Utf8Value url_value(self->Get(v8::String::NewSymbol("url")));
+			char* url = v8gl::Path::getReal(*url_value);
 
 			int width;
 			int height;
 
+
 			png_byte *data = api::Texture::load(url, width, height);
+
+
 			if (data == TEXTURE_LOAD_ERROR) {
+
 #ifndef __V8ADK__
-				thisObj->SetPointerInInternalField(0, (GLvoid*) NULL);
+				self->SetPointerInInternalField(0, (GLvoid*) NULL);
 #endif
 
 				v8::ThrowException(v8::Exception::Error(v8::String::New("Could not read Texture file.")));
 
 			} else {
+
 #ifndef __V8ADK_
-				thisObj->SetPointerInInternalField(0, (GLvoid*) data);
+				self->SetPointerInInternalField(0, (GLvoid*) data);
 #endif
 
-				thisObj->Set(v8::String::New("url"), v8::String::New(url), v8::ReadOnly);
-				thisObj->Set(v8::String::New("width"), v8::Integer::New(width), v8::ReadOnly);
-				thisObj->Set(v8::String::New("height"), v8::Integer::New(height), v8::ReadOnly);
+				self->Set(v8::String::NewSymbol("url"),    v8::String::New(url),     v8::ReadOnly);
+				self->Set(v8::String::NewSymbol("width"),  v8::Integer::New(width),  v8::ReadOnly);
+				self->Set(v8::String::NewSymbol("height"), v8::Integer::New(height), v8::ReadOnly);
 
 			}
 
 
-
-//			thisObj->SetPointerInInternalField(0, &texture);
-
-			v8::Local<v8::Function> callback = v8::Function::Cast(*thisObj->Get(v8::String::New("onload")));
+			v8::Local<v8::Function> callback = v8::Function::Cast(*self->Get(v8::String::NewSymbol("onload")));
 			if (!callback.IsEmpty()) {
-				callback->Call(thisObj, 0, NULL);
+				callback->Call(self, 0, NULL);
 			}
 
 		}
 
 
-		return scope.Close(v8::Null());
+		return scope.Close(v8::Undefined());
 
 	}
 
@@ -140,30 +132,26 @@ namespace api {
 	v8::Handle<v8::Value> Texture::handleGenerate(const v8::Arguments& args) {
 
 		v8::HandleScope scope;
-		v8::Local<v8::Object> thisObj = args.This();
-
-		if (thisObj.IsEmpty()) {
-			return scope.Close(v8::Null());
-		}
+		v8::Local<v8::Object> self = args.This();
 
 
-		v8::Local<v8::String> property = v8::String::New("id");
-		if (thisObj->Has(property)) {
+		if (!self.IsEmpty()) {
 
 #ifndef __V8ADK__
-			int width = thisObj->Get(v8::String::New("width"))->IntegerValue();
-			int height = thisObj->Get(v8::String::New("height"))->IntegerValue();
 
-			GLvoid* data = thisObj->GetPointerFromInternalField(0);
-			GLuint id = api::Texture::generate(width, height, data);
+			int width  = self->Get(v8::String::NewSymbol("width"))->IntegerValue();
+			int height = self->Get(v8::String::NewSymbol("height"))->IntegerValue();
 
-			// Not read-only to allow re-generation of Textures in different glut windows.
-			thisObj->Set(property, v8::Integer::New(id));
+			GLvoid* data = self->GetPointerFromInternalField(0);
+			GLuint id    = api::Texture::generate(width, height, data);
+
+			self->Set(v8::String::NewSymbol("id"), v8::Integer::New(id));
+
 #endif
 
 		}
 
-		return scope.Close(v8::Null());
+		return scope.Close(v8::Undefined());
 
 	}
 

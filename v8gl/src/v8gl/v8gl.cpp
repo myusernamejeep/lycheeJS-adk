@@ -45,6 +45,7 @@ namespace v8gl {
 
 		v8::Local<v8::ObjectTemplate> global = v8::ObjectTemplate::New();
 
+
 #ifdef __ANDROID__
 
 		// GLES/GLUES/GLUT Bindings
@@ -63,23 +64,25 @@ namespace v8gl {
 
 #endif
 
-		// Console API
-		global->Set(v8::String::New("console"), api::Console::generate());
-
-
-		// Advanced Data Types
-		global->Set(v8::String::New("Script"), api::Script::generate(), v8::ReadOnly);
-		global->Set(v8::String::New("Text"), api::Text::generate(), v8::ReadOnly);
-		global->Set(v8::String::New("Texture"), api::Texture::generate(), v8::ReadOnly);
-
-
-		// Navigator API
+		// Static APIs
+		global->Set(v8::String::New("console"),   api::Console::generate(),   v8::ReadOnly);
 		global->Set(v8::String::New("navigator"), api::Navigator::generate(), v8::ReadOnly);
 
 
 		v8::Persistent<v8::Context> context = v8::Context::New(NULL, global);
 
 		context->AllowCodeGenerationFromStrings(false);
+
+		context->Enter();
+
+
+		// Dynamic APIs
+		context->Global()->Set(v8::String::New("Script"),  api::Script::generate()->GetFunction(),  v8::ReadOnly);
+		context->Global()->Set(v8::String::New("Text"),    api::Text::generate()->GetFunction(),    v8::ReadOnly);
+		context->Global()->Set(v8::String::New("Texture"), api::Texture::generate()->GetFunction(), v8::ReadOnly);
+
+
+		context->Exit();
 
 
 		return context;

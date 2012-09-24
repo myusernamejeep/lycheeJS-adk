@@ -37,6 +37,16 @@
 
 	console.groupEnd();
 
+	console.group("instance.generate()");
+
+	    instance.generate();
+
+		console.log("instance.url: " + instance.url);
+		console.log("instance.id: " + instance.id);
+		console.log("instance.width: " + instance.width);
+		console.log("instance.height: " + instance.height);
+
+	console.groupEnd();
 
 	console.groupEnd();
 

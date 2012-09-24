@@ -6,6 +6,7 @@
 #include "v8gl.h"
 
 #include "../api/console.h"
+#include "../api/navigator.h"
 #include "../api/script.h"
 #include "../api/text.h"
 #include "../api/texture.h"
@@ -31,29 +32,25 @@ namespace v8gl {
 		v8::Local<v8::ObjectTemplate> global = v8::ObjectTemplate::New();
 
 
-		// Console API
-		global->Set(v8::String::New("console"), api::Console::generate());
-
-
-		// Advanced Data Types
-		global->Set(v8::String::New("Script"), api::Script::generate(), v8::ReadOnly);
-		global->Set(v8::String::New("Text"), api::Text::generate(), v8::ReadOnly);
-		global->Set(v8::String::New("Texture"), api::Texture::generate(), v8::ReadOnly);
-
-
-		// Navigator API
-		v8::Handle<v8::ObjectTemplate> navigator = v8::ObjectTemplate::New();
-		navigator->Set(v8::String::New("appName"), v8::String::New("V8GL"));
-		navigator->Set(v8::String::New("userAgent"), v8::String::New("V8GL"));
-		navigator->Set(v8::String::New("platform"), v8::String::New("Linux i686"));
-		navigator->Set(v8::String::New("vendor"), v8::String::New("lycheeJS"));
-		navigator->Set(v8::String::New("product"), v8::String::New("v8gl"));
-		global->Set(v8::String::New("navigator"), navigator);
+		// Static APIs
+		global->Set(v8::String::New("console"),   api::Console::generate(),   v8::ReadOnly);
+		global->Set(v8::String::New("navigator"), api::Navigator::generate(), v8::ReadOnly);
 
 
 		v8::Persistent<v8::Context> context = v8::Context::New(NULL, global);
 
 		context->AllowCodeGenerationFromStrings(false);
+
+		context->Enter();
+
+
+		// Dynamic APIs
+		context->Global()->Set(v8::String::New("Script"),  api::Script::generate()->GetFunction(),  v8::ReadOnly);
+		context->Global()->Set(v8::String::New("Text"),    api::Text::generate()->GetFunction(),    v8::ReadOnly);
+		context->Global()->Set(v8::String::New("Texture"), api::Texture::generate()->GetFunction(), v8::ReadOnly);
+
+
+		context->Exit();
 
 
 		return context;

@@ -7,18 +7,25 @@
 
 namespace api {
 
+	Text::Text(const Text &cpy) {}
 
-	Text::Text(const Text &cpy) {
-	}
-
-
+	v8::Persistent<v8::FunctionTemplate> _text_tpl;
 
 	v8::Handle<v8::FunctionTemplate> Text::generate() {
 
-		v8::Local<v8::FunctionTemplate> tpl = v8::FunctionTemplate::New(handleNew);
-		tpl->SetClassName(v8::String::New("Text"));
+		_text_tpl = v8::Persistent<v8::FunctionTemplate>::New(v8::FunctionTemplate::New(handleNew));
+		_text_tpl->SetClassName(v8::String::New("Text"));
 
-		return tpl;
+		v8::Local<v8::ObjectTemplate> instance_tpl = _text_tpl->InstanceTemplate();
+
+		instance_tpl->SetInternalFieldCount(0);
+		instance_tpl->Set(v8::String::New("load"),   v8::FunctionTemplate::New(handleLoad), v8::ReadOnly);
+		instance_tpl->Set(v8::String::New("onload"), v8::FunctionTemplate::New());
+		instance_tpl->Set(v8::String::New("url"),    v8::Null());
+		instance_tpl->Set(v8::String::New("data"),   v8::Null());
+
+
+		return _text_tpl;
 
 	}
 
@@ -27,28 +34,21 @@ namespace api {
 		v8::HandleScope scope;
 
 		if (!args.IsConstructCall()) {
-			return scope.Close(v8::ThrowException(v8::Exception::TypeError(v8::String::New("V8GL object constructor cannot be called as a function."))));
+			v8::ThrowException(v8::Exception::TypeError(v8::String::New("V8GL object constructor cannot be called as a function.")));
 		}
 
-		if (args.Length() != 1) {
-			return scope.Close(v8::ThrowException(v8::Exception::SyntaxError(v8::String::New("Usage: new Text(url)"))));
+		if (args.Length() != 1 || !args[0]->IsString()) {
+			v8::ThrowException(v8::Exception::SyntaxError(v8::String::New("Usage: new Text(url)")));
 		}
+
 
 		v8::String::Utf8Value value(args[0]);
 		char* url = *value;
 
 
-		v8::Local<v8::ObjectTemplate> instanceTemplate = v8::ObjectTemplate::New();
-		instanceTemplate->SetInternalFieldCount(0);
+		v8::Local<v8::Object> instance = args.This();
 
-		instanceTemplate->Set(v8::String::New("load"), v8::FunctionTemplate::New(handleLoad), v8::ReadOnly);
-		instanceTemplate->Set(v8::String::New("onload"), v8::FunctionTemplate::New());
-
-		instanceTemplate->Set(v8::String::New("toString"), v8::FunctionTemplate::New(handleToString), v8::ReadOnly);
-
-		v8::Local<v8::Object> instance = instanceTemplate->NewInstance();
-
-		instance->Set(v8::String::New("url"), v8::String::New(url));
+		instance->Set(v8::String::New("url"),  v8::String::New(url));
 		instance->Set(v8::String::New("data"), v8::Null());
 
 
@@ -56,48 +56,35 @@ namespace api {
 
 	}
 
-	v8::Handle<v8::Value> Text::handleToString(const v8::Arguments& args) {
-		return v8::String::New("[object Text]");
-	}
-
 	v8::Handle<v8::Value> Text::handleLoad(const v8::Arguments& args) {
 
 		v8::HandleScope scope;
-		v8::Local<v8::Object> thisObj = args.This();
-
-		if (thisObj.IsEmpty()) {
-			return scope.Close(v8::Null());
-		}
+		v8::Local<v8::Object> self = args.This();
 
 
-		v8::Local<v8::String> property = v8::String::New("data");
-		if (thisObj->Has(property)) {
+		if (!self.IsEmpty()) {
 
-			v8::String::Utf8Value value(thisObj->Get(v8::String::New("url")));
-			char* url = v8gl::Path::getReal((char*) *value);
-
+			v8::String::Utf8Value url_value(self->Get(v8::String::NewSymbol("url")));
+			char* url = v8gl::Path::getReal(*url_value);
 			char* data = api::Text::load(url);
+
 			if (data == NULL) {
-
-				thisObj->Set(property, v8::Null(), v8::ReadOnly);
+				self->Set(v8::String::NewSymbol("data"), v8::Null(),            v8::ReadOnly);
 				v8::ThrowException(v8::Exception::Error(v8::String::New("Could not read file.")));
-
 			} else {
-
-				thisObj->Set(v8::String::New("url"), v8::String::New(url), v8::ReadOnly);
-				thisObj->Set(property, v8::String::New(data), v8::ReadOnly);
-
+				self->Set(v8::String::NewSymbol("url"),  v8::String::New(url),  v8::ReadOnly);
+				self->Set(v8::String::NewSymbol("data"), v8::String::New(data), v8::ReadOnly);
 			}
 
-			v8::Local<v8::Function> callback = v8::Function::Cast(*thisObj->Get(v8::String::New("onload")));
+			v8::Local<v8::Function> callback = v8::Function::Cast(*self->Get(v8::String::NewSymbol("onload")));
 			if (!callback.IsEmpty()) {
-				callback->Call(thisObj, 0, NULL);
+				callback->Call(self, 0, NULL);
 			}
 
 		}
 
 
-		return scope.Close(v8::Null());
+		return scope.Close(v8::Undefined());
 
 	}
 

@@ -69,6 +69,8 @@ namespace binding {
 			static v8::Handle<v8::Value> handleEnable(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleEnd(const v8::Arguments& args);
 
+			static v8::Handle<v8::Value> handleFlush(const v8::Arguments& args);
+
 			static v8::Handle<v8::Value> handleLoadIdentity(const v8::Arguments& args);
 
 			static v8::Handle<v8::Value> handleMatrixMode(const v8::Arguments& args);

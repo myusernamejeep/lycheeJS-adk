@@ -9,7 +9,7 @@
 
 	console.group("var instance = new Script(url)");
 
-		var instance = new Script("../gl/icosahedron.js");
+		var instance = new Script("../binding/gl/icosahedron.js");
 
 		console.log("instance.url: " + instance.url);
 		console.log("instance.data: " + instance.data);
@@ -22,7 +22,8 @@
 	console.group("instance.load()");
 
 		instance.onload = function() {
-			console.log("instance.onload callback(): " + this.toString() + " > " + this.data.toString().substr(0, 10) + "...");
+			var data = this.data + '';
+			console.log("instance.onload callback(): " + this.toString() + " > " + data.substr(0, 10) + "...");
 		};
 
 	    instance.load();

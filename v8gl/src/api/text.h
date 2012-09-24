@@ -20,8 +20,6 @@ namespace api {
 			static v8::Handle<v8::Value> handleLoad(const v8::Arguments& args);
 			static char* load(char* filename);
 
-			static v8::Handle<v8::Value> handleToString(const v8::Arguments& args);
-
 			static v8::Handle<v8::FunctionTemplate> generate(void);
 
 	};

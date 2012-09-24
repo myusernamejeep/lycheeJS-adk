@@ -24,6 +24,8 @@ case "$1" in
 			cp $v8gl_path/v8gl ./start;
 			chmod +x ./start;
 
+		echo -e "Done.";
+
 		exit;
 		;;
 
@@ -41,7 +43,12 @@ case "$1" in
 
 	debug)
 
-		gdb --args ./start;
+		echo -e "\nDebugging...";
+
+			gdb --eval-command=run --eval-command=quit --args ./start;
+#			gdb -ex run --args ./start;
+
+		echo -e "Done.";
 
 		exit;
 		;;
