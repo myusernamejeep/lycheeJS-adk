@@ -31,6 +31,8 @@ namespace binding {
 			static v8::Handle<v8::Value> handleGetActiveUniform(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleGetAttachedShaders(const v8::Arguments& args);
 
+			static v8::Handle<v8::Value> handleShaderSource(const v8::Arguments& args);
+
 	};
 
 }

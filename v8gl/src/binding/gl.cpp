@@ -1629,6 +1629,8 @@ namespace binding {
 		gltpl->Set(v8::String::NewSymbol("getActiveUniform"),        v8::FunctionTemplate::New(WEBGL::handleGetActiveUniform));
 		gltpl->Set(v8::String::NewSymbol("getAttachedShaders"),      v8::FunctionTemplate::New(WEBGL::handleGetAttachedShaders));
 
+		gltpl->Set(v8::String::NewSymbol("shaderSource"),            v8::FunctionTemplate::New(WEBGL::handleShaderSource));
+
 #endif
 
 

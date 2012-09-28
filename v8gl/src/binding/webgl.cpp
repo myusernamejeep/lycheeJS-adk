@@ -173,7 +173,7 @@ namespace binding {
 
 			glGetAttachedShaders(
 				(GLuint) program, (GLsizei) maxCount,
-				&count, (GLuint*) shaders
+				&count, shaders
 			);
 
 
@@ -184,6 +184,25 @@ namespace binding {
 			}
 
 			return result;
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> WEBGL::handleShaderSource(const v8::Arguments& args) {
+
+		if (args.Length() == 2) {
+
+			GLuint shader = args[0]->Uint32Value();
+
+			v8::String::Utf8Value source_str(args[1]);
+			const GLchar *source = *source_str;
+
+			GLint length = source_str.length();
+
+			glShaderSource(shader, 1, &source, &length);
 
 		}
 
