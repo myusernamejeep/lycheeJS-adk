@@ -34,7 +34,6 @@
  * - 8. Color Index Colormap Management
  *
  * - 9. from State Retrieval:
- *   > glut.get
  *   > glut.layerGet
  *   > glut.deviceGet
  *
@@ -107,55 +106,6 @@ namespace binding {
 		return v8::Undefined();
 
 	}
-
-	v8::Handle<v8::Value> GLUT::getRGBA(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_RGBA);
-	}
-
-	v8::Handle<v8::Value> GLUT::getRGB(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_RGB);
-	}
-
-	v8::Handle<v8::Value> GLUT::getINDEX(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_INDEX);
-	}
-
-	v8::Handle<v8::Value> GLUT::getSINGLE(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_SINGLE);
-	}
-
-	v8::Handle<v8::Value> GLUT::getDOUBLE(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_DOUBLE);
-	}
-
-	v8::Handle<v8::Value> GLUT::getACCUM(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_ACCUM);
-	}
-
-	v8::Handle<v8::Value> GLUT::getALPHA(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_ALPHA);
-	}
-
-	v8::Handle<v8::Value> GLUT::getDEPTH(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_DEPTH);
-	}
-
-	v8::Handle<v8::Value> GLUT::getSTENCIL(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_STENCIL);
-	}
-
-	v8::Handle<v8::Value> GLUT::getMULTISAMPLE(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_MULTISAMPLE);
-	}
-
-	v8::Handle<v8::Value> GLUT::getSTEREO(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_STEREO);
-	}
-
-	// FIXME: Evaluate where this is available
-	// v8::Handle<v8::Value> GLUT::getLUMINANCE(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-	//	return v8::Uint32::New(GLUT_LUMINANCE);
-	//}
 
 	v8::Handle<v8::Value> GLUT::handleInitDisplayMode(const v8::Arguments& args) {
 
@@ -497,26 +447,6 @@ namespace binding {
 		return v8::Undefined();
 
 	}
- 
-	v8::Handle<v8::Value> GLUT::getLEFT_BUTTON(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_LEFT_BUTTON);
-	}
-
-	v8::Handle<v8::Value> GLUT::getMIDDLE_BUTTON(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_MIDDLE_BUTTON);
-	}
-
-	v8::Handle<v8::Value> GLUT::getRIGHT_BUTTON(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_RIGHT_BUTTON);
-	}
-
-	v8::Handle<v8::Value> GLUT::getUP(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_UP);
-	}
-
-	v8::Handle<v8::Value> GLUT::getDOWN(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_DOWN);
-	}
 
 	v8::Persistent<v8::Function> _glut_mouseFuncCallback;
 
@@ -682,16 +612,19 @@ namespace binding {
 	 * State Retrieval
 	 */
 
-	v8::Handle<v8::Value> GLUT::getACTIVE_SHIFT(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_ACTIVE_SHIFT);
-	}
+	v8::Handle<v8::Value> GLUT::handleGet(const v8::Arguments& args) {
 
-	v8::Handle<v8::Value> GLUT::getACTIVE_CTRL(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_ACTIVE_CTRL);
-	}
+		if (args.Length() == 1) {
 
-	v8::Handle<v8::Value> GLUT::getACTIVE_ALT(v8::Local<v8::String> property, const v8::AccessorInfo &info) {
-		return v8::Uint32::New(GLUT_ACTIVE_ALT);
+			int state = args[0]->IntegerValue();
+			int result = glutGet((GLenum) state);
+
+			return v8::Integer::New(result);
+
+		}
+
+		return v8::Undefined();
+
 	}
 
 	v8::Handle<v8::Value> GLUT::handleGetModifiers(const v8::Arguments& args) {
@@ -983,20 +916,20 @@ namespace binding {
 		gluttpl->Set(v8::String::NewSymbol("initWindowSize"),     v8::FunctionTemplate::New(GLUT::handleInitWindowSize));
 		gluttpl->Set(v8::String::NewSymbol("initDisplayMode"),    v8::FunctionTemplate::New(GLUT::handleInitDisplayMode));
 
-		gluttpl->SetAccessor(v8::String::NewSymbol("RGBA"),        GLUT::getRGBA);
-		gluttpl->SetAccessor(v8::String::NewSymbol("RGB"),         GLUT::getRGB);
-		gluttpl->SetAccessor(v8::String::NewSymbol("INDEX"),       GLUT::getINDEX);
-		gluttpl->SetAccessor(v8::String::NewSymbol("SINGLE"),      GLUT::getSINGLE);
-		gluttpl->SetAccessor(v8::String::NewSymbol("DOUBLE"),      GLUT::getDOUBLE);
-		gluttpl->SetAccessor(v8::String::NewSymbol("ACCUM"),       GLUT::getACCUM);
-		gluttpl->SetAccessor(v8::String::NewSymbol("ALPHA"),       GLUT::getALPHA);
-		gluttpl->SetAccessor(v8::String::NewSymbol("DEPTH"),       GLUT::getDEPTH);
-		gluttpl->SetAccessor(v8::String::NewSymbol("STENCIL"),     GLUT::getSTENCIL);
-		gluttpl->SetAccessor(v8::String::NewSymbol("MULTISAMPLE"), GLUT::getMULTISAMPLE);
-		gluttpl->SetAccessor(v8::String::NewSymbol("STEREO"),      GLUT::getSTEREO);
+		gluttpl->Set(v8::String::NewSymbol("RGBA"),        v8::Uint32::New(GLUT_RGBA),        v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("RGB"),         v8::Uint32::New(GLUT_RGB),         v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("INDEX"),       v8::Uint32::New(GLUT_INDEX),       v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("SINGLE"),      v8::Uint32::New(GLUT_SINGLE),      v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("DOUBLE"),      v8::Uint32::New(GLUT_DOUBLE),      v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("ACCUM"),       v8::Uint32::New(GLUT_ACCUM),       v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("ALPHA"),       v8::Uint32::New(GLUT_ALPHA),       v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("DEPTH"),       v8::Uint32::New(GLUT_DEPTH),       v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("STENCIL"),     v8::Uint32::New(GLUT_STENCIL),     v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("MULTISAMPLE"), v8::Uint32::New(GLUT_MULTISAMPLE), v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("STEREO"),      v8::Uint32::New(GLUT_STEREO),      v8::ReadOnly);
 
 		// FIXME: Evaluate where this is available
-		// glut->SetAccessor(v8::String::NewSymbol("LUMINANCE"),    GLUT::getLUMINANCE);
+		// gluttpl->Set(v8::String::NewSymbol("LUMINANCE"), v8::Uint32::New(GLUT_LUMINANCE), v8::ReadOnly);
 
 
 		/*
@@ -1044,11 +977,11 @@ namespace binding {
 		gluttpl->Set(v8::String::NewSymbol("overlayDisplayFunc"),    v8::FunctionTemplate::New(GLUT::handleOverlayDisplayFunc));
 		gluttpl->Set(v8::String::NewSymbol("reshapeFunc"),           v8::FunctionTemplate::New(GLUT::handleReshapeFunc));
 		gluttpl->Set(v8::String::NewSymbol("keyboardFunc"),          v8::FunctionTemplate::New(GLUT::handleKeyboardFunc));
-		gluttpl->SetAccessor(v8::String::NewSymbol("LEFT_BUTTON"),   GLUT::getLEFT_BUTTON);
-		gluttpl->SetAccessor(v8::String::NewSymbol("MIDDLE_BUTTON"), GLUT::getMIDDLE_BUTTON);
-		gluttpl->SetAccessor(v8::String::NewSymbol("RIGHT_BUTTON"),  GLUT::getRIGHT_BUTTON);
-		gluttpl->SetAccessor(v8::String::NewSymbol("UP"),            GLUT::getUP);
-		gluttpl->SetAccessor(v8::String::NewSymbol("DOWN"),          GLUT::getDOWN);
+		gluttpl->Set(v8::String::NewSymbol("LEFT_BUTTON"),           v8::Uint32::New(GLUT_LEFT_BUTTON),   v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("MIDDLE_BUTTON"),         v8::Uint32::New(GLUT_MIDDLE_BUTTON), v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("RIGHT_BUTTON"),          v8::Uint32::New(GLUT_RIGHT_BUTTON),  v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("UP"),                    v8::Uint32::New(GLUT_UP),            v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("DOWN"),                  v8::Uint32::New(GLUT_DOWN),          v8::ReadOnly);
 		gluttpl->Set(v8::String::NewSymbol("mouseFunc"),             v8::FunctionTemplate::New(GLUT::handleMouseFunc));
 		gluttpl->Set(v8::String::NewSymbol("motionFunc"),            v8::FunctionTemplate::New(GLUT::handleMotionFunc));
 		gluttpl->Set(v8::String::NewSymbol("idleFunc"),              v8::FunctionTemplate::New(GLUT::handleIdleFunc));
@@ -1058,11 +991,25 @@ namespace binding {
 		/*
 		 * State Retrieval
 		 */
-		gluttpl->SetAccessor(v8::String::NewSymbol("ACTIVE_SHIFT"), GLUT::getACTIVE_SHIFT);
-		gluttpl->SetAccessor(v8::String::NewSymbol("ACTIVE_CTRL"),  GLUT::getACTIVE_CTRL);
-		gluttpl->SetAccessor(v8::String::NewSymbol("ACTIVE_ALT"),   GLUT::getACTIVE_ALT);
-		gluttpl->Set(v8::String::NewSymbol("getModifiers"),         v8::FunctionTemplate::New(GLUT::handleGetModifiers));
-		gluttpl->Set(v8::String::NewSymbol("extensionSupported"),   v8::FunctionTemplate::New(GLUT::handleExtensionSupported));
+
+		gluttpl->Set(v8::String::NewSymbol("DISPLAY_MODE_POSSIBLE"), v8::Uint32::New(GLUT_DISPLAY_MODE_POSSIBLE), v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("INIT_DISPLAY_MODE"),     v8::Uint32::New(GLUT_INIT_DISPLAY_MODE),     v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("INIT_WINDOW_X"),         v8::Uint32::New(GLUT_INIT_WINDOW_X),         v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("INIT_WINDOW_Y"),         v8::Uint32::New(GLUT_INIT_WINDOW_Y),         v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("INIT_WINDOW_WIDTH"),     v8::Uint32::New(GLUT_INIT_WINDOW_WIDTH),     v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("INIT_WINDOW_HEIGHT"),    v8::Uint32::New(GLUT_INIT_WINDOW_HEIGHT),    v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("WINDOW_X"),              v8::Uint32::New(GLUT_WINDOW_X),              v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("WINDOW_Y"),              v8::Uint32::New(GLUT_WINDOW_Y),              v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("WINDOW_WIDTH"),          v8::Uint32::New(GLUT_WINDOW_WIDTH),          v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("WINDOW_HEIGHT"),         v8::Uint32::New(GLUT_WINDOW_HEIGHT),         v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("SCREEN_WIDTH"),          v8::Uint32::New(GLUT_SCREEN_WIDTH),          v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("SCREEN_HEIGHT"),         v8::Uint32::New(GLUT_SCREEN_HEIGHT),         v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("get"),                   v8::FunctionTemplate::New(GLUT::handleGet));
+		gluttpl->Set(v8::String::NewSymbol("ACTIVE_SHIFT"),          v8::Uint32::New(GLUT_ACTIVE_SHIFT), v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("ACTIVE_CTRL"),           v8::Uint32::New(GLUT_ACTIVE_CTRL),  v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("ACTIVE_ALT"),            v8::Uint32::New(GLUT_ACTIVE_ALT),   v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("getModifiers"),          v8::FunctionTemplate::New(GLUT::handleGetModifiers));
+		gluttpl->Set(v8::String::NewSymbol("extensionSupported"),    v8::FunctionTemplate::New(GLUT::handleExtensionSupported));
 
 
 		/*

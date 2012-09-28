@@ -17,7 +17,6 @@
  *
  *
  * NEXT TODO:
- * gl.drawBuffers()
  * gl.drawElements()
  * gl.drawPixels()
  * gl.drawRangeElements()
@@ -28,7 +27,6 @@
  *
  * Missing Bindings:
  *
- * - gl.bindBuffer()
  * - gl.bufferData()
  * - gl.bufferSubData()
  * - gl.colorTable()
@@ -46,8 +44,6 @@
  * - gl.copyColorSubTable()
  * - gl.copyConvolutionFilter1D()
  * - gl.copyConvolutionFilter2D()
- * - gl.deleteBuffers()
- * - gl.drawBuffers()
  *
  *
  * Incomplete Bindings (TODO):
@@ -654,10 +650,10 @@ namespace binding {
 
 		if (args.Length() == 4) {
 
-			unsigned int red   = args[0]->Uint32Value();
-			unsigned int green = args[1]->Uint32Value();
-			unsigned int blue  = args[2]->Uint32Value();
-			unsigned int alpha = args[3]->Uint32Value();
+			bool red   = args[0]->BooleanValue();
+			bool green = args[1]->BooleanValue();
+			bool blue  = args[2]->BooleanValue();
+			bool alpha = args[3]->BooleanValue();
 
 			glColorMask((GLboolean) red, (GLboolean) green, (GLboolean) blue, (GLboolean) alpha);
 
@@ -719,6 +715,15 @@ namespace binding {
 
 	}
 
+	v8::Handle<v8::Value> GL::handleCreateBuffer(const v8::Arguments& args) {
+
+		GLuint buffer;
+		glGenBuffers(1, &buffer);
+
+		return v8::Integer::New(buffer);
+
+	}
+
 	v8::Handle<v8::Value> GL::handleCreateProgram(const v8::Arguments& args) {
 		return v8::Uint32::New(glCreateProgram());
 	}
@@ -756,6 +761,28 @@ namespace binding {
 	/*
 	 * SECTION D
 	 */
+
+	v8::Handle<v8::Value> GL::handleDeleteBuffers(const v8::Arguments& args) {
+
+		if (args.Length() == 2) {
+
+			int n = args[0]->IntegerValue();
+
+			v8::Handle<v8::Array> arr_buffers = v8::Handle<v8::Array>::Cast(args[1]);
+			GLuint* buffers = new GLuint[arr_buffers->Length()];
+
+			for (unsigned i = 0; i < arr_buffers->Length(); i++) {
+				buffers[i] = (GLuint) arr_buffers->Get(v8::Integer::New(i))->Uint32Value();
+			}
+
+
+			glDeleteBuffers((GLsizei) n, (const GLuint*) buffers);
+
+		}
+
+		return v8::Undefined();
+
+	}
 
 	v8::Handle<v8::Value> GL::handleDeleteLists(const v8::Arguments& args) {
 
@@ -839,7 +866,7 @@ namespace binding {
 
 		if (args.Length() == 1) {
 
-			unsigned int flag = args[0]->Uint32Value();
+			bool flag = args[0]->BooleanValue();
 
 			glDepthMask((GLboolean) flag);
 
@@ -879,6 +906,48 @@ namespace binding {
 
 	}
 
+	v8::Handle<v8::Value> GL::handleDisable(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			int cap = args[0]->IntegerValue();
+
+			glDisable((GLenum) cap);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleDisableClientState(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			int cap = args[0]->IntegerValue();
+
+			glDisableClientState((GLenum) cap);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleDisableVertexAttribArray(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			int index = args[0]->Uint32Value();
+
+			glDisableVertexAttribArray((GLuint) index);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
 	v8::Handle<v8::Value> GL::handleDrawArrays(const v8::Arguments& args) {
 
 		if (args.Length() == 3) {
@@ -909,13 +978,21 @@ namespace binding {
 
 	}
 
-	v8::Handle<v8::Value> GL::handleDisable(const v8::Arguments& args) {
+	v8::Handle<v8::Value> GL::handleDrawBuffers(const v8::Arguments& args) {
 
-		if (args.Length() == 1) {
+		if (args.Length() == 2) {
 
-			int cap = args[0]->IntegerValue();
+			int n = args[0]->IntegerValue();
 
-			glDisable((GLenum) cap);
+			v8::Handle<v8::Array> arr_bufs = v8::Handle<v8::Array>::Cast(args[1]);
+			GLenum* bufs = new GLenum[arr_bufs->Length()];
+
+			for (unsigned i = 0; i < arr_bufs->Length(); i++) {
+				bufs[i] = (GLenum) arr_bufs->Get(v8::Integer::New(i))->IntegerValue();
+			}
+
+
+			glDrawBuffers((GLsizei) n, (const GLenum*) bufs);
 
 		}
 
@@ -928,6 +1005,20 @@ namespace binding {
 	/*
 	 * SECTION E
 	 */
+
+	v8::Handle<v8::Value> GL::handleEdgeFlag(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			bool flag = args[0]->BooleanValue();
+
+			glEdgeFlag((GLboolean) flag);
+
+		}
+
+		return v8::Undefined();
+
+	}
 
 	v8::Handle<v8::Value> GL::handleEnable(const v8::Arguments& args) {
 
@@ -943,10 +1034,52 @@ namespace binding {
 
 	}
 
-	v8::Handle<v8::Value> GL::handleEnd(const v8::Arguments& args) {
+	v8::Handle<v8::Value> GL::handleEnableClientState(const v8::Arguments& args) {
 
-		if (args.Length() == 0) {
-			glEnd();
+		if (args.Length() == 1) {
+
+			int cap = args[0]->IntegerValue();
+
+			glEnableClientState((GLenum) cap);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleEnableVertexAttribArray(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			unsigned int index = args[0]->Uint32Value();
+
+			glEnableVertexAttribArray((GLuint) index);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleEnd(const v8::Arguments& args) {
+		glEnd();
+		return v8::Undefined();
+	}
+
+	v8::Handle<v8::Value> GL::handleEndList(const v8::Arguments& args) {
+		glEndList();
+		return v8::Undefined();
+	}
+
+	v8::Handle<v8::Value> GL::handleEndQuery(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			int target = args[0]->IntegerValue();
+
+			glEndQuery((GLenum) target);
+
 		}
 
 		return v8::Undefined();
@@ -970,14 +1103,23 @@ namespace binding {
 	 * SECTION L
 	 */
 
-	v8::Handle<v8::Value> GL::handleLoadIdentity(const v8::Arguments& args) {
+	v8::Handle<v8::Value> GL::handleLinkProgram(const v8::Arguments& args) {
 
-		if (args.Length() == 0) {
-			glLoadIdentity();
+		if (args.Length() == 1) {
+
+			unsigned int program = args[0]->Uint32Value();
+
+			glLinkProgram((GLuint) program);
+
 		}
 
 		return v8::Undefined();
 
+	}
+
+	v8::Handle<v8::Value> GL::handleLoadIdentity(const v8::Arguments& args) {
+		glLoadIdentity();
+		return v8::Undefined();
 	}
 
 
@@ -1042,6 +1184,26 @@ namespace binding {
 			double y = args[1]->NumberValue();
 
 			glTexCoord2f((GLfloat) x, (GLfloat) y);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+
+
+	/*
+	 * SECTION U
+	 */
+
+	v8::Handle<v8::Value> GL::handleUseProgram(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			unsigned int program = args[0]->Uint32Value();
+
+			glUseProgram((GLuint) program);
 
 		}
 
@@ -1136,8 +1298,6 @@ namespace binding {
 		gltpl->Set(v8::String::NewSymbol("beginQuery"),				  v8::FunctionTemplate::New(GL::handleBeginQuery));
 		gltpl->Set(v8::String::NewSymbol("ARRAY_BUFFER"),             v8::Uint32::New(GL_ARRAY_BUFFER),          v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("ELEMENT_ARRAY_BUFFER"),     v8::Uint32::New(GL_ELEMENT_ARRAY_BUFFER),  v8::ReadOnly);
-		gltpl->Set(v8::String::NewSymbol("PIXEL_PACK_BUFFER"),        v8::Uint32::New(GL_PIXEL_PACK_BUFFER),     v8::ReadOnly);
-		gltpl->Set(v8::String::NewSymbol("PIXEL_UNPACK_BUFFER"),      v8::Uint32::New(GL_PIXEL_UNPACK_BUFFER),   v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("bindBuffer"),               v8::FunctionTemplate::New(GL::handleBindBuffer));
 		gltpl->Set(v8::String::NewSymbol("TEXTURE_2D"),               v8::Uint32::New(GL_TEXTURE_2D),            v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("bindTexture"),              v8::FunctionTemplate::New(GL::handleBindTexture));
@@ -1228,6 +1388,7 @@ namespace binding {
 		gltpl->Set(v8::String::NewSymbol("DEPTH"),               v8::Uint32::New(GL_DEPTH),   v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("STENCIL"),             v8::Uint32::New(GL_STENCIL), v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("copyPixels"),          v8::FunctionTemplate::New(GL::handleCopyPixels));
+		gltpl->Set(v8::String::NewSymbol("createBuffer"),        v8::FunctionTemplate::New(GL::handleCreateBuffer));
 		gltpl->Set(v8::String::NewSymbol("createProgram"),       v8::FunctionTemplate::New(GL::handleCreateProgram));
 		gltpl->Set(v8::String::NewSymbol("FRAGMENT_SHADER"),     v8::Uint32::New(GL_FRAGMENT_SHADER), v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("VERTEX_SHADER"),       v8::Uint32::New(GL_VERTEX_SHADER),   v8::ReadOnly);
@@ -1243,28 +1404,49 @@ namespace binding {
 		 * SECTION D
 		 */
 
-		gltpl->Set(v8::String::NewSymbol("deleteLists"),      v8::FunctionTemplate::New(GL::handleDeleteLists));
-		gltpl->Set(v8::String::NewSymbol("deleteProgram"),    v8::FunctionTemplate::New(GL::handleDeleteProgram));
-		gltpl->Set(v8::String::NewSymbol("deleteQueries"),    v8::FunctionTemplate::New(GL::handleDeleteQueries));
-		gltpl->Set(v8::String::NewSymbol("deleteShader"),     v8::FunctionTemplate::New(GL::handleDeleteShader));
-		gltpl->Set(v8::String::NewSymbol("depthFunc"),        v8::FunctionTemplate::New(GL::handleDepthFunc));
-		gltpl->Set(v8::String::NewSymbol("depthMask"),        v8::FunctionTemplate::New(GL::handleDepthMask));
-		gltpl->Set(v8::String::NewSymbol("depthRange"),       v8::FunctionTemplate::New(GL::handleDepthRange));
-		gltpl->Set(v8::String::NewSymbol("detachShader"),     v8::FunctionTemplate::New(GL::handleDetachShader));
-		gltpl->Set(v8::String::NewSymbol("drawArrays"),       v8::FunctionTemplate::New(GL::handleDrawArrays));
-		gltpl->Set(v8::String::NewSymbol("drawBuffer"),       v8::FunctionTemplate::New(GL::handleDrawBuffer));
-		gltpl->Set(v8::String::NewSymbol("BLEND"),            v8::Uint32::New(GL_BLEND), v8::ReadOnly);
-		gltpl->Set(v8::String::NewSymbol("DEPTH_TEST"),       v8::Uint32::New(GL_DEPTH_TEST), v8::ReadOnly);
-		gltpl->Set(v8::String::NewSymbol("COLOR_BUFFER_BIT"), v8::Uint32::New(GL_COLOR_BUFFER_BIT), v8::ReadOnly);
-		gltpl->Set(v8::String::NewSymbol("DEPTH_BUFFER_BIT"), v8::Uint32::New(GL_DEPTH_BUFFER_BIT), v8::ReadOnly);
-		gltpl->Set(v8::String::NewSymbol("disable"),          v8::FunctionTemplate::New(GL::handleDisable));
+		gltpl->Set(v8::String::NewSymbol("deleteBuffers"),            v8::FunctionTemplate::New(GL::handleDeleteBuffers));
+		gltpl->Set(v8::String::NewSymbol("deleteLists"),              v8::FunctionTemplate::New(GL::handleDeleteLists));
+		gltpl->Set(v8::String::NewSymbol("deleteProgram"),            v8::FunctionTemplate::New(GL::handleDeleteProgram));
+		gltpl->Set(v8::String::NewSymbol("deleteQueries"),            v8::FunctionTemplate::New(GL::handleDeleteQueries));
+		gltpl->Set(v8::String::NewSymbol("deleteShader"),             v8::FunctionTemplate::New(GL::handleDeleteShader));
+		gltpl->Set(v8::String::NewSymbol("depthFunc"),                v8::FunctionTemplate::New(GL::handleDepthFunc));
+		gltpl->Set(v8::String::NewSymbol("depthMask"),                v8::FunctionTemplate::New(GL::handleDepthMask));
+		gltpl->Set(v8::String::NewSymbol("depthRange"),               v8::FunctionTemplate::New(GL::handleDepthRange));
+		gltpl->Set(v8::String::NewSymbol("detachShader"),             v8::FunctionTemplate::New(GL::handleDetachShader));
+		gltpl->Set(v8::String::NewSymbol("BLEND"),                    v8::Uint32::New(GL_BLEND),            v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("DEPTH_TEST"),               v8::Uint32::New(GL_DEPTH_TEST),       v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("COLOR_BUFFER_BIT"),         v8::Uint32::New(GL_COLOR_BUFFER_BIT), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("DEPTH_BUFFER_BIT"),         v8::Uint32::New(GL_DEPTH_BUFFER_BIT), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("disable"),                  v8::FunctionTemplate::New(GL::handleDisable));
+		gltpl->Set(v8::String::NewSymbol("COLOR_ARRAY"),              v8::Uint32::New(GL_COLOR_ARRAY),           v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("EDGE_FLAG_ARRAY"),          v8::Uint32::New(GL_EDGE_FLAG_ARRAY),       v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("FOG_COORD_ARRAY"),          v8::Uint32::New(GL_FOG_COORD_ARRAY),       v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("INDEX_ARRAY"),              v8::Uint32::New(GL_INDEX_ARRAY),           v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("NORMAL_ARRAY"),             v8::Uint32::New(GL_NORMAL_ARRAY),          v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("SECONDARY_COLOR_ARRAY"),    v8::Uint32::New(GL_SECONDARY_COLOR_ARRAY), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("TEXTURE_COORD_ARRAY"),      v8::Uint32::New(GL_TEXTURE_COORD_ARRAY),   v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("VERTEX_ARRAY"),             v8::Uint32::New(GL_VERTEX_ARRAY),          v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("disableClientState"),       v8::FunctionTemplate::New(GL::handleDisableClientState));
+		gltpl->Set(v8::String::NewSymbol("disableVertexAttribArray"), v8::FunctionTemplate::New(GL::handleDisableVertexAttribArray));
+		gltpl->Set(v8::String::NewSymbol("drawArrays"),               v8::FunctionTemplate::New(GL::handleDrawArrays));
+		gltpl->Set(v8::String::NewSymbol("BACK_LEFT"),                v8::Uint32::New(GL_BACK_LEFT),  v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("BACK_RIGHT"),               v8::Uint32::New(GL_BACK_RIGHT), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("LEFT"),                     v8::Uint32::New(GL_LEFT),       v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("RIGHT"),                    v8::Uint32::New(GL_RIGHT),      v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("drawBuffer"),               v8::FunctionTemplate::New(GL::handleDrawBuffer));
+		gltpl->Set(v8::String::NewSymbol("drawBuffers"),              v8::FunctionTemplate::New(GL::handleDrawBuffers));
 
 		/*
 		 * SECTION E
 		 */
 
-		gltpl->Set(v8::String::NewSymbol("enable"), v8::FunctionTemplate::New(GL::handleEnable));
-		gltpl->Set(v8::String::NewSymbol("end"),    v8::FunctionTemplate::New(GL::handleEnd));
+		gltpl->Set(v8::String::NewSymbol("edgeFlag"),                v8::FunctionTemplate::New(GL::handleEdgeFlag));
+		gltpl->Set(v8::String::NewSymbol("enable"),                  v8::FunctionTemplate::New(GL::handleEnable));
+		gltpl->Set(v8::String::NewSymbol("enableClientState"),       v8::FunctionTemplate::New(GL::handleEnableClientState));
+		gltpl->Set(v8::String::NewSymbol("enableVertexAttribArray"), v8::FunctionTemplate::New(GL::handleEnableVertexAttribArray));
+		gltpl->Set(v8::String::NewSymbol("end"),                     v8::FunctionTemplate::New(GL::handleEnd));
+		gltpl->Set(v8::String::NewSymbol("endList"),                 v8::FunctionTemplate::New(GL::handleEndList));
+		gltpl->Set(v8::String::NewSymbol("endQuery"),                v8::FunctionTemplate::New(GL::handleEndQuery));
 
 		/*
 		 * SECTION F
@@ -1276,6 +1458,7 @@ namespace binding {
 		 * SECTION L
 		 */
 
+		gltpl->Set(v8::String::NewSymbol("linkProgram"),  v8::FunctionTemplate::New(GL::handleLinkProgram));
 		gltpl->Set(v8::String::NewSymbol("loadIdentity"), v8::FunctionTemplate::New(GL::handleLoadIdentity));
 
 		/*
@@ -1299,6 +1482,12 @@ namespace binding {
 		 */
 
 		gltpl->Set(v8::String::NewSymbol("texCoord2f"),  v8::FunctionTemplate::New(GL::handleTexCoord2f));
+
+		/*
+		 * SECTION U
+		 */
+
+		gltpl->Set(v8::String::NewSymbol("useProgram"),  v8::FunctionTemplate::New(GL::handleUseProgram));
 
 		/*
 		 * SECTION V

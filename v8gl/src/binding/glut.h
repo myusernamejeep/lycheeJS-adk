@@ -15,19 +15,6 @@ namespace binding {
 			static v8::Handle<v8::Value> handleInit(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleInitWindowPosition(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleInitWindowSize(const v8::Arguments& args);
-
-			static v8::Handle<v8::Value> getRGBA(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-			static v8::Handle<v8::Value> getRGB(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-			static v8::Handle<v8::Value> getINDEX(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-			static v8::Handle<v8::Value> getSINGLE(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-			static v8::Handle<v8::Value> getDOUBLE(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-			static v8::Handle<v8::Value> getACCUM(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-			static v8::Handle<v8::Value> getALPHA(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-			static v8::Handle<v8::Value> getDEPTH(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-			static v8::Handle<v8::Value> getSTENCIL(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-			static v8::Handle<v8::Value> getMULTISAMPLE(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-			static v8::Handle<v8::Value> getSTEREO(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-//			static v8::Handle<v8::Value> getLUMINANCE(v8::Local<v8::String> property, const v8::AccessorInfo &info);
 			static v8::Handle<v8::Value> handleInitDisplayMode(const v8::Arguments& args);
 
 			static v8::Handle<v8::Value> handleCreateWindow(const v8::Arguments& args);
@@ -59,19 +46,12 @@ namespace binding {
 			static v8::Handle<v8::Value> handleOverlayDisplayFunc(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleReshapeFunc(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleKeyboardFunc(const v8::Arguments& args);
-			static v8::Handle<v8::Value> getLEFT_BUTTON(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-			static v8::Handle<v8::Value> getMIDDLE_BUTTON(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-			static v8::Handle<v8::Value> getRIGHT_BUTTON(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-			static v8::Handle<v8::Value> getUP(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-			static v8::Handle<v8::Value> getDOWN(v8::Local<v8::String> property, const v8::AccessorInfo &info);
 			static v8::Handle<v8::Value> handleMouseFunc(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleMotionFunc(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleIdleFunc(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleTimerFunc(const v8::Arguments& args);
 
-			static v8::Handle<v8::Value> getACTIVE_SHIFT(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-			static v8::Handle<v8::Value> getACTIVE_CTRL(v8::Local<v8::String> property, const v8::AccessorInfo &info);
-			static v8::Handle<v8::Value> getACTIVE_ALT(v8::Local<v8::String> property, const v8::AccessorInfo &info);
+			static v8::Handle<v8::Value> handleGet(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleGetModifiers(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleExtensionSupported(const v8::Arguments& args);
 

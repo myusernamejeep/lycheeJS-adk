@@ -50,27 +50,38 @@ namespace binding {
 			static v8::Handle<v8::Value> handleColorMaterial(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleCompileShader(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleCopyPixels(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleCreateBuffer(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleCreateProgram(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleCreateShader(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleCullFace(const v8::Arguments& args);
 
+			static v8::Handle<v8::Value> handleDeleteBuffers(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleDeleteLists(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleDeleteProgram(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleDeleteQueries(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleDeleteShader(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleDisable(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleDisableClientState(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleDisableVertexAttribArray(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleDepthFunc(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleDepthMask(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleDepthRange(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleDetachShader(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleDrawArrays(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleDrawBuffer(const v8::Arguments& args);
-			static v8::Handle<v8::Value> handleDisable(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleDrawBuffers(const v8::Arguments& args);
 
+			static v8::Handle<v8::Value> handleEdgeFlag(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleEnable(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleEnableClientState(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleEnableVertexAttribArray(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleEnd(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleEndList(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleEndQuery(const v8::Arguments& args);
 
 			static v8::Handle<v8::Value> handleFlush(const v8::Arguments& args);
 
+			static v8::Handle<v8::Value> handleLinkProgram(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleLoadIdentity(const v8::Arguments& args);
 
 			static v8::Handle<v8::Value> handleMatrixMode(const v8::Arguments& args);
@@ -78,6 +89,8 @@ namespace binding {
 			static v8::Handle<v8::Value> handleOrtho(const v8::Arguments& args);
 
 			static v8::Handle<v8::Value> handleTexCoord2f(const v8::Arguments& args);
+
+			static v8::Handle<v8::Value> handleUseProgram(const v8::Arguments& args);
 
 			static v8::Handle<v8::Value> handleVertex2f(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleVertex2i(const v8::Arguments& args);

@@ -37,89 +37,6 @@ v8::Handle<v8::Value> GLglDeleteTexturesCallback(const v8::Arguments& args) {
 	return res;
 }
 
-v8::Handle<v8::Value> GLglDisableClientStateCallback(const v8::Arguments& args) {
-	
-	if (args.Length() < 1) return v8::Undefined();
-
-	int arg0 = args[0]->IntegerValue();
-
-
-	glDisableClientState((GLenum) arg0);
-	v8::Handle<v8::Object> res(GlFactory::self_);
-
-	return res;
-}
-
-v8::Handle<v8::Value> GLglEdgeFlagCallback(const v8::Arguments& args) {
-	
-	if (args.Length() < 1) return v8::Undefined();
-
-	unsigned int arg0 = args[0]->Uint32Value();
-
-
-	glEdgeFlag((GLboolean) arg0);
-	v8::Handle<v8::Object> res(GlFactory::self_);
-
-	return res;
-}
-
-
-
-
-v8::Handle<v8::Value> GLglEdgeFlagvCallback(const v8::Arguments& args) {
-	
-	if (args.Length() < 1) return v8::Undefined();
-
-
-    
-	v8::Handle<v8::Array> arrHandle0 = v8::Handle<v8::Array>::Cast(args[0]);
- 	GLboolean* arg0 = new GLboolean[arrHandle0->Length()];
-
-	for (unsigned j = 0; j < arrHandle0->Length(); j++) {
-		v8::Handle<v8::Value> arg(arrHandle0->Get(v8::Integer::New(j)));
- 		GLboolean aux = ( GLboolean)arg->Uint32Value();
-		arg0[j] = aux; 
-	}
-    
-    
-
-	glEdgeFlagv((const GLboolean*) arg0);
-	v8::Handle<v8::Object> res(GlFactory::self_);
-
-	return res;
-}
-
-
-
-
-v8::Handle<v8::Value> GLglEnableClientStateCallback(const v8::Arguments& args) {
-	
-	if (args.Length() < 1) return v8::Undefined();
-
-	int arg0 = args[0]->IntegerValue();
-
-
-	glEnableClientState((GLenum) arg0);
-	v8::Handle<v8::Object> res(GlFactory::self_);
-
-	return res;
-}
-
-v8::Handle<v8::Value> GLglEndListCallback(const v8::Arguments& args) {
-	
-	if (args.Length() < 0) return v8::Undefined();
-
-
-
-	glEndList();
-	v8::Handle<v8::Object> res(GlFactory::self_);
-
-	return res;
-}
-
-
-
-
 v8::Handle<v8::Value> GLglEvalCoord1dCallback(const v8::Arguments& args) {
 	
 	if (args.Length() < 1) return v8::Undefined();
@@ -7069,28 +6986,6 @@ v8::Handle<v8::Value> GLglPointParameterivCallback(const v8::Arguments& args) {
 	return res;
 }
 
-
-
-
-v8::Handle<v8::Value> GLglBlendFuncSeparateCallback(const v8::Arguments& args) {
-	
-	if (args.Length() < 4) return v8::Undefined();
-
-	int arg0 = args[0]->IntegerValue();
-	int arg1 = args[1]->IntegerValue();
-	int arg2 = args[2]->IntegerValue();
-	int arg3 = args[3]->IntegerValue();
-
-
-	glBlendFuncSeparate((GLenum) arg0, (GLenum) arg1, (GLenum) arg2, (GLenum) arg3);
-	v8::Handle<v8::Object> res(GlFactory::self_);
-
-	return res;
-}
-
-
-
-
 v8::Handle<v8::Value> GLglMultiDrawArraysCallback(const v8::Arguments& args) {
 	
 	if (args.Length() < 4) return v8::Undefined();
@@ -7649,34 +7544,6 @@ v8::Handle<v8::Value> GLglBindBufferCallback(const v8::Arguments& args) {
 
 
 
-
-v8::Handle<v8::Value> GLglDeleteBuffersCallback(const v8::Arguments& args) {
-	
-	if (args.Length() < 2) return v8::Undefined();
-
-	int arg0 = args[0]->IntegerValue();
-
-    
-	v8::Handle<v8::Array> arrHandle1 = v8::Handle<v8::Array>::Cast(args[1]);
- 	GLuint* arg1 = new	GLuint[arrHandle1->Length()];
-
-	for (unsigned j = 0; j < arrHandle1->Length(); j++) {
-		v8::Handle<v8::Value> arg(arrHandle1->Get(v8::Integer::New(j)));
- 		GLuint aux = ( GLuint)arg->Uint32Value();
-		arg1[j] = aux; 
-	}
-    
-    
-
-	glDeleteBuffers((GLsizei) arg0, (const GLuint*) arg1);
-	v8::Handle<v8::Object> res(GlFactory::self_);
-
-	return res;
-}
-
-
-
-
 v8::Handle<v8::Value> GLglGenBuffersCallback(const v8::Arguments& args) {
 	
 	if (args.Length() < 2) return v8::Undefined();
@@ -7754,36 +7621,6 @@ v8::Handle<v8::Value> GLglGetBufferParameterivCallback(const v8::Arguments& args
 
 	return res;
 }
-
-
-
-
-v8::Handle<v8::Value> GLglDrawBuffersCallback(const v8::Arguments& args) {
-	
-	if (args.Length() < 2) return v8::Undefined();
-
-	int arg0 = args[0]->IntegerValue();
-
-    
-	v8::Handle<v8::Array> arrHandle1 = v8::Handle<v8::Array>::Cast(args[1]);
-	GLenum* arg1 = new GLenum[arrHandle1->Length()];
-
-	for (unsigned j = 0; j < arrHandle1->Length(); j++) {
-		v8::Handle<v8::Value> arg(arrHandle1->Get(v8::Integer::New(j)));
-		GLenum aux = ( GLenum)arg->IntegerValue();
-		arg1[j] = aux; 
-	}
-    
-    
-
-	glDrawBuffers((GLsizei) arg0, (const GLenum*) arg1);
-	v8::Handle<v8::Object> res(GlFactory::self_);
-
-	return res;
-}
-
-
-
 
 v8::Handle<v8::Value> GLglVertexAttrib1dCallback(const v8::Arguments& args) {
 	
@@ -8645,41 +8482,6 @@ v8::Handle<v8::Value> GLglVertexAttrib4usvCallback(const v8::Arguments& args) {
 	return res;
 }
 
-
-
-
-v8::Handle<v8::Value> GLglEnableVertexAttribArrayCallback(const v8::Arguments& args) {
-	
-	if (args.Length() < 1) return v8::Undefined();
-
-	unsigned int arg0 = args[0]->Uint32Value();
-
-
-	glEnableVertexAttribArray((GLuint) arg0);
-	v8::Handle<v8::Object> res(GlFactory::self_);
-
-	return res;
-}
-
-
-
-
-v8::Handle<v8::Value> GLglDisableVertexAttribArrayCallback(const v8::Arguments& args) {
-	
-	if (args.Length() < 1) return v8::Undefined();
-
-	unsigned int arg0 = args[0]->Uint32Value();
-
-
-	glDisableVertexAttribArray((GLuint) arg0);
-	v8::Handle<v8::Object> res(GlFactory::self_);
-
-	return res;
-}
-
-
-
-
 v8::Handle<v8::Value> GLglGetVertexAttribdvCallback(const v8::Arguments& args) {
 	
 	if (args.Length() < 3) return v8::Undefined();
@@ -8760,37 +8562,6 @@ v8::Handle<v8::Value> GLglGetVertexAttribivCallback(const v8::Arguments& args) {
 
 	return res;
 }
-
-
-v8::Handle<v8::Value> GLglLinkProgramCallback(const v8::Arguments& args) {
-	
-	if (args.Length() < 1) return v8::Undefined();
-
-	unsigned int arg0 = args[0]->Uint32Value();
-
-
-	glLinkProgram((GLuint) arg0);
-	v8::Handle<v8::Object> res(GlFactory::self_);
-
-	return res;
-}
-
-
-
-
-v8::Handle<v8::Value> GLglUseProgramCallback(const v8::Arguments& args) {
-	
-	if (args.Length() < 1) return v8::Undefined();
-
-	unsigned int arg0 = args[0]->Uint32Value();
-
-
-	glUseProgram((GLuint) arg0);
-	v8::Handle<v8::Object> res(GlFactory::self_);
-
-	return res;
-}
-
 
 v8::Handle<v8::Value> GLglValidateProgramCallback(const v8::Arguments& args) {
 	
@@ -10610,21 +10381,8 @@ v8::Handle<v8::ObjectTemplate> GlFactory::createGl(void) {
 	Gl->Set(v8::String::NewSymbol("COMPRESSED_SLUMINANCE_ALPHA"), v8::Uint32::New(GL_COMPRESSED_SLUMINANCE_ALPHA), v8::ReadOnly);
 	Gl->Set(v8::String::NewSymbol("accum"), v8::FunctionTemplate::New(GLglAccumCallback));
 	Gl->Set(v8::String::NewSymbol("alphaFunc"), v8::FunctionTemplate::New(GLglAlphaFuncCallback));
-	Gl->Set(v8::String::NewSymbol("deleteLists"), v8::FunctionTemplate::New(GLglDeleteListsCallback));
-	Gl->Set(v8::String::NewSymbol("deleteTextures"), v8::FunctionTemplate::New(GLglDeleteTexturesCallback));
-	Gl->Set(v8::String::NewSymbol("depthFunc"), v8::FunctionTemplate::New(GLglDepthFuncCallback));
-	Gl->Set(v8::String::NewSymbol("depthMask"), v8::FunctionTemplate::New(GLglDepthMaskCallback));
-	Gl->Set(v8::String::NewSymbol("depthRange"), v8::FunctionTemplate::New(GLglDepthRangeCallback));
-	Gl->Set(v8::String::NewSymbol("disable"), v8::FunctionTemplate::New(GLglDisableCallback));
-	Gl->Set(v8::String::NewSymbol("disableClientState"), v8::FunctionTemplate::New(GLglDisableClientStateCallback));
-	Gl->Set(v8::String::NewSymbol("drawArrays"), v8::FunctionTemplate::New(GLglDrawArraysCallback));
-	Gl->Set(v8::String::NewSymbol("drawBuffer"), v8::FunctionTemplate::New(GLglDrawBufferCallback));
 	Gl->Set(v8::String::NewSymbol("edgeFlag"), v8::FunctionTemplate::New(GLglEdgeFlagCallback));
 	Gl->Set(v8::String::NewSymbol("edgeFlagv"), v8::FunctionTemplate::New(GLglEdgeFlagvCallback));
-	Gl->Set(v8::String::NewSymbol("enable"), v8::FunctionTemplate::New(GLglEnableCallback));
-	Gl->Set(v8::String::NewSymbol("enableClientState"), v8::FunctionTemplate::New(GLglEnableClientStateCallback));
-	Gl->Set(v8::String::NewSymbol("end"), v8::FunctionTemplate::New(GLglEndCallback));
-	Gl->Set(v8::String::NewSymbol("endList"), v8::FunctionTemplate::New(GLglEndListCallback));
 	Gl->Set(v8::String::NewSymbol("evalCoord1d"), v8::FunctionTemplate::New(GLglEvalCoord1dCallback));
 	Gl->Set(v8::String::NewSymbol("evalCoord1dv"), v8::FunctionTemplate::New(GLglEvalCoord1dvCallback));
 	Gl->Set(v8::String::NewSymbol("evalCoord1f"), v8::FunctionTemplate::New(GLglEvalCoord1fCallback));
@@ -10964,7 +10722,6 @@ v8::Handle<v8::ObjectTemplate> GlFactory::createGl(void) {
 	Gl->Set(v8::String::NewSymbol("windowPos3s"), v8::FunctionTemplate::New(GLglWindowPos3sCallback));
 	Gl->Set(v8::String::NewSymbol("windowPos3sv"), v8::FunctionTemplate::New(GLglWindowPos3svCallback));
 	Gl->Set(v8::String::NewSymbol("genQueries"), v8::FunctionTemplate::New(GLglGenQueriesCallback));
-	Gl->Set(v8::String::NewSymbol("deleteQueries"), v8::FunctionTemplate::New(GLglDeleteQueriesCallback));
 	Gl->Set(v8::String::NewSymbol("isQuery"), v8::FunctionTemplate::New(GLglIsQueryCallback));
 	Gl->Set(v8::String::NewSymbol("beginQuery"), v8::FunctionTemplate::New(GLglBeginQueryCallback));
 	Gl->Set(v8::String::NewSymbol("endQuery"), v8::FunctionTemplate::New(GLglEndQueryCallback));
@@ -10972,12 +10729,10 @@ v8::Handle<v8::ObjectTemplate> GlFactory::createGl(void) {
 	Gl->Set(v8::String::NewSymbol("getQueryObjectiv"), v8::FunctionTemplate::New(GLglGetQueryObjectivCallback));
 	Gl->Set(v8::String::NewSymbol("getQueryObjectuiv"), v8::FunctionTemplate::New(GLglGetQueryObjectuivCallback));
 	Gl->Set(v8::String::NewSymbol("bindBuffer"), v8::FunctionTemplate::New(GLglBindBufferCallback));
-	Gl->Set(v8::String::NewSymbol("deleteBuffers"), v8::FunctionTemplate::New(GLglDeleteBuffersCallback));
 	Gl->Set(v8::String::NewSymbol("genBuffers"), v8::FunctionTemplate::New(GLglGenBuffersCallback));
 	Gl->Set(v8::String::NewSymbol("isBuffer"), v8::FunctionTemplate::New(GLglIsBufferCallback));
 	Gl->Set(v8::String::NewSymbol("unmapBuffer"), v8::FunctionTemplate::New(GLglUnmapBufferCallback));
 	Gl->Set(v8::String::NewSymbol("getBufferParameteriv"), v8::FunctionTemplate::New(GLglGetBufferParameterivCallback));
-	Gl->Set(v8::String::NewSymbol("drawBuffers"), v8::FunctionTemplate::New(GLglDrawBuffersCallback));
 	Gl->Set(v8::String::NewSymbol("vertexAttrib1d"), v8::FunctionTemplate::New(GLglVertexAttrib1dCallback));
 	Gl->Set(v8::String::NewSymbol("vertexAttrib1dv"), v8::FunctionTemplate::New(GLglVertexAttrib1dvCallback));
 	Gl->Set(v8::String::NewSymbol("vertexAttrib1f"), v8::FunctionTemplate::New(GLglVertexAttrib1fCallback));
@@ -11014,20 +10769,13 @@ v8::Handle<v8::ObjectTemplate> GlFactory::createGl(void) {
 	Gl->Set(v8::String::NewSymbol("vertexAttrib4ubv"), v8::FunctionTemplate::New(GLglVertexAttrib4ubvCallback));
 	Gl->Set(v8::String::NewSymbol("vertexAttrib4uiv"), v8::FunctionTemplate::New(GLglVertexAttrib4uivCallback));
 	Gl->Set(v8::String::NewSymbol("vertexAttrib4usv"), v8::FunctionTemplate::New(GLglVertexAttrib4usvCallback));
-	Gl->Set(v8::String::NewSymbol("enableVertexAttribArray"), v8::FunctionTemplate::New(GLglEnableVertexAttribArrayCallback));
-	Gl->Set(v8::String::NewSymbol("disableVertexAttribArray"), v8::FunctionTemplate::New(GLglDisableVertexAttribArrayCallback));
 	Gl->Set(v8::String::NewSymbol("getVertexAttribdv"), v8::FunctionTemplate::New(GLglGetVertexAttribdvCallback));
 	Gl->Set(v8::String::NewSymbol("getVertexAttribfv"), v8::FunctionTemplate::New(GLglGetVertexAttribfvCallback));
 	Gl->Set(v8::String::NewSymbol("getVertexAttribiv"), v8::FunctionTemplate::New(GLglGetVertexAttribivCallback));
-	Gl->Set(v8::String::NewSymbol("deleteShader"), v8::FunctionTemplate::New(GLglDeleteShaderCallback));
-	Gl->Set(v8::String::NewSymbol("detachShader"), v8::FunctionTemplate::New(GLglDetachShaderCallback));
 	Gl->Set(v8::String::NewSymbol("createShader"), v8::FunctionTemplate::New(GLglCreateShaderCallback));
 	Gl->Set(v8::String::NewSymbol("compileShader"), v8::FunctionTemplate::New(GLglCompileShaderCallback));
 	Gl->Set(v8::String::NewSymbol("createProgram"), v8::FunctionTemplate::New(GLglCreateProgramCallback));
 	Gl->Set(v8::String::NewSymbol("attachShader"), v8::FunctionTemplate::New(GLglAttachShaderCallback));
-	Gl->Set(v8::String::NewSymbol("linkProgram"), v8::FunctionTemplate::New(GLglLinkProgramCallback));
-	Gl->Set(v8::String::NewSymbol("useProgram"), v8::FunctionTemplate::New(GLglUseProgramCallback));
-	Gl->Set(v8::String::NewSymbol("deleteProgram"), v8::FunctionTemplate::New(GLglDeleteProgramCallback));
 	Gl->Set(v8::String::NewSymbol("validateProgram"), v8::FunctionTemplate::New(GLglValidateProgramCallback));
 	Gl->Set(v8::String::NewSymbol("uniform1f"), v8::FunctionTemplate::New(GLglUniform1fCallback));
 	Gl->Set(v8::String::NewSymbol("uniform2f"), v8::FunctionTemplate::New(GLglUniform2fCallback));
