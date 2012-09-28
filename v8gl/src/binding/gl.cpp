@@ -1,6 +1,11 @@
 
 #include "gl.h"
 
+#ifdef __WEBGL__
+	#include "webgl.h"
+#endif
+
+
 #ifdef __APPLE__
 	#include <OpenGL/OpenGL.h>
 #else
@@ -21,10 +26,6 @@
  * gl.drawPixels()
  * gl.drawRangeElements()
  *
- *
- * TODO (Integration with V8GL APIs):
- * gl.deleteTextures()
- *
  * Missing Bindings:
  *
  * - gl.bufferData()
@@ -44,11 +45,6 @@
  * - gl.copyColorSubTable()
  * - gl.copyConvolutionFilter1D()
  * - gl.copyConvolutionFilter2D()
- *
- *
- * Incomplete Bindings (TODO):
- *
- * - gl.bindAttribLocation()
  *
  */
 
@@ -199,6 +195,25 @@ namespace binding {
 			unsigned int id = args[1]->Uint32Value();
 
 			glBeginQuery((GLenum) target, (GLuint) id);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleBindAttribLocation(const v8::Arguments& args) {
+
+		if (args.Length() == 3) {
+
+			unsigned int program = args[0]->Uint32Value();
+			unsigned int index   = args[1]->Uint32Value();
+
+			v8::String::Utf8Value value(args[2]);
+			char* name = *value;
+
+
+			glBindAttribLocation((GLuint) program, (GLuint) index, (const GLchar*) name);
 
 		}
 
@@ -715,14 +730,58 @@ namespace binding {
 
 	}
 
-	v8::Handle<v8::Value> GL::handleCreateBuffer(const v8::Arguments& args) {
+	v8::Handle<v8::Value> GL::handleCopyTexImage2D(const v8::Arguments& args) {
 
-		GLuint buffer;
-		glGenBuffers(1, &buffer);
+		if (args.Length() == 8) {
 
-		return v8::Integer::New(buffer);
+			int target         = args[0]->IntegerValue();
+			int level          = args[1]->IntegerValue();
+			int internalformat = args[2]->IntegerValue();
+			int x              = args[3]->IntegerValue();
+			int y              = args[4]->IntegerValue();
+			int width          = args[5]->IntegerValue();
+			int height         = args[6]->IntegerValue();
+			int border         = args[7]->IntegerValue();
+
+			glCopyTexImage2D(
+				(GLenum) target, (GLint) level, (GLenum) internalformat,
+				(GLint) x, (GLint) y,
+				(GLsizei) width, (GLsizei) height,
+				(GLint) border
+			);
+
+		}
+
+		return v8::Undefined();
 
 	}
+
+	v8::Handle<v8::Value> GL::handleCopyTexSubImage2D(const v8::Arguments& args) {
+  
+ 		if (args.Length() == 8) {
+
+			int target  = args[0]->IntegerValue();
+			int level   = args[1]->IntegerValue();
+			int xoffset = args[2]->IntegerValue();
+			int yoffset = args[3]->IntegerValue();
+			int x       = args[4]->IntegerValue();
+			int y       = args[5]->IntegerValue();
+			int width   = args[6]->IntegerValue();
+			int height  = args[7]->IntegerValue();
+
+			glCopyTexSubImage2D(
+				(GLenum) target, (GLint) level,
+				(GLint) xoffset, (GLint) yoffset,
+				(GLint) x, (GLint) y,
+				(GLsizei) width, (GLsizei) height
+			);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
 
 	v8::Handle<v8::Value> GL::handleCreateProgram(const v8::Arguments& args) {
 		return v8::Uint32::New(glCreateProgram());
@@ -841,6 +900,28 @@ namespace binding {
 			unsigned int shader = args[0]->Uint32Value();
 
 			glDeleteShader((GLuint) shader);
+
+		}
+
+		return v8::Undefined();
+
+	}
+
+	v8::Handle<v8::Value> GL::handleDeleteTextures(const v8::Arguments& args) {
+
+		if (args.Length() == 2) {
+
+			int n = args[0]->IntegerValue();
+
+			v8::Handle<v8::Array> arr_textures = v8::Handle<v8::Array>::Cast(args[1]);
+			GLuint* textures = new GLuint[arr_textures->Length()];
+
+			for (unsigned i = 0; i < arr_textures->Length(); i++) {
+				textures[i] = (GLuint) arr_textures->Get(v8::Integer::New(i))->Uint32Value();
+			}
+
+
+			glDeleteTextures((GLsizei) n, (const GLuint*) textures);
 
 		}
 
@@ -1092,9 +1173,28 @@ namespace binding {
 	 * SECTION F
 	 */
 
+	v8::Handle<v8::Value> GL::handleFinish(const v8::Arguments& args) {
+		glFinish();
+		return v8::Undefined();
+	}
+
 	v8::Handle<v8::Value> GL::handleFlush(const v8::Arguments& args) {
 		glFlush();
 		return v8::Undefined();
+	}
+
+	v8::Handle<v8::Value> GL::handleFrontFace(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			int mode = args[0]->IntegerValue();
+
+			glFrontFace((GLenum) mode);
+
+		}
+
+		return v8::Undefined();
+
 	}
 
 
@@ -1296,10 +1396,14 @@ namespace binding {
 		gltpl->Set(v8::String::NewSymbol("POLYGON"),                  v8::Uint32::New(GL_POLYGON),        v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("begin"),				      v8::FunctionTemplate::New(GL::handleBegin));
 		gltpl->Set(v8::String::NewSymbol("beginQuery"),				  v8::FunctionTemplate::New(GL::handleBeginQuery));
+		gltpl->Set(v8::String::NewSymbol("bindAttribLocation"),       v8::FunctionTemplate::New(GL::handleBindAttribLocation));
 		gltpl->Set(v8::String::NewSymbol("ARRAY_BUFFER"),             v8::Uint32::New(GL_ARRAY_BUFFER),          v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("ELEMENT_ARRAY_BUFFER"),     v8::Uint32::New(GL_ELEMENT_ARRAY_BUFFER),  v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("bindBuffer"),               v8::FunctionTemplate::New(GL::handleBindBuffer));
+		gltpl->Set(v8::String::NewSymbol("TEXTURE_1D"),               v8::Uint32::New(GL_TEXTURE_1D),            v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("TEXTURE_2D"),               v8::Uint32::New(GL_TEXTURE_2D),            v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("TEXTURE_3D"),               v8::Uint32::New(GL_TEXTURE_3D),            v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("TEXTURE_CUBE_MAP"),         v8::Uint32::New(GL_TEXTURE_CUBE_MAP),      v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("bindTexture"),              v8::FunctionTemplate::New(GL::handleBindTexture));
 		gltpl->Set(v8::String::NewSymbol("bitmap"),                   v8::FunctionTemplate::New(GL::handleBitmap));
 		gltpl->Set(v8::String::NewSymbol("BLEND_COLOR"),              v8::Uint32::New(GL_BLEND_COLOR),           v8::ReadOnly);
@@ -1388,7 +1492,8 @@ namespace binding {
 		gltpl->Set(v8::String::NewSymbol("DEPTH"),               v8::Uint32::New(GL_DEPTH),   v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("STENCIL"),             v8::Uint32::New(GL_STENCIL), v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("copyPixels"),          v8::FunctionTemplate::New(GL::handleCopyPixels));
-		gltpl->Set(v8::String::NewSymbol("createBuffer"),        v8::FunctionTemplate::New(GL::handleCreateBuffer));
+		gltpl->Set(v8::String::NewSymbol("copyTexImage2D"),      v8::FunctionTemplate::New(GL::handleCopyTexImage2D));
+		gltpl->Set(v8::String::NewSymbol("copyTexSubImage2D"),   v8::FunctionTemplate::New(GL::handleCopyTexSubImage2D));
 		gltpl->Set(v8::String::NewSymbol("createProgram"),       v8::FunctionTemplate::New(GL::handleCreateProgram));
 		gltpl->Set(v8::String::NewSymbol("FRAGMENT_SHADER"),     v8::Uint32::New(GL_FRAGMENT_SHADER), v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("VERTEX_SHADER"),       v8::Uint32::New(GL_VERTEX_SHADER),   v8::ReadOnly);
@@ -1409,6 +1514,7 @@ namespace binding {
 		gltpl->Set(v8::String::NewSymbol("deleteProgram"),            v8::FunctionTemplate::New(GL::handleDeleteProgram));
 		gltpl->Set(v8::String::NewSymbol("deleteQueries"),            v8::FunctionTemplate::New(GL::handleDeleteQueries));
 		gltpl->Set(v8::String::NewSymbol("deleteShader"),             v8::FunctionTemplate::New(GL::handleDeleteShader));
+		gltpl->Set(v8::String::NewSymbol("deleteTextures"),           v8::FunctionTemplate::New(GL::handleDeleteTextures));
 		gltpl->Set(v8::String::NewSymbol("depthFunc"),                v8::FunctionTemplate::New(GL::handleDepthFunc));
 		gltpl->Set(v8::String::NewSymbol("depthMask"),                v8::FunctionTemplate::New(GL::handleDepthMask));
 		gltpl->Set(v8::String::NewSymbol("depthRange"),               v8::FunctionTemplate::New(GL::handleDepthRange));
@@ -1452,7 +1558,11 @@ namespace binding {
 		 * SECTION F
 		 */
 
-		gltpl->Set(v8::String::NewSymbol("flush"), v8::FunctionTemplate::New(GL::handleFlush));
+		gltpl->Set(v8::String::NewSymbol("finish"),     v8::FunctionTemplate::New(GL::handleFinish));
+		gltpl->Set(v8::String::NewSymbol("flush"),      v8::FunctionTemplate::New(GL::handleFlush));
+		gltpl->Set(v8::String::NewSymbol("CW"),         v8::Uint32::New(GL_CW),  v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("CCW"),        v8::Uint32::New(GL_CCW), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("frontFace"),  v8::FunctionTemplate::New(GL::handleFrontFace));
 
 		/*
 		 * SECTION L
@@ -1495,6 +1605,31 @@ namespace binding {
 
 		gltpl->Set(v8::String::NewSymbol("vertex2f"),  v8::FunctionTemplate::New(GL::handleVertex2f));
 		gltpl->Set(v8::String::NewSymbol("vertex2i"),  v8::FunctionTemplate::New(GL::handleVertex2i));
+
+
+
+#ifdef __WEBGL__
+
+		gltpl->Set(v8::String::NewSymbol("createBuffer"),            v8::FunctionTemplate::New(WEBGL::handleCreateBuffer));
+		gltpl->Set(v8::String::NewSymbol("createFramebuffer"),       v8::FunctionTemplate::New(WEBGL::handleCreateFramebuffer));
+		gltpl->Set(v8::String::NewSymbol("createRenderbuffer"),      v8::FunctionTemplate::New(WEBGL::handleCreateRenderbuffer));
+		gltpl->Set(v8::String::NewSymbol("createTexture"),           v8::FunctionTemplate::New(WEBGL::handleCreateTexture));
+
+		gltpl->Set(v8::String::NewSymbol("deleteBuffer"),            v8::FunctionTemplate::New(WEBGL::handleDeleteBuffer));
+		gltpl->Set(v8::String::NewSymbol("deleteFramebuffer"),       v8::FunctionTemplate::New(WEBGL::handleDeleteFramebuffer));
+		gltpl->Set(v8::String::NewSymbol("deleteRenderbuffer"),      v8::FunctionTemplate::New(WEBGL::handleDeleteRenderbuffer));
+		gltpl->Set(v8::String::NewSymbol("deleteTexture"),           v8::FunctionTemplate::New(WEBGL::handleDeleteTexture));
+		gltpl->Set(v8::String::NewSymbol("drawElements"),            v8::FunctionTemplate::New(WEBGL::handleDrawElements));
+
+		gltpl->Set(v8::String::NewSymbol("framebufferRenderbuffer"), v8::FunctionTemplate::New(WEBGL::handleFramebufferRenderbuffer));
+		gltpl->Set(v8::String::NewSymbol("framebufferTexture2D"),    v8::FunctionTemplate::New(WEBGL::handleFramebufferTexture2D));
+
+		gltpl->Set(v8::String::NewSymbol("generateMipmap"),          v8::FunctionTemplate::New(WEBGL::handleGenerateMipmap));
+		gltpl->Set(v8::String::NewSymbol("getActiveAttrib"),         v8::FunctionTemplate::New(WEBGL::handleGetActiveAttrib));
+		gltpl->Set(v8::String::NewSymbol("getActiveUniform"),        v8::FunctionTemplate::New(WEBGL::handleGetActiveUniform));
+		gltpl->Set(v8::String::NewSymbol("getAttachedShaders"),      v8::FunctionTemplate::New(WEBGL::handleGetAttachedShaders));
+
+#endif
 
 
 		return scope.Close(gltpl);

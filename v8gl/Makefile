@@ -45,17 +45,19 @@ V8ADK_SHARED_LIBRARIES =
 #
 
 V8GL_PROG_NAME = v8gl
-V8GL_CFLAGS = -D__V8GL__
+V8GL_CFLAGS = -D__V8GL__ -D__WEBGL__
 
 V8GL_HEADER_FILES = src/v8gl/v8gl.h \
 	src/v8gl/path.h \
 	src/binding/gl.h \
+	src/binding/webgl.h \
 	src/binding/glu.h \
 	src/binding/glut.h
 
 V8GL_SRC_FILES = src/v8gl/v8gl.cpp \
 	src/v8gl/path.cpp \
 	src/binding/gl.cpp \
+	src/binding/webgl.cpp \
 	src/binding/glu.cpp \
 	src/binding/glut.cpp
 
@@ -123,6 +125,7 @@ $(BUILDS): $(HEADER_FILES)
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/v8gl/v8gl.cpp -c -o $(OUTDIR)/v8gl_v8gl.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/v8gl/path.cpp -c -o $(OUTDIR)/v8gl_path.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/binding/gl.cpp -c -o $(OUTDIR)/binding_gl.o
+	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/binding/webgl.cpp -c -o $(OUTDIR)/binding_webgl.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/binding/glu.cpp -c -o $(OUTDIR)/binding_glu.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/binding/glut.cpp -c -o $(OUTDIR)/binding_glut.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/arraybuffer.cpp -c -o $(OUTDIR)/api_arraybuffer.o
@@ -132,7 +135,8 @@ $(BUILDS): $(HEADER_FILES)
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/text.cpp -c -o $(OUTDIR)/api_text.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/texture.cpp -c -o $(OUTDIR)/api_texture.o
 	$(AR) rc $(OUTDIR)/libv8gl.a $(OUTDIR)/v8gl_v8gl.o $(OUTDIR)/v8gl_path.o \
-	$(OUTDIR)/binding_gl.o $(OUTDIR)/binding_glu.o $(OUTDIR)/binding_glut.o \
+	$(OUTDIR)/binding_gl.o $(OUTDIR)/binding_webgl.o \
+	$(OUTDIR)/binding_glu.o $(OUTDIR)/binding_glut.o \
 	$(OUTDIR)/api_arraybuffer.o \
 	$(OUTDIR)/api_console.o $(OUTDIR)/api_navigator.o $(OUTDIR)/api_script.o \
 	$(OUTDIR)/api_text.o $(OUTDIR)/api_texture.o
