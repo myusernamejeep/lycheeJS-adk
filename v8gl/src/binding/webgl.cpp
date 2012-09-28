@@ -169,11 +169,11 @@ namespace binding {
 
 
 			GLsizei count = (GLsizei) 0;
-			GLuint shaders[(int) maxCount];
+			GLuint* shaders = new GLuint[(int) maxCount];
 
 			glGetAttachedShaders(
 				(GLuint) program, (GLsizei) maxCount,
-				&count, (GLuint*) &shaders
+				&count, (GLuint*) shaders
 			);
 
 
