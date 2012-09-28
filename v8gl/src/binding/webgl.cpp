@@ -164,23 +164,23 @@ namespace binding {
 
 			unsigned int program = args[0]->Uint32Value();
 
-			GLint* maxCount = (GLint) 0;
-			glGetProgramiv((GLuint) program, GL_ATTACHED_SHADERS, (GLint*) maxCount);
+			GLint maxCount = (GLint) 0;
+			glGetProgramiv((GLuint) program, GL_ATTACHED_SHADERS, &maxCount);
 
 
-			GLsizei* count = (GLsizei) 0;
-			GLuint* shaders[(int)*maxCount];
+			GLsizei count = (GLsizei) 0;
+			GLuint shaders[(int) maxCount];
 
 			glGetAttachedShaders(
-				(GLuint) program, (GLsizei) *maxCount,
-				(GLsizei*) count, (GLuint*) shaders
+				(GLuint) program, (GLsizei) maxCount,
+				&count, (GLuint*) &shaders
 			);
 
 
-			v8::Handle<v8::Array> result = v8::Array::New(*count);
+			v8::Handle<v8::Array> result = v8::Array::New((int)count);
 
-			for (int i = 0; i < *count; i++) {
-				result->Set(v8::Integer::New(i), v8::Uint32::New((unsigned int) *shaders[i]));
+			for (int i = 0; i < (int)count; i++) {
+				result->Set(v8::Integer::New(i), v8::Uint32::New((unsigned int) shaders[i]));
 			}
 
 			return result;
