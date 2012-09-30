@@ -30,6 +30,9 @@
 
 	console.debug(arr);
 
+	gl.linkProgram(program);
+	gl.useProgram(program);
+
 
 })(this);
 

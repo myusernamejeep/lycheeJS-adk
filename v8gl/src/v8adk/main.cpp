@@ -23,6 +23,7 @@ Usage: %s <task> <path/to/init.js>\n\
 \n\
 \n\
 Tasks:\n\
+	execute          Executes the JavaScript file.\n\
 	export-bash      Exports the environment to a via-bash includable format.\n\
 	export-json      Exports the environment to a JSON format.\n\
 	rewrite          Rewrites and prepares your init.js.\n\
@@ -59,7 +60,7 @@ v8adk rewrite-v8gl ./external/lycheeJS/game/boilerplate/init.js > v8gl_init.js\n
 				v8gl::V8GL::dispatch(context, (char*) "rewrite-v8gl");
 			} else if (strcmp(argv[1], "rewrite") == 0) {
 				v8gl::V8GL::dispatch(context, (char*) "rewrite");
-			} else {
+			} else if (strcmp(argv[1], "execute") != 0){
 
 				fprintf(stderr, usage, argv[0]);
 				return 1;
