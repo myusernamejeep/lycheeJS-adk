@@ -1,8 +1,6 @@
 
-#include <fstream>
-
 #include "text.h"
-#include "../v8gl/path.h"
+#include "../lib/fs.h"
 
 
 namespace api {
@@ -34,11 +32,11 @@ namespace api {
 		v8::HandleScope scope;
 
 		if (!args.IsConstructCall()) {
-			v8::ThrowException(v8::Exception::TypeError(v8::String::New("V8GL object constructor cannot be called as a function.")));
+			return v8::ThrowException(v8::Exception::TypeError(v8::String::New("V8GL object constructor cannot be called as a function.")));
 		}
 
 		if (args.Length() != 1 || !args[0]->IsString()) {
-			v8::ThrowException(v8::Exception::SyntaxError(v8::String::New("Usage: new Text(url)")));
+			return v8::ThrowException(v8::Exception::SyntaxError(v8::String::New("Usage: new Text(url)")));
 		}
 
 
@@ -65,12 +63,13 @@ namespace api {
 		if (!self.IsEmpty()) {
 
 			v8::String::Utf8Value url_value(self->Get(v8::String::NewSymbol("url")));
-			char* url = v8gl::Path::getReal(*url_value);
-			char* data = api::Text::load(url);
+
+			char* data = lib::FS::readVM(*url_value);
+			char* url = lib::FS::getReal(*url_value);
 
 			if (data == NULL) {
 				self->Set(v8::String::NewSymbol("data"), v8::Null(),            v8::ReadOnly);
-				v8::ThrowException(v8::Exception::Error(v8::String::New("Could not read file.")));
+				return v8::ThrowException(v8::Exception::Error(v8::String::New("Could not read file.")));
 			} else {
 				self->Set(v8::String::NewSymbol("url"),  v8::String::New(url),  v8::ReadOnly);
 				self->Set(v8::String::NewSymbol("data"), v8::String::New(data), v8::ReadOnly);
@@ -85,34 +84,6 @@ namespace api {
 
 
 		return scope.Close(v8::Undefined());
-
-	}
-
-	char* Text::load(char* filename) {
-
-		FILE* file = fopen(filename, "rb");
-		if (file == NULL) {
-			return NULL;
-		}
-
-
-		fseek(file, 0, SEEK_END);
-		int size = ftell(file);
-		rewind(file);
-
-
-		char* chars = new char[size + 1];
-		chars[size] = '\0';
-
-		for (int i = 0; i < size; ) {
-			int read = static_cast<int>(fread(&chars[i], 1, size - i, file));
-			i += read;
-		}
-
-		fclose(file);
-
-
-		return chars;
 
 	}
 

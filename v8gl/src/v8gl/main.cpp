@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "v8gl.h"
-#include "path.h"
+#include "../lib/fs.h"
 
 
 
@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
 
 	} else {
 
-		root_file = realpath(argv[0], buf1);
+		root_file = realpath(argv[1], buf1);
 
 	}
 
@@ -34,7 +34,8 @@ int main(int argc, char* argv[]) {
 	v8::Persistent<v8::Context> context = v8gl::V8GL::initialize(&argc, argv);
 
 
-	v8gl::Path::setRoot((char*) root_prog, (char*) root_file);
+	lib::FS::setVMRoot((char*) root_prog, (char*) root_file);
+
 
 	v8gl::V8GL::dispatch(context, (char*) "lycheeJS");
 
@@ -48,20 +49,16 @@ int main(int argc, char* argv[]) {
 
 		if (path) {
 
-			char* _source = v8gl::V8GL::read(path);
-			v8::Local<v8::String> source = v8::String::New(_source);
+			// TODO: Maybe do this via lib::FS::readVM()?
+			char* rawsource = lib::FS::read(path);
+
+			v8::Local<v8::String> source = v8::String::New(rawsource);
 
 
 			if (source.IsEmpty()) {
-
 				fprintf(stderr, "Error reading file %s", path);
-
 			} else {
-
-				char *old_path = v8gl::Path::pushRoot(path);
 				v8gl::V8GL::execute(context, source, v8::String::New(path));
-				v8gl::Path::popRoot(old_path);
-
 			}
 
 		} else {

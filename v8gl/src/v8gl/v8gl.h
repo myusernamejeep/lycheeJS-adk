@@ -19,8 +19,8 @@ namespace v8gl {
 			static bool dispatch(v8::Handle<v8::Context>, char* what);
 
 			static v8::Handle<v8::Value> execute(v8::Handle<v8::Context> context, v8::Handle<v8::String> source, v8::Handle<v8::String> filename);
+			static v8::Handle<v8::Value> executeVM(v8::Handle<v8::Context> context, v8::Handle<v8::String> source, v8::Handle<v8::String> filename);
 
-			static char* read(char* filename);
 			static void logException(v8::TryCatch* try_catch);
 
 	};

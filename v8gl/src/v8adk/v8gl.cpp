@@ -1,9 +1,9 @@
 
-#include <limits.h>
 #include <string.h>
-#include <fstream>
 
 #include "v8gl.h"
+
+#include "../lib/fs.h"
 
 #include "../api/arraybuffer.h"
 #include "../api/console.h"
@@ -34,6 +34,7 @@ namespace v8gl {
 
 
 		// Static APIs
+		global->Set(v8::String::New("fs"),        lib::FS::generate(),        v8::ReadOnly);
 		global->Set(v8::String::New("console"),   api::Console::generate(),   v8::ReadOnly);
 		global->Set(v8::String::New("navigator"), api::Navigator::generate(), v8::ReadOnly);
 
@@ -128,6 +129,20 @@ namespace v8gl {
 	}
 
 
+
+	v8::Handle<v8::Value> V8GL::executeVM(v8::Handle<v8::Context> context, v8::Handle<v8::String> source, v8::Handle<v8::String> filename) {
+
+		char* filepath = *v8::String::Utf8Value(filename);
+
+		char *old_root = lib::FS::pushVMRoot(filepath);
+		v8::Handle<v8::Value> result = V8GL::execute(context, source, filename);
+		lib::FS::popVMRoot(old_root);
+
+		delete old_root;
+
+		return result;
+
+	}
 
 	v8::Handle<v8::Value> V8GL::execute(v8::Handle<v8::Context> context, v8::Handle<v8::String> source, v8::Handle<v8::String> filename) {
 
@@ -354,35 +369,5 @@ namespace v8gl {
 		}
 
 	}
-
-
-
-	char* V8GL::read(char* filename) {
-
-		FILE* file = fopen(filename, "rb");
-		if (file == NULL) {
-			return NULL;
-		}
-
-
-		fseek(file, 0, SEEK_END);
-		int size = ftell(file);
-		rewind(file);
-
-
-		char* chars = new char[size + 1];
-		chars[size] = '\0';
-
-		for (int i = 0; i < size; ) {
-			int read = static_cast<int>(fread(&chars[i], 1, size - i, file));
-			i += read;
-		}
-
-		fclose(file);
-
-		return chars;
-
-	}
-
 
 }

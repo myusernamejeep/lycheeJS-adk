@@ -4,7 +4,7 @@
 #include <png.h>
 
 #include "texture.h"
-#include "../v8gl/path.h"
+#include "../lib/fs.h"
 
 #define TEXTURE_LOAD_ERROR 0
 
@@ -86,7 +86,8 @@ namespace api {
 		if (!self.IsEmpty()) {
 		
 			v8::String::Utf8Value url_value(self->Get(v8::String::NewSymbol("url")));
-			char* url = v8gl::Path::getReal(*url_value);
+
+			char* url = lib::FS::getReal(*url_value);
 
 			int width;
 			int height;

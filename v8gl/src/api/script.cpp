@@ -1,9 +1,7 @@
 
-#include <fstream>
-
 #include "script.h"
+#include "../lib/fs.h"
 #include "../v8gl/v8gl.h"
-#include "../v8gl/path.h"
 
 
 namespace api {
@@ -65,8 +63,9 @@ namespace api {
 
 
 			v8::String::Utf8Value url_value(self->Get(v8::String::NewSymbol("url")));
-			char* url = v8gl::Path::getReal(*url_value);
-			char* data = api::Script::load(url);
+
+			char* data = lib::FS::readVM(*url_value);
+			char* url = lib::FS::getReal(*url_value);
 
 			if (data == NULL) {
 				self->Set(v8::String::NewSymbol("data"), v8::Null(),            v8::ReadOnly);
@@ -105,11 +104,7 @@ namespace api {
 			v8::Local<v8::String> data = v8::String::Cast(*self->Get(v8::String::NewSymbol("data")));
 
 
-			char* filepath = *v8::String::Utf8Value(url);
-
-			char *old_root = v8gl::Path::pushRoot(filepath);
 			v8::Handle<v8::Value> value = v8gl::V8GL::execute(context, data, url);
-			v8gl::Path::popRoot(old_root);
 
 
 			return scope.Close(value);
@@ -118,34 +113,6 @@ namespace api {
 
 
 		return scope.Close(v8::Undefined());
-
-	}
-
-	char* Script::load(char* filename) {
-
-		FILE* file = fopen(filename, "rb");
-		if (file == NULL) {
-			return NULL;
-		}
-
-
-		fseek(file, 0, SEEK_END);
-		int size = ftell(file);
-		rewind(file);
-
-
-		char* chars = new char[size + 1];
-		chars[size] = '\0';
-
-		for (int i = 0; i < size; ) {
-			int read = static_cast<int>(fread(&chars[i], 1, size - i, file));
-			i += read;
-		}
-
-		fclose(file);
-
-
-		return chars;
 
 	}
 

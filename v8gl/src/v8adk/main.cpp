@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "v8gl.h"
-#include "path.h"
+#include "../lib/fs.h"
 
 
 
@@ -41,11 +41,11 @@ v8adk rewrite-v8gl ./external/lycheeJS/game/boilerplate/init.js > v8gl_init.js\n
 	if (argc == 3) {
 
 		char buf[PATH_MAX + 1];
-		char *filepath = realpath(argv[2], buf);
+		char *path = realpath(argv[2], buf);
 
-		if (filepath) {
+		if (path) {
 
-			char* rawsource = v8gl::V8GL::read(filepath);
+			char* rawsource = lib::FS::read(path);
 
 
 			v8::HandleScope scope;
@@ -70,16 +70,12 @@ v8adk rewrite-v8gl ./external/lycheeJS/game/boilerplate/init.js > v8gl_init.js\n
 
 			v8::Local<v8::String> source = v8::String::New(rawsource);
 			if (source.IsEmpty()) {
-				v8::ThrowException(v8::String::New("Error reading initialization script file."));
+				fprintf(stderr, "Error reading file %s", path);
 			} else {
 
-				v8gl::Path::setRoot(argv[0], argv[2]);
+				lib::FS::setVMRoot(argv[0], argv[2]);
 
-				char *old_path = v8gl::Path::pushRoot(filepath);
-				v8gl::V8GL::execute(context, source, v8::String::New(filepath));
-				v8gl::Path::popRoot(old_path);
-
-				delete old_path;
+				v8gl::V8GL::executeVM(context, source, v8::String::New(path));
 
 			}
 
