@@ -64,15 +64,15 @@ V8GL_SHARED_LIBRARIES = -lglut -lGLU -lGL
 
 
 HEADER_FILES = src/lib/fs.h \
+	src/lib/os.h \
 	src/api/arraybuffer.h \
-	src/api/console.h \
 	src/api/script.h \
 	src/api/text.h \
 	src/api/texture.h
 
 SRC_FILES = src/lib/fs.cpp \
+	src/lib/os.cpp \
 	src/api/arraybuffer.cpp \
-	src/api/console.cpp \
 	src/api/navigator.cpp \
 	src/api/script.cpp \
 	src/api/text.cpp \
@@ -93,6 +93,7 @@ OUTDIR = ./out/$@
 clean:
 	rm -rf ./out/
 	rm -rf ./lib/
+	rm ./src/js/console.h
 	rm ./src/js/interval.h
 	rm ./src/js/timeout.h
 
@@ -111,11 +112,14 @@ dependencies: must-set-LYCHEEJS_ROOT must-set-LIBPNG_PATH must-set-LIBV8_PATH
 	cp $(LIBPNG_PATH)/libpng.a $(V8GL_ROOT)/lib/$(LIB_ARCH)/libpng.a
 	cp $(LIBV8_PATH)/libv8_base.a $(V8GL_ROOT)/lib/$(LIB_ARCH)/libv8_base.a
 	cp $(LIBV8_PATH)/libv8_nosnapshot.a $(V8GL_ROOT)/lib/$(LIB_ARCH)/libv8_nosnapshot.a
+
+builtin-js:
+	cd src/ && xxd -i "js/console.js" "js/console.h"
 	cd src/ && xxd -i "js/interval.js" "js/interval.h"
 	cd src/ && xxd -i "js/timeout.js" "js/timeout.h"
 
 
-$(BUILDS): $(HEADER_FILES)
+$(BUILDS): builtin-js $(HEADER_FILES)
 	rm -rf $(OUTDIR)
 	mkdir -p $(OUTDIR)
 	$(CC) -Wall $(V8ADK_CFLAGS) $(STATIC_INCLUDES) src/v8adk/main.cpp $(V8ADK_SRC_FILES) -o $(OUTDIR)/v8adk $(V8ADK_LDFLAGS)
@@ -126,8 +130,8 @@ $(BUILDS): $(HEADER_FILES)
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/binding/glu.cpp -c -o $(OUTDIR)/binding_glu.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/binding/glut.cpp -c -o $(OUTDIR)/binding_glut.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/lib/fs.cpp -c -o $(OUTDIR)/lib_fs.o
+	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/lib/os.cpp -c -o $(OUTDIR)/lib_os.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/arraybuffer.cpp -c -o $(OUTDIR)/api_arraybuffer.o
-	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/console.cpp -c -o $(OUTDIR)/api_console.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/navigator.cpp -c -o $(OUTDIR)/api_navigator.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/script.cpp -c -o $(OUTDIR)/api_script.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/text.cpp -c -o $(OUTDIR)/api_text.o
@@ -135,9 +139,9 @@ $(BUILDS): $(HEADER_FILES)
 	$(AR) rc $(OUTDIR)/libv8gl.a $(OUTDIR)/v8gl_v8gl.o \
 	$(OUTDIR)/binding_gl.o $(OUTDIR)/binding_webgl.o \
 	$(OUTDIR)/binding_glu.o $(OUTDIR)/binding_glut.o \
-	$(OUTDIR)/lib_fs.o \
+	$(OUTDIR)/lib_fs.o $(OUTDIR)/lib_os.o \
 	$(OUTDIR)/api_arraybuffer.o \
-	$(OUTDIR)/api_console.o $(OUTDIR)/api_navigator.o $(OUTDIR)/api_script.o \
+	$(OUTDIR)/api_navigator.o $(OUTDIR)/api_script.o \
 	$(OUTDIR)/api_text.o $(OUTDIR)/api_texture.o
 	$(RANLIB) $(OUTDIR)/libv8gl.a
 

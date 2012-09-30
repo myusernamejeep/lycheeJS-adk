@@ -627,7 +627,7 @@ case "$1" in
 		then
 
 			V8_PLATFORM="x64.release";
-			_BUILD_ARCH=$2;
+			_BUILD_ARCH="linux";
 			_BUILD_V8=1;
 			_BUILD_V8GL=1;
 			_BUILD_GAME=0;

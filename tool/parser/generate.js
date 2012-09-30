@@ -23,6 +23,7 @@ var find_in_gl_headers = function(token) {
 
 		if (current === '') continue;
 
+
 		// Ignore preprocessor instructions
 		if (current.substr(0, 2) === '/*') {
 			is_comment = true;
@@ -50,11 +51,23 @@ var find_in_gl_headers = function(token) {
 			} else if (
 				token.type === 'method'
 				&& current.substr(0, 24) === 'GLAPI void GLAPIENTRY gl'
+				&& current.indexOf('(') > 0
 			) {
 
 				var str = 'GLAPI void GLAPIENTRY gl' + token.name.charAt(0).toUpperCase() + token.name.substr(1);
+				if (current.substr(0, current.indexOf('(')).trim() === str) {
+					token.gl = true;
+					break;
+				}
 
-				if (current.substr(0, str.length) === str) {
+			} else if (
+				token.type === 'method'
+				&& current.substr(0, 22) === 'GLAPI void APIENTRY gl'
+				&& current.indexOf('(') > 0
+			) {
+
+				var str = 'GLAPI void APIENTRY gl' + token.name.charAt(0).toUpperCase() + token.name.substr(1);
+				if (current.substr(0, current.indexOf('(')).trim() === str) {
 					token.gl = true;
 					break;
 				}
@@ -123,6 +136,13 @@ var find_in_gl_headers = function(token) {
 
 	}
 
+
+	if (debug === true && token.gl === false && token.gles === false) {
+		console.warn('WebGL Token', token.type, token.name);
+	}
+
+
+
 };
 
 
@@ -132,6 +152,8 @@ var generate_token = function(line) {
 
 	var tmp, sig;
 	var token = {
+		gl: false,
+		gles: false,
 		type: null,
 		name: null,
 		signature: null
@@ -155,7 +177,6 @@ var generate_token = function(line) {
 		}
 
 		token.name = tmp;
-		token.signature = false;
 
 
 	// ENUM
@@ -167,7 +188,6 @@ var generate_token = function(line) {
 		tmp = tmp.substr(0, tmp.indexOf('=')).trim();
 
 		token.name = tmp;
-		token.signature = false;
 
 
 	// METHOD
@@ -180,23 +200,23 @@ var generate_token = function(line) {
 		var spec_retval = line.split(' ')[0];
 
 		switch(spec_retval) {
-			case 'any':                  token.returnval = 'v8::Value';                    break;
-			case 'boolean':              token.returnval = 'v8::Boolean';                  break;
-			case 'void':                 token.returnval = 'v8::Undefined';                break;
-			case 'DOMString':            token.returnval = 'v8::String';                   break;
-			case 'DOMString[':           token.returnval = 'v8::Array(v8::String)';        break;
-			case 'GLboolean':            token.returnval = 'v8::Boolean';                  break;
-			case 'GLenum':               token.returnval = 'v8::Uint32';                   break;
-			case 'GLint':                token.returnval = 'v8::Integer';                  break;
-			case 'WebGLActiveInfo':      token.returnval = 'api::WebGLActiveInfo';         break;
-			case 'WebGLBuffer':          token.returnval = 'api::WebGLBuffer';             break;
-			case 'WebGLFramebuffer':     token.returnval = 'api::WebGLFramebuffer';        break;
-			case 'WebGLRenderbuffer':    token.returnval = 'api::WebGLRenderbuffer';       break;
-			case 'WebGLProgram':         token.returnval = 'api::WebGLProgram';            break;
-			case 'WebGLShader':          token.returnval = 'api::WebGLShader';             break;
-			case 'WebGLShader[':         token.returnval = 'v8::Array(api::WebGLShader)';  break;
-			case 'WebGLTexture':         token.returnval = 'api::WebGLTexture';            break;
-			case 'WebGLUniformLocation': token.returnval = 'api::WebGLUniformLocation';    break;
+			case 'any':                  token.retval = 'v8::Value';                    break;
+			case 'boolean':              token.retval = 'v8::Boolean';                  break;
+			case 'void':                 token.retval = 'v8::Undefined';                break;
+			case 'DOMString':            token.retval = 'v8::String';                   break;
+			case 'DOMString[':           token.retval = 'v8::Array(v8::String)';        break;
+			case 'GLboolean':            token.retval = 'v8::Boolean';                  break;
+			case 'GLenum':               token.retval = 'v8::Uint32';                   break;
+			case 'GLint':                token.retval = 'v8::Integer';                  break;
+			case 'WebGLActiveInfo':      token.retval = 'api::WebGLActiveInfo';         break;
+			case 'WebGLBuffer':          token.retval = 'api::WebGLBuffer';             break;
+			case 'WebGLFramebuffer':     token.retval = 'api::WebGLFramebuffer';        break;
+			case 'WebGLRenderbuffer':    token.retval = 'api::WebGLRenderbuffer';       break;
+			case 'WebGLProgram':         token.retval = 'api::WebGLProgram';            break;
+			case 'WebGLShader':          token.retval = 'api::WebGLShader';             break;
+			case 'WebGLShader[':         token.retval = 'v8::Array(api::WebGLShader)';  break;
+			case 'WebGLTexture':         token.retval = 'api::WebGLTexture';            break;
+			case 'WebGLUniformLocation': token.retval = 'api::WebGLUniformLocation';    break;
 
 			default:
 
@@ -272,7 +292,7 @@ String.prototype.trim = function() {
 	raw.headers.gl = new Text('./gl.h');
 	raw.headers.gl.load();
 
-	raw.headers.glext = new Text('./gl.h');
+	raw.headers.glext = new Text('./glext.h');
 	raw.headers.glext.load();
 
 	raw.headers.gles = new Text('./gles.h');

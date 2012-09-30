@@ -60,7 +60,9 @@ v8adk rewrite-v8gl ./external/lycheeJS/game/boilerplate/init.js > v8gl_init.js\n
 				v8gl::V8GL::dispatch(context, (char*) "rewrite-v8gl");
 			} else if (strcmp(argv[1], "rewrite") == 0) {
 				v8gl::V8GL::dispatch(context, (char*) "rewrite");
-			} else if (strcmp(argv[1], "execute") != 0){
+			} else if (strcmp(argv[1], "execute") == 0) {
+				v8gl::V8GL::dispatch(context, (char*) "execute");
+			} else {
 
 				fprintf(stderr, usage, argv[0]);
 				return 1;
@@ -75,7 +77,7 @@ v8adk rewrite-v8gl ./external/lycheeJS/game/boilerplate/init.js > v8gl_init.js\n
 
 				lib::FS::setVMRoot(argv[0], argv[2]);
 
-				v8gl::V8GL::executeVM(context, source, v8::String::New(path));
+				v8gl::V8GL::execute(context, source, v8::String::New(path));
 
 			}
 

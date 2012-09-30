@@ -7,26 +7,6 @@
 
 namespace v8gl {
 
-	class Path {
-
-		private:
-
-		public:
-
-			static char seperator_;
-			static char* root_;
-
-			static char* getRoot(void);
-			static void setRoot(char* program_path, char* file_path);
-
-			static char *pushRoot(char* new_path);
-			static void popRoot(char *old_path);
-
-			static char* getReal(char* filepath);
-
-	};
-
-
 	class V8GL {
 
 		private:
@@ -40,7 +20,6 @@ namespace v8gl {
 
 			static v8::Handle<v8::Value> execute(v8::Handle<v8::Context> context, v8::Handle<v8::String> source, v8::Handle<v8::String> filename);
 
-			static char* read(char* filename);
 			static void logException(v8::TryCatch* try_catch);
 
 	};

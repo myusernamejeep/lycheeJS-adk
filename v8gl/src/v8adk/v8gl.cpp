@@ -4,9 +4,9 @@
 #include "v8gl.h"
 
 #include "../lib/fs.h"
+#include "../lib/os.h"
 
 #include "../api/arraybuffer.h"
-#include "../api/console.h"
 #include "../api/navigator.h"
 #include "../api/script.h"
 #include "../api/text.h"
@@ -14,6 +14,7 @@
 
 
 // Advanced @built-in JavaScript headers
+#include "../js/console.h"
 #include "../js/interval.h"
 #include "../js/timeout.h"
 
@@ -35,7 +36,7 @@ namespace v8gl {
 
 		// Static APIs
 		global->Set(v8::String::New("fs"),        lib::FS::generate(),        v8::ReadOnly);
-		global->Set(v8::String::New("console"),   api::Console::generate(),   v8::ReadOnly);
+		global->Set(v8::String::New("os"),        lib::OS::generate(),        v8::ReadOnly);
 		global->Set(v8::String::New("navigator"), api::Navigator::generate(), v8::ReadOnly);
 
 
@@ -64,8 +65,9 @@ namespace v8gl {
 	bool V8GL::dispatch(v8::Handle<v8::Context> context, char* what) {
 
 		// @built-in Polyfills for BOM/DOM like behaviours
+		execute(context, v8::String::New((char*) js_console_js),  v8::String::New("@built-in/console.js"));
 		execute(context, v8::String::New((char*) js_interval_js), v8::String::New("@built-in/interval.js"));
-		execute(context, v8::String::New((char*) js_timeout_js), v8::String::New("@built-in/timeout.js"));
+		execute(context, v8::String::New((char*) js_timeout_js),  v8::String::New("@built-in/timeout.js"));
 
 		// @built-in lycheeJS libraries for communication between Engine & ADK and/or V8GL
 		execute(context, v8::String::New((char*) lychee_core_js), v8::String::New("@built-in/lychee/core.js"));
