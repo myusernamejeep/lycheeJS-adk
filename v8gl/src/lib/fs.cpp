@@ -32,6 +32,8 @@ namespace lib {
 				result = v8::String::New(buffer);
 			}
 
+			delete buffer;
+
 		}
 
 
@@ -178,6 +180,8 @@ namespace lib {
 		strncpy(buf1, pch1 ? file_path : _folder_this, index1);
 		buf1[index1] = '\0';
 
+		delete[] _root;
+
 		_root = new char[index + index1 + 1];
 		strcpy(_root, buf);
 		strcpy(_root, buf1);
@@ -194,7 +198,9 @@ namespace lib {
 		char *pch = strrchr(new_path, _folder_separator);
 		int index = pch ? (pch - new_path + 1) : 2;
 
-		_root= new char[index + 1];
+		delete[] _root;
+		_root = new char[index + 1];
+
 		strncpy(_root, pch ? new_path : _folder_this, index);
 		_root[index] = '\0';
 
