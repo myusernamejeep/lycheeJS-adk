@@ -1200,6 +1200,27 @@ namespace binding {
 
 
 	/*
+	 * SECTION G
+	 */
+	v8::Handle<v8::Value> GL::handleGetString(const v8::Arguments& args) {
+
+		if (args.Length() == 1) {
+
+			GLenum name = args[0]->Uint32Value();
+			char* value = (char*) glGetString(name);
+
+
+			return v8::String::New((const char*) value);
+
+		}
+
+
+		return v8::Null();
+
+	}
+
+
+	/*
 	 * SECTION L
 	 */
 
@@ -1406,6 +1427,7 @@ namespace binding {
 		gltpl->Set(v8::String::NewSymbol("BLEND_SRC_RGB"),            v8::Uint32::New(GL_BLEND_SRC_RGB),            v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("BLEND_DST_ALPHA"),          v8::Uint32::New(GL_BLEND_DST_ALPHA),          v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("BLEND_SRC_ALPHA"),          v8::Uint32::New(GL_BLEND_SRC_ALPHA),          v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("BLEND_EQUATION"),           v8::Uint32::New(GL_BLEND_EQUATION),       v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("BLEND_EQUATION_RGB"),       v8::Uint32::New(GL_BLEND_EQUATION_RGB),       v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("BLEND_EQUATION_ALPHA"),     v8::Uint32::New(GL_BLEND_EQUATION_ALPHA),     v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("CONSTANT_COLOR"),           v8::Uint32::New(GL_CONSTANT_COLOR),           v8::ReadOnly);
@@ -1449,15 +1471,114 @@ namespace binding {
 		gltpl->Set(v8::String::NewSymbol("OUT_OF_MEMORY"),     v8::Uint32::New(GL_OUT_OF_MEMORY),     v8::ReadOnly);
 
 		// Front Face Direction
-		gltpl->Set(v8::String::NewSymbol("CW"),         v8::Uint32::New(GL_CW),  v8::ReadOnly);
-		gltpl->Set(v8::String::NewSymbol("CCW"),        v8::Uint32::New(GL_CCW), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("CW"),  v8::Uint32::New(GL_CW),  v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("CCW"), v8::Uint32::New(GL_CCW), v8::ReadOnly);
 
-		/*
-		 * SECTION A
-		 */
+		// Parameter Names
+		gltpl->Set(v8::String::NewSymbol("LINE_WIDTH"),               v8::Uint32::New(GL_LINE_WIDTH), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("ALIASED_POINT_SIZE_RANGE"), v8::Uint32::New(GL_ALIASED_POINT_SIZE_RANGE), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("ALIASED_LINE_WIDTH_RANGE"), v8::Uint32::New(GL_ALIASED_LINE_WIDTH_RANGE), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("CULL_FACE_MODE"), v8::Uint32::New(GL_CULL_FACE_MODE), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("FRONT_FACE"), v8::Uint32::New(GL_FRONT_FACE), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("DEPTH_RANGE"), v8::Uint32::New(GL_DEPTH_RANGE), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("DEPTH_WRITEMASK"), v8::Uint32::New(GL_DEPTH_WRITEMASK), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("DEPTH_CLEAR_VALUE"), v8::Uint32::New(GL_DEPTH_CLEAR_VALUE), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("DEPTH_FUNC"), v8::Uint32::New(GL_DEPTH_FUNC), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL_CLEAR_VALUE"), v8::Uint32::New(GL_STENCIL_CLEAR_VALUE), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL_FUNC"), v8::Uint32::New(GL_STENCIL_FUNC), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL_FAIL"), v8::Uint32::New(GL_STENCIL_FAIL), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL_PASS_DEPTH_FAIL"), v8::Uint32::New(GL_STENCIL_PASS_DEPTH_FAIL), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL_PASS_DEPTH_PASS"), v8::Uint32::New(GL_STENCIL_PASS_DEPTH_PASS), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL_REF"), v8::Uint32::New(GL_STENCIL_REF), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL_VALUE_MASK"), v8::Uint32::New(GL_STENCIL_VALUE_MASK), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL_WRITEMASK"), v8::Uint32::New(GL_STENCIL_WRITEMASK), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL_BACK_FUNC"), v8::Uint32::New(GL_STENCIL_BACK_FUNC), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL_BACK_FAIL"), v8::Uint32::New(GL_STENCIL_BACK_FAIL), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL_BACK_PASS_DEPTH_FAIL"), v8::Uint32::New(GL_STENCIL_BACK_PASS_DEPTH_FAIL), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL_BACK_PASS_DEPTH_PASS"), v8::Uint32::New(GL_STENCIL_BACK_PASS_DEPTH_PASS), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL_BACK_REF"), v8::Uint32::New(GL_STENCIL_BACK_REF), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL_BACK_VALUE_MASK"), v8::Uint32::New(GL_STENCIL_BACK_VALUE_MASK), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL_BACK_WRITEMASK"), v8::Uint32::New(GL_STENCIL_BACK_WRITEMASK), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("VIEWPORT"), v8::Uint32::New(GL_VIEWPORT), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("SCISSOR_BOX"), v8::Uint32::New(GL_SCISSOR_BOX), v8::ReadOnly);
 
-		gltpl->Set(v8::String::NewSymbol("accum"),               v8::FunctionTemplate::New(GL::handleAccum));
-		gltpl->Set(v8::String::NewSymbol("activeTexture"),       v8::FunctionTemplate::New(GL::handleActiveTexture));
+		// Scissor Test
+		gltpl->Set(v8::String::NewSymbol("COLOR_CLEAR_VALUE"), v8::Uint32::New(GL_COLOR_CLEAR_VALUE), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("COLOR_WRITEMASK"),   v8::Uint32::New(GL_COLOR_WRITEMASK),   v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("UNPACK_ALIGNMENT"),  v8::Uint32::New(GL_UNPACK_ALIGNMENT),  v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("PACK_ALIGNMENT"),    v8::Uint32::New(GL_PACK_ALIGNMENT),    v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("MAX_TEXTURE_SIZE"),  v8::Uint32::New(GL_MAX_TEXTURE_SIZE),  v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("MAX_VIEWPORT_DIMS"), v8::Uint32::New(GL_MAX_VIEWPORT_DIMS), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("SUBPIXEL_BITS"),     v8::Uint32::New(GL_SUBPIXEL_BITS),     v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("RED_BITS"),          v8::Uint32::New(GL_RED_BITS),          v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("GREEN_BITS"),        v8::Uint32::New(GL_GREEN_BITS),        v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("BLUE_BITS"),         v8::Uint32::New(GL_BLUE_BITS),         v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("ALPHA_BITS"),        v8::Uint32::New(GL_ALPHA_BITS),        v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("DEPTH_BITS"),        v8::Uint32::New(GL_DEPTH_BITS),        v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("STENCIL_BITS"),      v8::Uint32::New(GL_STENCIL_BITS),      v8::ReadOnly);
+
+		// Polygon Offset Fills
+		gltpl->Set(v8::String::NewSymbol("POLYGON_OFFSET_UNITS"),   v8::Uint32::New(GL_POLYGON_OFFSET_UNITS), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("POLYGON_OFFSET_FACTOR"),  v8::Uint32::New(GL_POLYGON_OFFSET_FACTOR), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("TEXTURE_BINDING_2D"),     v8::Uint32::New(GL_TEXTURE_BINDING_2D), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("SAMPLE_BUFFERS"),         v8::Uint32::New(GL_SAMPLE_BUFFERS), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("SAMPLES"),                v8::Uint32::New(GL_SAMPLES), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("SAMPLE_COVERAGE_VALUE"),  v8::Uint32::New(GL_SAMPLE_COVERAGE_VALUE), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("SAMPLE_COVERAGE_INVERT"), v8::Uint32::New(GL_SAMPLE_COVERAGE_INVERT), v8::ReadOnly);
+
+		// Texture Compression
+		gltpl->Set(v8::String::NewSymbol("NUM_COMPRESSED_TEXTURE_FORMATS"), v8::Uint32::New(GL_NUM_COMPRESSED_TEXTURE_FORMATS), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("COMPRESSED_TEXTURE_FORMATS"),     v8::Uint32::New(GL_COMPRESSED_TEXTURE_FORMATS), v8::ReadOnly);
+
+		// Hinting Modes and Targets
+		gltpl->Set(v8::String::NewSymbol("DONT_CARE"),            v8::Uint32::New(GL_DONT_CARE),            v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("FASTEST"),              v8::Uint32::New(GL_FASTEST),              v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("NICEST"),               v8::Uint32::New(GL_NICEST),               v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("GENERATE_MIPMAP_HINT"), v8::Uint32::New(GL_GENERATE_MIPMAP_HINT), v8::ReadOnly);
+
+		// Data Types
+		gltpl->Set(v8::String::NewSymbol("BYTE"),           v8::Uint32::New(GL_BYTE),           v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("UNSIGNED_BYTE"),  v8::Uint32::New(GL_UNSIGNED_BYTE),  v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("SHORT"),          v8::Uint32::New(GL_SHORT),          v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("UNSIGNED_SHORT"), v8::Uint32::New(GL_UNSIGNED_SHORT), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("INT"),            v8::Uint32::New(GL_INT),            v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("UNSIGNED_INT"),   v8::Uint32::New(GL_UNSIGNED_INT),   v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("FLOAT"),          v8::Uint32::New(GL_FLOAT),          v8::ReadOnly);
+
+		// Pixel Formats
+		gltpl->Set(v8::String::NewSymbol("DEPTH_COMPONENT"), v8::Uint32::New(GL_DEPTH_COMPONENT), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("ALPHA"), v8::Uint32::New(GL_ALPHA), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("RGB"), v8::Uint32::New(GL_RGB), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("RGBA"), v8::Uint32::New(GL_RGBA), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("LUMINANCE"), v8::Uint32::New(GL_LUMINANCE), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("LUMINANCE_ALPHA"), v8::Uint32::New(GL_LUMINANCE_ALPHA), v8::ReadOnly);
+
+		// Pixel Types
+		gltpl->Set(v8::String::NewSymbol("UNSIGNED_SHORT_4_4_4_4"), v8::Uint32::New(GL_UNSIGNED_SHORT_4_4_4_4), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("UNSIGNED_SHORT_5_5_5_1"), v8::Uint32::New(GL_UNSIGNED_SHORT_5_5_5_1), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("UNSIGNED_SHORT_5_6_5"),   v8::Uint32::New(GL_UNSIGNED_SHORT_5_6_5),   v8::ReadOnly);
+
+		// Shaders
+		gltpl->Set(v8::String::NewSymbol("FRAGMENT_SHADER"),                  v8::Uint32::New(GL_FRAGMENT_SHADER),                  v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("VERTEX_SHADER"),                    v8::Uint32::New(GL_VERTEX_SHADER),                    v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("MAX_VERTEX_ATTRIBS"),               v8::Uint32::New(GL_MAX_VERTEX_ATTRIBS),               v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("MAX_VERTEX_UNIFORM_VECTORS"),       v8::Uint32::New(GL_MAX_VERTEX_UNIFORM_VECTORS),       v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("MAX_VARYING_VECTORS"),              v8::Uint32::New(GL_MAX_VARYING_VECTORS),              v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("MAX_COMBINED_TEXTURE_IMAGE_UNITS"), v8::Uint32::New(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("MAX_VERTEX_TEXTURE_IMAGE_UNITS"),   v8::Uint32::New(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS),   v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("MAX_TEXTURE_IMAGE_UNITS"),          v8::Uint32::New(GL_MAX_TEXTURE_IMAGE_UNITS),          v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("MAX_FRAGMENT_UNIFORM_VECTORS"),     v8::Uint32::New(GL_MAX_FRAGMENT_UNIFORM_VECTORS),     v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("SHADER_TYPE"),                      v8::Uint32::New(GL_SHADER_TYPE),                      v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("DELETE_STATUS"),                    v8::Uint32::New(GL_DELETE_STATUS),                    v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("LINK_STATUS"),                      v8::Uint32::New(GL_LINK_STATUS),                      v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("VALIDATE_STATUS"),                  v8::Uint32::New(GL_VALIDATE_STATUS),                  v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("ATTACHED_SHADERS"),                 v8::Uint32::New(GL_ATTACHED_SHADERS),                 v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("ACTIVE_UNIFORMS"),                  v8::Uint32::New(GL_ACTIVE_UNIFORMS),                  v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("ACTIVE_ATTRIBUTES"),                v8::Uint32::New(GL_ACTIVE_ATTRIBUTES),                v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("SHADING_LANGUAGE_VERSION"),         v8::Uint32::New(GL_SHADING_LANGUAGE_VERSION),         v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("CURRENT_PROGRAM"),                  v8::Uint32::New(GL_CURRENT_PROGRAM),                  v8::ReadOnly);
+
+		// Stencil Functions
 		gltpl->Set(v8::String::NewSymbol("NEVER"),               v8::Uint32::New(GL_NEVER),    v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("LESS"),                v8::Uint32::New(GL_LESS),     v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("EQUAL"),               v8::Uint32::New(GL_EQUAL),    v8::ReadOnly);
@@ -1466,6 +1587,29 @@ namespace binding {
 		gltpl->Set(v8::String::NewSymbol("NOTEQUAL"),            v8::Uint32::New(GL_NOTEQUAL), v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("GEQUAL"),              v8::Uint32::New(GL_GEQUAL),   v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("ALWAYS"),              v8::Uint32::New(GL_ALWAYS),   v8::ReadOnly);
+
+		// Stencil Operations
+		gltpl->Set(v8::String::NewSymbol("KEEP"),      v8::Uint32::New(GL_KEEP),      v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("REPLACE"),   v8::Uint32::New(GL_REPLACE),   v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("INCR"),      v8::Uint32::New(GL_INCR),      v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("DECR"),      v8::Uint32::New(GL_DECR),      v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("INVERT"),    v8::Uint32::New(GL_INVERT),    v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("INCR_WRAP"), v8::Uint32::New(GL_INCR_WRAP), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("DECR_WRAP"), v8::Uint32::New(GL_DECR_WRAP), v8::ReadOnly);
+
+		// Platform Information
+		gltpl->Set(v8::String::NewSymbol("VENDOR"),   v8::Uint32::New(GL_VENDOR),   v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("RENDERER"), v8::Uint32::New(GL_RENDERER), v8::ReadOnly);
+		gltpl->Set(v8::String::NewSymbol("VERSION"),  v8::Uint32::New(GL_VERSION),  v8::ReadOnly);
+
+
+
+		/*
+		 * SECTION A
+		 */
+
+		gltpl->Set(v8::String::NewSymbol("accum"),               v8::FunctionTemplate::New(GL::handleAccum));
+		gltpl->Set(v8::String::NewSymbol("activeTexture"),       v8::FunctionTemplate::New(GL::handleActiveTexture));
 		gltpl->Set(v8::String::NewSymbol("alphaFunc"),           v8::FunctionTemplate::New(GL::handleAlphaFunc));
 		gltpl->Set(v8::String::NewSymbol("areTexturesResident"), v8::FunctionTemplate::New(GL::handleAreTexturesResident));
 		gltpl->Set(v8::String::NewSymbol("arrayElement"),        v8::FunctionTemplate::New(GL::handleArrayElement));
@@ -1556,8 +1700,6 @@ namespace binding {
 		gltpl->Set(v8::String::NewSymbol("copyTexImage2D"),      v8::FunctionTemplate::New(GL::handleCopyTexImage2D));
 		gltpl->Set(v8::String::NewSymbol("copyTexSubImage2D"),   v8::FunctionTemplate::New(GL::handleCopyTexSubImage2D));
 		gltpl->Set(v8::String::NewSymbol("createProgram"),       v8::FunctionTemplate::New(GL::handleCreateProgram));
-		gltpl->Set(v8::String::NewSymbol("FRAGMENT_SHADER"),     v8::Uint32::New(GL_FRAGMENT_SHADER), v8::ReadOnly);
-		gltpl->Set(v8::String::NewSymbol("VERTEX_SHADER"),       v8::Uint32::New(GL_VERTEX_SHADER),   v8::ReadOnly);
 		gltpl->Set(v8::String::NewSymbol("createShader"),        v8::FunctionTemplate::New(GL::handleCreateShader));
 		gltpl->Set(v8::String::NewSymbol("cullFace"),            v8::FunctionTemplate::New(GL::handleCullFace));
 
@@ -1613,6 +1755,12 @@ namespace binding {
 		gltpl->Set(v8::String::NewSymbol("finish"),     v8::FunctionTemplate::New(GL::handleFinish));
 		gltpl->Set(v8::String::NewSymbol("flush"),      v8::FunctionTemplate::New(GL::handleFlush));
 		gltpl->Set(v8::String::NewSymbol("frontFace"),  v8::FunctionTemplate::New(GL::handleFrontFace));
+
+		/*
+		 * SECTION G
+		 */
+
+		gltpl->Set(v8::String::NewSymbol("getString"), v8::FunctionTemplate::New(GL::handleGetString));
 
 		/*
 		 * SECTION L

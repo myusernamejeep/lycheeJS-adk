@@ -87,6 +87,8 @@ namespace binding {
 			static v8::Handle<v8::Value> handleFlush(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleFrontFace(const v8::Arguments& args);
 
+			static v8::Handle<v8::Value> handleGetString(const v8::Arguments& args);
+
 			static v8::Handle<v8::Value> handleLinkProgram(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleLoadIdentity(const v8::Arguments& args);
 
