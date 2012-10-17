@@ -22,6 +22,8 @@ namespace binding {
 			static v8::Handle<v8::Value> handleBeginQuery(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleBindAttribLocation(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleBindBuffer(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleBindFramebuffer(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleBindRenderbuffer(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleBindTexture(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleBitmap(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleBlendColor(const v8::Arguments& args);
@@ -102,6 +104,8 @@ namespace binding {
 
 			static v8::Handle<v8::Value> handleVertex2f(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleVertex2i(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleVertex3f(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleVertex3i(const v8::Arguments& args);
 
 		public:
 
