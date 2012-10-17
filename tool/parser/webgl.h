@@ -221,6 +221,7 @@ interface WebGLRenderingContext {
     const GLenum MAX_TEXTURE_IMAGE_UNITS          = 0x8872;
     const GLenum MAX_FRAGMENT_UNIFORM_VECTORS     = 0x8DFD;
     const GLenum SHADER_TYPE                      = 0x8B4F;
+    const GLenum COMPILE_STATUS                   = 0x8B81;
     const GLenum DELETE_STATUS                    = 0x8B80;
     const GLenum LINK_STATUS                      = 0x8B82;
     const GLenum VALIDATE_STATUS                  = 0x8B83;
@@ -229,6 +230,14 @@ interface WebGLRenderingContext {
     const GLenum ACTIVE_ATTRIBUTES                = 0x8B89;
     const GLenum SHADING_LANGUAGE_VERSION         = 0x8B8C;
     const GLenum CURRENT_PROGRAM                  = 0x8B8D;
+
+    /* Shader Precision-Specified Types */
+    const GLenum LOW_FLOAT                      = 0x8DF0;
+    const GLenum MEDIUM_FLOAT                   = 0x8DF1;
+    const GLenum HIGH_FLOAT                     = 0x8DF2;
+    const GLenum LOW_INT                        = 0x8DF3;
+    const GLenum MEDIUM_INT                     = 0x8DF4;
+    const GLenum HIGH_INT                       = 0x8DF5;
     
     /* StencilFunction */
     const GLenum NEVER                          = 0x0200;
@@ -352,17 +361,6 @@ interface WebGLRenderingContext {
     const GLenum VERTEX_ATTRIB_ARRAY_NORMALIZED     = 0x886A;
     const GLenum VERTEX_ATTRIB_ARRAY_POINTER        = 0x8645;
     const GLenum VERTEX_ATTRIB_ARRAY_BUFFER_BINDING = 0x889F;
-    
-    /* Shader Source */
-    const GLenum COMPILE_STATUS                 = 0x8B81;
-    
-    /* Shader Precision-Specified Types */
-    const GLenum LOW_FLOAT                      = 0x8DF0;
-    const GLenum MEDIUM_FLOAT                   = 0x8DF1;
-    const GLenum HIGH_FLOAT                     = 0x8DF2;
-    const GLenum LOW_INT                        = 0x8DF3;
-    const GLenum MEDIUM_INT                     = 0x8DF4;
-    const GLenum HIGH_INT                       = 0x8DF5;
     
     /* Framebuffer Object. */
     const GLenum FRAMEBUFFER                    = 0x8D40;
