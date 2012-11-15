@@ -13,7 +13,7 @@ AR=ar
 CC=gcc
 RANLIB=ranlib
 CFLAGS=-W -Wall -O3 -funroll-loops -Iinclude/
-LDFLAGS=
+LDFLAGS=-lz -lm
 
 
 HEADERS = include/png.h \
