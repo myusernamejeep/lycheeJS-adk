@@ -38,7 +38,10 @@ fi;
 
 echo -e "ADK call: $0 $1 $2 $3 $4" >> $ADK_PATH/log;
 echo -e "Environment: "$(uname -a) >> $ADK_PATH/log;
-echo -e "g++ Version: "$(g++ --version | sed -n 1p) >> $ADK_PATH/log;
+if [ $(which g++) != "" ]
+then
+	echo -e "g++ Version: "$(g++ --version | sed -n 1p) >> $ADK_PATH/log;
+fi;
 echo -e "\n" >> $ADK_PATH/log;
 
 
@@ -184,8 +187,8 @@ install_dependencies() {
 
 	install_command="sudo $1 -y install
 	wget git unzip
-	ant openjdk-7-jdk
-	build-essential g++ gcc-multilib
+	ant openjdk-7-jdk lib32ncurses5 lib32stdc++6 lib32gcc1
+	build-essential g++ gcc-multilib zlib1g-dev
 	freeglut3-dev libgl1-mesa-dev libglu1-mesa-dev";
 
 	echo -e "$install_command\n" >> $ADK_PATH/log;
