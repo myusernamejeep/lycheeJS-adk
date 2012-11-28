@@ -1,4 +1,5 @@
 
+// var debug = true;
 var debug = false;
 
 var _ = { headers: {}, code: {} };
@@ -20,7 +21,6 @@ var find_in_gl_headers = function(token) {
 	for (var g = 0, l = _.headers.gl.length; g < l; g++) {
 
 		var current = _.headers.gl[g].trim();
-
 		if (current === '') continue;
 
 
@@ -141,7 +141,56 @@ var find_in_gl_headers = function(token) {
 		console.warn('WebGL Token', token.type, token.name);
 	}
 
+};
 
+
+
+var find_in_gl_code = function(token) {
+
+	for (var g = 0, l = _.code.gl.length; g < l; g++) {
+
+		var current = _.code.gl[g].trim();
+		if (current === '') continue;
+
+		var prefix = 'gltpl->Set(v8::String::NewSymbol("' + token.name + '")';
+
+
+		// Constants
+		if (
+			token.type === 'enum'
+			&& current.substr(0, prefix.length) === prefix
+		) {
+
+			return true;
+
+		} else if (
+			token.type === 'method'
+			&& current.substr(0, prefix.length) === prefix
+		) {
+
+			return true;
+
+		}
+
+	}
+
+
+	if (debug === true) {
+		console.warn("GL Token not in code", token.type, token.name);
+	}
+
+
+	return false;
+
+};
+
+var find_in_gles_code = function(token) {
+	return false;
+};
+
+var find_in_webgl_code = function(token) {
+
+	return false;
 
 };
 
@@ -298,8 +347,11 @@ String.prototype.trim = function() {
 	raw.headers.gles = new Text('./gles.h');
 	raw.headers.gles.load();
 
-	raw.code.gl    = new Text('../../v8gl/src/binding/gl.cpp');
+	raw.code.gl = new Text('../../v8gl/src/binding/gl.cpp');
 	raw.code.gl.load();
+
+	raw.code.gles = new Text('../../v8gl/src/binding/gles.cpp');
+	raw.code.gles.load();
 
 	raw.code.webgl = new Text('../../v8gl/src/binding/webgl.cpp');
 	raw.code.webgl.load();
@@ -309,6 +361,10 @@ String.prototype.trim = function() {
 	_.headers.gl    = (raw.headers.gl.data + '\n' + raw.headers.glext.data).split('\n');
 	_.headers.gles  = raw.headers.gles.data.split('\n');
 	_.headers.webgl = raw.headers.webgl.data.split('\n');
+
+	_.code.gl       = raw.code.gl.data.split('\n');
+	_.code.gles     = raw.code.gles.data.split('\n');
+	_.code.webgl    = raw.code.webgl.data.split('\n');
 
 
 	var cache = {
@@ -333,13 +389,24 @@ String.prototype.trim = function() {
 		find_in_gl_headers(token);
 
 
-		if (token.gl === true) {
-			cache.gl.push(token);
-		} else if (token.gles === true) {
-			cache.gles.push(token);
+		if (
+			token.gl === true
+		) {
+			if (find_in_gl_code(token) === false) {
+				cache.gl.push(token);
+			}
+		} else if (
+			token.gles === true
+		) {
+			if (find_in_gles_code(token) === false) {
+				cache.gles.push(token);
+			}
 		} else {
-			token.webgl = true;
-			cache.webgl.push(token);
+
+			if (find_in_webgl_code(token) === false) {
+				token.webgl = true;
+				cache.webgl.push(token);
+			}
 		}
 
 	}
