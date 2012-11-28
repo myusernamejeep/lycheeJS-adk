@@ -137,15 +137,18 @@ var find_in_gl_headers = function(token) {
 	}
 
 
-	if (debug === true && token.gl === false && token.gles === false) {
-		console.warn('WebGL Token', token.type, token.name);
-	}
+//	if (debug === true && token.gl === false && token.gles === false) {
+//		console.warn('WebGL Token', token.type, token.name);
+//	}
 
 };
 
 
 
-var find_in_gl_code = function(token) {
+var find_in_gl_code = function(token, silent) {
+
+	silent = silent === true ? true : false;
+
 
 	for (var g = 0, l = _.code.gl.length; g < l; g++) {
 
@@ -175,7 +178,7 @@ var find_in_gl_code = function(token) {
 	}
 
 
-	if (debug === true) {
+	if (debug === true && silent === false) {
 		console.warn("GL Token not in code", token.type, token.name);
 	}
 
@@ -185,12 +188,61 @@ var find_in_gl_code = function(token) {
 };
 
 var find_in_gles_code = function(token) {
+
+	for (var g = 0, l = _.code.gles.length; g < l; g++) {
+
+		var current = _.code.gles[g].trim();
+		if (current === '') continue;
+
+		var prefix = 'glestpl->Set(v8::String::NewSymbol("' + token.name + '")';
+
+
+		// Constants
+		if (
+			token.type === 'enum'
+			&& current.substr(0, prefix.length) === prefix
+		) {
+
+			return true;
+
+		} else if (
+			token.type === 'method'
+			&& current.substr(0, prefix.length) === prefix
+		) {
+
+			return true;
+
+		}
+
+	}
+
+
+	if (debug === true) {
+		console.warn("GLES Token not in code", token.type, token.name);
+	}
+
+
 	return false;
+
 };
+
+
+
+/*
+ * WebGL API is implemented and added to
+ * the origin gltpl inside the gl.cpp
+ */
 
 var find_in_webgl_code = function(token) {
 
-	return false;
+	var found = find_in_gl_code(token, true);
+
+	if (found === false && debug === true ) {
+		console.warn("WebGL Token not in code", token.type, token.name);
+	}
+
+
+	return found;
 
 };
 
