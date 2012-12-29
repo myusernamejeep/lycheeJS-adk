@@ -3,6 +3,8 @@
 
 	var _margin = 0;
 
+	var _stub = function() {};
+
 	var _toString = function(object) {
 
 		var data = object;
@@ -21,6 +23,23 @@
 	};
 
 
+
+	// expression [, object... ]
+	var assert = function(expression) {
+
+		var trueish = !!expression;
+		if (trueish !== true) {
+
+			var args = [ 'Assertion failed:' ];
+			for (var a = 1, l = arguments.length; a < l; a++) {
+				args.push(arguments[a]);
+			}
+
+			console.error.apply(console, args);
+
+		}
+
+	};
 
 	var log = function() {
 
@@ -103,8 +122,12 @@
 	};
 
 
+
 	global.console = {
+		assert: assert,
+		clear: _stub,
 		debug: log,
+		info: log,
 		log: log,
 		warn: warn,
 		error: error,
