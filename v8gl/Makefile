@@ -106,7 +106,8 @@ dependencies: must-set-LYCHEEJS_ROOT must-set-LIBPNG_PATH must-set-LIBV8_PATH
 	mkdir -p lib/raw
 	cd $(LYCHEEJS_ROOT) && xxd -i "lychee/core.js" $(V8GL_ROOT)/lib/raw/lychee_core_js.h
 	cd $(LYCHEEJS_ROOT) && xxd -i "lychee/Builder.js" $(V8GL_ROOT)/lib/raw/lychee_Builder_js.h
-	cd $(LYCHEEJS_ROOT) && xxd -i "lychee/platform/v8gl/Preloader.js" $(V8GL_ROOT)/lib/raw/lychee_Preloader_js.h
+	cd $(LYCHEEJS_ROOT) && xxd -i "lychee/Preloader.js" $(V8GL_ROOT)/lib/raw/lychee_Preloader_js.h
+	cd $(LYCHEEJS_ROOT) && xxd -i "lychee/platform/v8gl/bootstrap.js" $(V8GL_ROOT)/lib/raw/bootstrap_js.h
 	rm -rf lib/$(LIB_ARCH)
 	mkdir -p lib/$(LIB_ARCH)
 	cp $(LIBPNG_PATH)/libpng.a $(V8GL_ROOT)/lib/$(LIB_ARCH)/libpng.a

@@ -132,6 +132,11 @@ namespace binding {
 				result = v8::True();
 			}
 
+
+			delete[] textures;
+			delete[] residences;
+
+
 		}
 
 		return result;

@@ -21,6 +21,7 @@
 #include "../../lib/raw/lychee_core_js.h"
 #include "../../lib/raw/lychee_Builder_js.h"
 #include "../../lib/raw/lychee_Preloader_js.h"
+#include "../../lib/raw/bootstrap_js.h"
 
 
 
@@ -70,9 +71,10 @@ namespace v8gl {
 		execute(context, v8::String::New((char*) js_timeout_js),  v8::String::New("@built-in/timeout.js"));
 
 		// @built-in lycheeJS libraries for communication between Engine & ADK and/or V8GL
-		execute(context, v8::String::New((char*) lychee_core_js), v8::String::New("@built-in/lychee/core.js"));
-		execute(context, v8::String::New((char*) lychee_Builder_js), v8::String::New("@built-in/lychee/Builder.js"));
-		execute(context, v8::String::New((char*) lychee_platform_v8gl_Preloader_js), v8::String::New("@built-in/lychee/platform/v8gl/Preloader.js"));
+		execute(context, v8::String::New((char*) lychee_core_js),      v8::String::New("@built-in/lychee/core.js"));
+		execute(context, v8::String::New((char*) lychee_Builder_js),   v8::String::New("@built-in/lychee/Builder.js"));
+		execute(context, v8::String::New((char*) lychee_Preloader_js), v8::String::New("@built-in/lychee/Preloader.js"));
+		execute(context, v8::String::New((char*) lychee_platform_v8gl_bootstrap_js), v8::String::New("@built-in/lychee/platform/v8gl/bootstrap.js"));
 
 
 		if (strcmp(what, "export-bash") == 0) {
