@@ -20,14 +20,8 @@ that also contains the roadmap of the lycheeJS ADK.
 
 # License
 
-The lycheeJS-ADK is released under the GNU General Public License
-(GNU GPLv3).
+The lycheeJS-ADK is released under MIT license.
 
-An alternative licensed version is available at http://martens.ms/lycheeJS/buy/
-
-Projects hosted in the ./external folder are licensed under different
-terms, so they (should) all have a license file included.
- 
 
 # Development Environment
 
