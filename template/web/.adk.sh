@@ -71,6 +71,9 @@ case "$1" in
 		;;
 
 	clean)
+
+			rm -rf ./lib;
+
 		exit;
 		;;
 
