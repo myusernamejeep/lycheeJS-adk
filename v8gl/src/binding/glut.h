@@ -48,6 +48,7 @@ namespace binding {
 			static v8::Handle<v8::Value> handleKeyboardFunc(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleMouseFunc(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleMotionFunc(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleVisibilityFunc(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleIdleFunc(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleTimerFunc(const v8::Arguments& args);
 

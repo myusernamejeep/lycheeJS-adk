@@ -22,7 +22,6 @@
  *
  * - 7. from Callback Registration:
  *   > glut.passiveMotionFunc
- *   > glut.visibilityFunc
  *   > glut.entryFunc
  *   > glut.specialFunc
  *   > glut.spaceballMotionFunc, glut.spaceballRotationFunc, glut.spaceballButtonFunc
@@ -516,6 +515,40 @@ namespace binding {
 
 	}
 
+	v8::Persistent<v8::Function> _glut_visibilityFuncCallback;
+
+	void _glut_visibilityFunc(int x, int y) {
+
+		v8::HandleScope scope;
+
+		v8::Handle<v8::Value> args[2];
+		args[0] = v8::Integer::New(x);
+		args[1] = v8::Integer::New(y);
+
+		v8::Local<v8::Object> callback_scope = _glut_visibilityFuncCallback->CreationContext()->Global()->Get(v8::String::NewSymbol("glut"))->ToObject();
+		v8::Local<v8::Value> result = _glut_visibilityFuncCallback->Call(callback_scope, 2, args);
+
+		scope.Close(result);
+
+	}
+
+	v8::Handle<v8::Value> GLUT::handleVisibilityFunc(const v8::Arguments& args) {
+
+		if (args.Length() == 1 && args[0]->IsFunction()) {
+
+			_glut_visibilityFuncCallback.Dispose();
+			v8::Handle<v8::Function> callback = v8::Handle<v8::Function>::Cast(args[0]);
+			_glut_visibilityFuncCallback = v8::Persistent<v8::Function>::New(callback);
+
+			glutMotionFunc((void (*)(int x, int y)) _glut_visibilityFunc);
+
+		}
+
+		return v8::Undefined();
+
+	}
+ 
+
 	v8::Handle<v8::Value> GLUT::handleIdleFunc(const v8::Arguments& args) {
 		return v8::Undefined();
 	}
@@ -984,6 +1017,9 @@ namespace binding {
 		gluttpl->Set(v8::String::NewSymbol("DOWN"),                  v8::Uint32::New(GLUT_DOWN),          v8::ReadOnly);
 		gluttpl->Set(v8::String::NewSymbol("mouseFunc"),             v8::FunctionTemplate::New(GLUT::handleMouseFunc));
 		gluttpl->Set(v8::String::NewSymbol("motionFunc"),            v8::FunctionTemplate::New(GLUT::handleMotionFunc));
+		gluttpl->Set(v8::String::NewSymbol("VISIBLE"),               v8::Uint32::New(GLUT_VISIBLE),     v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("NOT_VISIBLE"),           v8::Uint32::New(GLUT_NOT_VISIBLE), v8::ReadOnly);
+		gluttpl->Set(v8::String::NewSymbol("visibilityFunc"),        v8::FunctionTemplate::New(GLUT::handleVisibilityFunc));
 		gluttpl->Set(v8::String::NewSymbol("idleFunc"),              v8::FunctionTemplate::New(GLUT::handleIdleFunc));
 		gluttpl->Set(v8::String::NewSymbol("timerFunc"),             v8::FunctionTemplate::New(GLUT::handleTimerFunc));
 
