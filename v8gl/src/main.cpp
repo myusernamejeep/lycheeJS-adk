@@ -35,6 +35,9 @@ int main(int argc, char* argv[]) {
 			v8gl::V8GL::execute(context, source, v8::String::New(main_file));
 		}
 
+
+		v8gl::V8GL::execute(context, v8::String::New("if(typeof main !== 'undefined') main(argc, argv);"), v8::String::New("@runtime"));
+
 	} else {
 		fprintf(stderr, "\nERROR: No ./main.js file found.\n");
 	}
