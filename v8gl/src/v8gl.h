@@ -13,7 +13,7 @@ namespace v8gl {
 
 		public:
 
-			static v8::Persistent<v8::Context> initialize(int* pargc, char** argv);
+			static v8::Persistent<v8::Context> initialize(int argc, char* argv[]);
 			static bool dispatch(v8::Handle<v8::Context>);
 
 			static v8::Handle<v8::Value> execute(v8::Handle<v8::Context> context, v8::Handle<v8::String> source, v8::Handle<v8::String> filename);

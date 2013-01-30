@@ -36,7 +36,7 @@
 
 namespace v8gl {
 
-	v8::Persistent<v8::Context> V8GL::initialize(int* pargc, char** argv) {
+	v8::Persistent<v8::Context> V8GL::initialize(int argc, char** argv) {
 
 		v8::Local<v8::ObjectTemplate> global = v8::ObjectTemplate::New();
 
@@ -55,7 +55,7 @@ namespace v8gl {
 		// GL/GLU/GLUT Bindings
 		global->Set(v8::String::New("gl"),   binding::GL::generate());
 		global->Set(v8::String::New("glu"),  binding::GLU::generate());
-		global->Set(v8::String::New("glut"), binding::GLUT::generate(pargc, argv));
+		global->Set(v8::String::New("glut"), binding::GLUT::generate(&argc, argv));
 
 #endif
 
@@ -77,6 +77,22 @@ namespace v8gl {
 		context->Global()->Set(v8::String::New("Script"),      api::Script::generate()->GetFunction(),      v8::ReadOnly);
 		context->Global()->Set(v8::String::New("Text"),        api::Text::generate()->GetFunction(),        v8::ReadOnly);
 		context->Global()->Set(v8::String::New("Texture"),     api::Texture::generate()->GetFunction(),     v8::ReadOnly);
+
+		v8::Handle<v8::Array> argv_array = v8::Array::New(argc);
+
+		int c = 0;
+		for (int i = 0; i < argc; i++) {
+
+			v8::Handle<v8::Number> key = v8::Number::New(c);
+			v8::Handle<v8::String> value = v8::String::New(argv[i]);
+
+			argv_array->Set(key, value);
+			c++;
+
+		}
+
+		context->Global()->Set(v8::String::New("argc"), v8::Number::New(argc));
+		context->Global()->Set(v8::String::New("argv"), argv_array);
 
 
 		context->Exit();

@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 	if (main_file) {
 
 		v8::HandleScope scope;
-		v8::Persistent<v8::Context> context = v8gl::V8GL::initialize(&argc, argv);
+		v8::Persistent<v8::Context> context = v8gl::V8GL::initialize(argc, argv);
 
 		lib::FS::setVMRoot((char*) main_prog, (char*) main_file);
 
