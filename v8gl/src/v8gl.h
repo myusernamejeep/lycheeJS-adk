@@ -1,6 +1,6 @@
 
-#ifndef V8ADK_V8GL_H_
-#define V8ADK_V8GL_H_
+#ifndef V8GL_V8GL_H_
+#define V8GL_V8GL_H_
 
 #include <v8.h>
 
@@ -13,16 +13,11 @@ namespace v8gl {
 
 		public:
 
-			static bool _v8gl_targeted;
-
 			static v8::Persistent<v8::Context> initialize(int* pargc, char** argv);
-			static bool dispatch(v8::Handle<v8::Context>, char* what);
+			static bool dispatch(v8::Handle<v8::Context>);
 
 			static v8::Handle<v8::Value> execute(v8::Handle<v8::Context> context, v8::Handle<v8::String> source, v8::Handle<v8::String> filename);
 			static v8::Handle<v8::Value> executeVM(v8::Handle<v8::Context> context, v8::Handle<v8::String> source, v8::Handle<v8::String> filename);
-			static v8::Handle<v8::Value> handleBuildExportBash(const v8::Arguments& args);
-			static v8::Handle<v8::Value> handleBuildExportJSON(const v8::Arguments& args);
-			static v8::Handle<v8::Value> handleBuildRewrite(const v8::Arguments& args);
 
 			static void logException(v8::TryCatch* try_catch);
 

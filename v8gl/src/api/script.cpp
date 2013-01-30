@@ -1,7 +1,7 @@
 
 #include "script.h"
 #include "../lib/fs.h"
-#include "../v8gl/v8gl.h"
+#include "../v8gl.h"
 
 
 namespace api {

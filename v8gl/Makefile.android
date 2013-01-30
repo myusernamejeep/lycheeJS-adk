@@ -68,7 +68,7 @@ RANLIB=$(ANDROID_TOOLCHAIN)/bin/*-ranlib
 CC=$(ANDROID_TOOLCHAIN)/bin/*-g++
 
 
-HEADERS = src/v8gl/v8gl.h \
+HEADERS = src/v8gl.h \
 	src/binding/gles.h \
 	src/lib/fs.h \
 	src/lib/os.h \
@@ -78,7 +78,7 @@ HEADERS = src/v8gl/v8gl.h \
 	src/api/text.h \
 	src/api/texture.h
 
-OBJECTS = $(OUTDIR)/v8gl_v8gl.o \
+OBJECTS = $(OUTDIR)/v8gl.o \
 	$(OUTDIR)/binding_gles.o \
 	$(OUTDIR)/lib_fs.o \
 	$(OUTDIR)/lib_os.o \
@@ -100,7 +100,7 @@ debug: $(HEADERS)
 release: $(HEADERS)
 	rm -rf $(OUTDIR)
 	mkdir $(OUTDIR)
-	$(CC) $(CFLAGS) -c -o $(OUTDIR)/v8gl_v8gl.o src/v8gl/v8gl.cpp $(LDFLAGS)
+	$(CC) $(CFLAGS) -c -o $(OUTDIR)/v8gl.o src/v8gl.cpp $(LDFLAGS)
 	$(CC) $(CFLAGS) -c -o $(OUTDIR)/binding_gles.o src/binding/gles.cpp $(LDFLAGS)
 	$(CC) $(CFLAGS) -c -o $(OUTDIR)/lib_fs.o src/lib/fs.cpp $(LDFLAGS)
 	$(CC) $(CFLAGS) -c -o $(OUTDIR)/lib_os.o src/lib/os.cpp $(LDFLAGS)

@@ -3,46 +3,38 @@
 
 #include "v8gl.h"
 
-#include "../lib/fs.h"
-#include "../lib/os.h"
+#include "./lib/fs.h"
+#include "./lib/os.h"
 
 #ifdef __ANDROID__
 
-	#include "../binding/gles.h"
-//	#include "../binding/glues.h"
+	#include "./binding/gles.h"
+//	#include "./binding/glues.h"
 
 #else
 
-	#include "../binding/gl.h"
-	#include "../binding/glu.h"
-	#include "../binding/glut.h"
+	#include "./binding/gl.h"
+	#include "./binding/glu.h"
+	#include "./binding/glut.h"
 
 #endif
 
 
-#include "../api/arraybuffer.h"
-#include "../api/navigator.h"
-#include "../api/script.h"
-#include "../api/text.h"
-#include "../api/texture.h"
+#include "./api/arraybuffer.h"
+#include "./api/navigator.h"
+#include "./api/script.h"
+#include "./api/text.h"
+#include "./api/texture.h"
 
 
 // Advanced @built-in JavaScript headers
-#include "../js/console.h"
-#include "../js/interval.h"
-#include "../js/timeout.h"
-
-#include "../../lib/raw/lychee_core_js.h"
-#include "../../lib/raw/lychee_Builder_js.h"
-#include "../../lib/raw/lychee_Preloader_js.h"
-#include "../../lib/raw/bootstrap_js.h"
+#include "./js/console.h"
+#include "./js/interval.h"
+#include "./js/timeout.h"
 
 
 
 namespace v8gl {
-
-	bool V8GL::_v8gl_targeted = true;
-
 
 	v8::Persistent<v8::Context> V8GL::initialize(int* pargc, char** argv) {
 
@@ -95,19 +87,12 @@ namespace v8gl {
 	}
 
 
-	bool V8GL::dispatch(v8::Handle<v8::Context> context, char* what) {
+	bool V8GL::dispatch(v8::Handle<v8::Context> context) {
 
 		// @built-in Polyfills for BOM/DOM like behaviours
 		execute(context, v8::String::New((char*) js_console_js),  v8::String::New("@built-in/console.js"));
 		execute(context, v8::String::New((char*) js_interval_js), v8::String::New("@built-in/interval.js"));
 		execute(context, v8::String::New((char*) js_timeout_js),  v8::String::New("@built-in/timeout.js"));
-
-		// @built-in lycheeJS libraries for communication between Engine & ADK and/or V8GL
-		execute(context, v8::String::New((char*) lychee_core_js),      v8::String::New("@built-in/lychee/core.js"));
-		execute(context, v8::String::New((char*) lychee_Builder_js),   v8::String::New("@built-in/lychee/Builder.js"));
-		execute(context, v8::String::New((char*) lychee_Preloader_js), v8::String::New("@built-in/lychee/Preloader.js"));
-		execute(context, v8::String::New((char*) lychee_platform_v8gl_bootstrap_js), v8::String::New("@built-in/lychee/platform/v8gl/bootstrap.js"));
-
 
 		return true;
 

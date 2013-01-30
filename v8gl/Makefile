@@ -24,19 +24,6 @@ STATIC_LIBRARIES =  lib/$(ARCH)/libpng.a \
 SHARED_LIBRARIES = -lpthread -lz -lm
 
 
-#
-# V8ADK parsing runtime
-#
-
-V8ADK_PROG_NAME = v8adk
-V8ADK_CFLAGS = -D__V8ADK__
-
-V8ADK_HEADER_FILES = src/v8adk/v8gl.h
-
-V8ADK_SRC_FILES = src/v8adk/v8gl.cpp
-
-V8ADK_SHARED_LIBRARIES =
-
 
 #
 # V8GL game runtime
@@ -45,44 +32,35 @@ V8ADK_SHARED_LIBRARIES =
 V8GL_PROG_NAME = v8gl
 V8GL_CFLAGS = -D__V8GL__ -D__WEBGL__
 
-V8GL_HEADER_FILES = src/v8gl/v8gl.h \
+V8GL_HEADER_FILES = src/v8gl.h \
 	src/binding/gl.h \
 	src/binding/webgl.h \
 	src/binding/glu.h \
-	src/binding/glut.h
-
-V8GL_SRC_FILES = src/v8gl/v8gl.cpp \
-	src/binding/gl.cpp \
-	src/binding/webgl.cpp \
-	src/binding/glu.cpp \
-	src/binding/glut.cpp
-
-V8GL_SHARED_LIBRARIES = -lglut -lGLU -lGL
-
-
-
-
-
-HEADER_FILES = src/lib/fs.h \
+	src/binding/glut.h \
+	src/lib/fs.h \
 	src/lib/os.h \
 	src/api/arraybuffer.h \
 	src/api/script.h \
 	src/api/text.h \
 	src/api/texture.h
+ 
 
-SRC_FILES = src/lib/fs.cpp \
+V8GL_SRC_FILES = src/v8gl.cpp \
+	src/binding/gl.cpp \
+	src/binding/webgl.cpp \
+	src/binding/glu.cpp \
+	src/binding/glut.cpp \
+	src/lib/fs.cpp \
 	src/lib/os.cpp \
 	src/api/arraybuffer.cpp \
 	src/api/navigator.cpp \
 	src/api/script.cpp \
 	src/api/text.cpp \
 	src/api/texture.cpp
+ 
 
+V8GL_SHARED_LIBRARIES = -lglut -lGLU -lGL
 
-V8ADK_SRC_FILES += $(SRC_FILES)
-V8GL_SRC_FILES += $(SRC_FILES)
-
-V8ADK_LDFLAGS = $(STATIC_LIBRARIES) $(SHARED_LIBRARIES) $(V8ADK_SHARED_LIBRARIES)
 V8GL_LDFLAGS = $(STATIC_LIBRARIES) $(SHARED_LIBRARIES) $(V8GL_SHARED_LIBRARIES)
 
 
@@ -99,15 +77,9 @@ clean:
 
 all: $(MODES)
 
-# ADK_PATH=$(cd "$(dirname "$0")"; pwd);
-
-dependencies: must-set-LYCHEEJS_ROOT must-set-LIBPNG_PATH must-set-LIBV8_PATH
+dependencies: must-set-LIBPNG_PATH must-set-LIBV8_PATH
 	rm -rf lib/raw
 	mkdir -p lib/raw
-	cd $(LYCHEEJS_ROOT) && xxd -i "lychee/core.js" $(V8GL_ROOT)/lib/raw/lychee_core_js.h
-	cd $(LYCHEEJS_ROOT) && xxd -i "lychee/Builder.js" $(V8GL_ROOT)/lib/raw/lychee_Builder_js.h
-	cd $(LYCHEEJS_ROOT) && xxd -i "lychee/Preloader.js" $(V8GL_ROOT)/lib/raw/lychee_Preloader_js.h
-	cd $(LYCHEEJS_ROOT) && xxd -i "lychee/platform/v8gl/bootstrap.js" $(V8GL_ROOT)/lib/raw/bootstrap_js.h
 	rm -rf lib/$(LIB_ARCH)
 	mkdir -p lib/$(LIB_ARCH)
 	cp $(LIBPNG_PATH)/libpng.a $(V8GL_ROOT)/lib/$(LIB_ARCH)/libpng.a
@@ -123,9 +95,8 @@ builtin-js:
 $(BUILDS): builtin-js $(HEADER_FILES)
 	rm -rf $(OUTDIR)
 	mkdir -p $(OUTDIR)
-	$(CC) -Wall $(V8ADK_CFLAGS) $(STATIC_INCLUDES) src/v8adk/main.cpp $(V8ADK_SRC_FILES) -o $(OUTDIR)/v8adk $(V8ADK_LDFLAGS)
-	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/v8gl/main.cpp $(V8GL_SRC_FILES) -o $(OUTDIR)/v8gl $(V8GL_LDFLAGS)
-	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/v8gl/v8gl.cpp -c -o $(OUTDIR)/v8gl_v8gl.o
+	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/main.cpp $(V8GL_SRC_FILES) -o $(OUTDIR)/v8gl $(V8GL_LDFLAGS)
+	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/v8gl.cpp -c -o $(OUTDIR)/v8gl.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/binding/gl.cpp -c -o $(OUTDIR)/binding_gl.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/binding/webgl.cpp -c -o $(OUTDIR)/binding_webgl.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/binding/glu.cpp -c -o $(OUTDIR)/binding_glu.o
@@ -137,7 +108,7 @@ $(BUILDS): builtin-js $(HEADER_FILES)
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/script.cpp -c -o $(OUTDIR)/api_script.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/text.cpp -c -o $(OUTDIR)/api_text.o
 	$(CC) -Wall $(V8GL_CFLAGS) $(STATIC_INCLUDES) src/api/texture.cpp -c -o $(OUTDIR)/api_texture.o
-	$(AR) rc $(OUTDIR)/libv8gl.a $(OUTDIR)/v8gl_v8gl.o \
+	$(AR) rc $(OUTDIR)/libv8gl.a $(OUTDIR)/v8gl.o \
 	$(OUTDIR)/binding_gl.o $(OUTDIR)/binding_webgl.o \
 	$(OUTDIR)/binding_glu.o $(OUTDIR)/binding_glut.o \
 	$(OUTDIR)/lib_fs.o $(OUTDIR)/lib_os.o \
@@ -146,11 +117,6 @@ $(BUILDS): builtin-js $(HEADER_FILES)
 	$(OUTDIR)/api_text.o $(OUTDIR)/api_texture.o
 	$(RANLIB) $(OUTDIR)/libv8gl.a
 
-
-must-set-LYCHEEJS_ROOT:
-ifndef LYCHEEJS_ROOT
-	$(error LYCHEEJS_ROOT must be set)
-endif
 
 must-set-LIBPNG_PATH:
 ifndef LIBPNG_PATH
