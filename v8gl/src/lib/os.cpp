@@ -1,5 +1,7 @@
 
 #include "os.h"
+#include "string.h"
+
 
 #ifdef __ANDROID__
 
@@ -17,6 +19,7 @@ namespace lib {
 		tpl->Set(v8::String::NewSymbol("log"),   v8::FunctionTemplate::New(OS::handleLog),   v8::ReadOnly);
 		tpl->Set(v8::String::NewSymbol("warn"),  v8::FunctionTemplate::New(OS::handleWarn),  v8::ReadOnly);
 		tpl->Set(v8::String::NewSymbol("error"), v8::FunctionTemplate::New(OS::handleError), v8::ReadOnly);
+		tpl->Set(v8::String::NewSymbol("exec"),  v8::FunctionTemplate::New(OS::handleExec),  v8::ReadOnly);
 
 		return tpl;
 
@@ -58,6 +61,42 @@ namespace lib {
 		}
 
 		return scope.Close(v8::Undefined());
+
+	}
+
+
+	v8::Handle<v8::Value> OS::handleExec(const v8::Arguments& args) {
+
+		v8::HandleScope scope;
+
+		if (args.Length() == 1) {
+
+			char buffer[BUFSIZ + 1];
+
+			memset(buffer, '\0', sizeof(buffer));
+
+			v8::String::Utf8Value cmd(args[0]->ToString());
+
+			FILE *stream = popen(*cmd, "r");
+			if (stream != NULL) {
+
+				int chars = fread(buffer, sizeof(char), BUFSIZ, stream);
+				while (chars > 0) {
+					buffer[chars - 1] = '\0';
+					chars = fread(buffer, sizeof(char), BUFSIZ, stream);
+				}
+
+				pclose(stream);
+
+			}
+
+
+			return v8::String::New(buffer, strlen(buffer));
+
+		}
+
+
+		return v8::Null();
 
 	}
 

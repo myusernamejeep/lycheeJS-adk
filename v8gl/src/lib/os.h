@@ -18,6 +18,7 @@ namespace lib {
 			static v8::Handle<v8::Value> handleLog(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleWarn(const v8::Arguments& args);
 			static v8::Handle<v8::Value> handleError(const v8::Arguments& args);
+			static v8::Handle<v8::Value> handleExec(const v8::Arguments& args);
 
 			static void log(char* message);
 			static void warn(char* message);
