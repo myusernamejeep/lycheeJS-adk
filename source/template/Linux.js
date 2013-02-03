@@ -7,6 +7,10 @@
 
 	};
 
+
+	adk.template.Linux.DESCRIPTION = 'Linux builds with V8GL (requires OpenGL 2.1 on targeted system).';
+
+
 	adk.template.Linux.prototype = {
 
 		build: function() {

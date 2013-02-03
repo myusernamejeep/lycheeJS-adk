@@ -8,14 +8,14 @@
 	};
 
 
+	adk.adapter.lycheeJS.DESCRIPTION = 'Games made with the lycheeJS engine (http://martens.ms/lycheeJS).';
+
+
 	adk.adapter.lycheeJS.prototype = {
 
-		getTree: function() {
+		getTree: function(directory) {
 
-			var gamedir = this.__main.getSettings().gamedir;
-
-
-			console.log('game directory', gamedir);
+			console.log('game directory', directory);
 
 
 		}
