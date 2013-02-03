@@ -52,7 +52,7 @@ this.adk = {
 		}
 
 		if (settings.flags.adapter !== null) {
-			this.__adapter = adk.adapter[settings.flags.adapter];
+			this.__adapter = new adk.adapter[settings.flags.adapter](this);
 		}
 
 
@@ -133,6 +133,16 @@ console.log('adk main', this.__settings);
 
 			return data;
 
+		},
+
+
+
+		/*
+		 * PUBLIC API
+		 */
+
+		getSettings: function() {
+			return this.__settings;
 		}
 
 	};

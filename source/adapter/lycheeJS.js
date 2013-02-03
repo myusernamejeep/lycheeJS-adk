@@ -1,15 +1,26 @@
 
 (function(global, adk, shell) {
 
-	var Adapter = {};
+	adk.adapter.lycheeJS = function(main) {
 
-
-	Adapter.getTree = function() {
+		this.__main = main;
 
 	};
 
 
-	adk.adapter.lycheeJS = Adapter;
+	adk.adapter.lycheeJS.prototype = {
+
+		getTree: function() {
+
+			var gamedir = this.__main.getSettings().gamedir;
+
+
+			console.log('game directory', gamedir);
+
+
+		}
+
+	};
 
 })(this, this.adk, this.shell);
 
