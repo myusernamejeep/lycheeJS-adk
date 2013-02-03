@@ -6,5 +6,6 @@
 /v8gl/out/*
 /v8gl/lib
 /v8gl/src/js/*.h
+/adk
 /out/*
 
