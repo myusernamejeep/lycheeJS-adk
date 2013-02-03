@@ -7,6 +7,4 @@
 /v8gl/lib
 /v8gl/src/js/*.h
 /out/*
-/.temp
-/log
 
