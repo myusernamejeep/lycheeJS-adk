@@ -26,9 +26,11 @@
 
 	global.main = function(argc, argv) {
 
+		include('./source/bootstrap.js');
+
 		include('./source/Main.js', function() {
 
-			new adk.Main(argc, argv);
+			new adk.Main(argc, argv, true);
 
 		}, this);
 

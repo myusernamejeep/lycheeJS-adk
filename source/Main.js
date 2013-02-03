@@ -6,12 +6,11 @@ this.adk = {
 };
 
 
-(function(global, adk) {
+(function(global, adk, shell) {
 
-	var shell = include('./shell.js');
+	adk.Main = function(argc, argv, debug) {
 
-
-	adk.Main = function(argc, argv) {
+		this.__debug    = debug === true;
 
 		this.__settings = this.__parseArguments(argc, argv);
 
@@ -21,10 +20,10 @@ console.log('adk main', this.__settings);
 	};
 
 
-	adk.Main.ACTIONS = {
-		build: {},
-		clean: {},
-		debug: {}
+	adk.Main.ACTION = {
+		build: 0,
+		clean: 1,
+		debug: 2
 	};
 
 
@@ -38,7 +37,6 @@ console.log('adk main', this.__settings);
 
 			var data = {
 				action:   null,
-				adapter:  null,
 				gamedir:  null,
 				flags:    {},
 				template: null
@@ -49,7 +47,9 @@ console.log('adk main', this.__settings);
 				var str = argv[av];
 
 				// ./adk build
-				if (adk.Main.ACTIONS[str] !== undefined) {
+				if (adk.Main.ACTION[str] !== undefined) {
+
+					data.action = adk.Main.ACTION[str];
 
 
 				// ./adk build web
@@ -64,7 +64,7 @@ console.log('adk main', this.__settings);
 					data.gamedir = str;
 
 				// ./adk build web ./game/path --flag=value
-				} else if (str.substr(2) === "--"){
+				} else if (str.substr(0, 2) === "--"){
 
 					str = str.substr(2);
 
@@ -72,6 +72,10 @@ console.log('adk main', this.__settings);
 					if (tmp[0] && tmp[1]) {
 						data.flags[tmp[0]] = tmp[1];
 					}
+
+				} else if (this.__debug === true) {
+
+					console.warn('Could not interpret argument "' + str + '"');
 
 				}
 
@@ -84,5 +88,5 @@ console.log('adk main', this.__settings);
 
 	};
 
-})(this, this.adk);
+})(this, this.adk, this.shell);
 
