@@ -276,7 +276,13 @@ this.adk = {
 		},
 
 		getTemporaryFolder: function() {
+
+			if (shell.isDirectory(this.__settings.tmpdir) === false) {
+				shell.createDirectory(this.__settings.tmpdir);
+			}
+
 			return this.__settings.tmpdir;
+
 		},
 
 
