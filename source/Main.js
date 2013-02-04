@@ -36,6 +36,7 @@ this.adk = {
 		}
 
 	})([
+		'Builder.js',
 		'Help.js',
 		'adapter/lycheeJS.js',
 		'template/Android.js',
@@ -50,6 +51,8 @@ this.adk = {
 
 
 		this.__self     = argv[0];
+		this.__root     = shell.exec('cd "$(dirname "' + this.__self + '")"; pwd;');
+		this.__builder  = new adk.Builder(this);
 		this.__help     = new adk.Help(this);
 		this.__adapter  = new adk.adapter[settings.flags.adapter || 'lycheeJS'](this);
 		this.__template = null;
@@ -244,6 +247,14 @@ this.adk = {
 		/*
 		 * PUBLIC API
 		 */
+
+		getBuilder: function() {
+			return this.__builder;
+		},
+
+		getRoot: function() {
+			return this.__root;
+		},
 
 		getSelf: function() {
 			return this.__self;

@@ -87,6 +87,58 @@ this.shell = {};
 
 	};
 
+	shell.copyDirectory = function(from, to) {
+
+		from = typeof from === 'string' ? from : null;
+		to   = typeof to === 'string' ? to : null;
+
+
+		if (
+			from !== null
+			&& to !== null
+			&& shell.isDirectory(from) === true
+			&& shell.isDirectory(to) === false
+		) {
+
+			var cmd = 'cp -r "' + from + '" "' + to + '";';
+
+			os.exec(cmd);
+
+			return shell.isDirectory(to) === true;
+
+		}
+
+
+		return false;
+
+	};
+
+	shell.copyFile = function(from, to) {
+
+		from = typeof from === 'string' ? from : null;
+		to   = typeof to === 'string' ? to : null;
+
+
+		if (
+			from !== null
+			&& to !== null
+			&& shell.isFile(from) === true
+			&& shell.isFile(to) === false
+		) {
+
+			var cmd = 'cp "' + from + '" "' + to + '";';
+
+			os.exec(cmd);
+
+			return shell.isFile(to) === true;
+
+		}
+
+
+		return false;
+
+	};
+
 	shell.removeDirectory = function(path) {
 
 		path = typeof path === 'string' ? path : null;
