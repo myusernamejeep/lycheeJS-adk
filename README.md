@@ -80,6 +80,7 @@ will also need to manually install git via *sudo aptitude install git*.
 
 ```bash
 	cd ~/Desktop/lycheeJS-adk;
+	./setup.sh;
 	chmod +x ./adk; # in case you downloaded the zip file.
 	./adk setup
 ```
