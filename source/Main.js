@@ -91,7 +91,7 @@ this.adk = {
 		}
 
 		if (settings.outdir === null) {
-			settings.outdir = './out/' + settings.template + settings.arch;
+			settings.outdir = './out/' + settings.template + '.' + settings.arch;
 		}
 
 		settings.tmpdir = './.temp';
@@ -139,6 +139,7 @@ this.adk = {
 		getBuildTarget: function(arch) {
 
 			if (adk.debug === true) {
+// TODO: Enable this after all Makefiles are supporting debug symbol variants
 //				return arch + '.debug';
 				return arch + '.release';
 			} else {
@@ -301,28 +302,34 @@ this.adk = {
 			var outdir = this.__settings.outdir;
 
 
-			var source = null;
+			var env = null;
 			if (this.__adapter !== null) {
-				source = this.__adapter.getTree(indir);
+				env = this.__adapter.getEnvironment(indir);
 			}
 
-/*
-			var target = null;
+
 			if (this.__template !== null) {
-				target = this.__template.getTree();
+				env = this.__template.getEnvironment(indir, env);
 			}
-*/
 
-			/*
-			 * Required Steps:
-			 *
-			 * 1. adapter:  Create main.js for parsing.
-			 * 2. adapter:  Parse the environment
-			 * 3. adapter:  Create tree for file system hierarchy
-			 * 4. template: Parse the tree, dependend on outdir (e.g. move all contents of ./external/lycheeJS/ to ./lychee)
-			 * 5. template: Create a main.js for the outdir (only on V8GL build, so it's the template) and attach it to the tree
-			 * 6. Copy all necessary files from the tree to the outdir
-			 */
+
+
+			if (env !== null) {
+
+				shell.createDirectory(outdir, true);
+
+				for (var f = 0, fl = env.folders.length; f < fl; f++) {
+					shell.copyDirectory(env.folders[f][0], outdir + '/' + env.folders[f][1]);
+				}
+
+				for (var f = 0, fl = env.files.length; f < fl; f++) {
+					shell.copyFile(env.files[f][0], outdir + '/' + target.files[f][1]);
+				}
+
+			}
+
+
+			// TODO: Move final build to out/$target folder
 
 		},
 

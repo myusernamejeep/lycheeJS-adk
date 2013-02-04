@@ -57,7 +57,15 @@
 
 		__getEnvironment: function(folder) {
 
-			var env  = null;
+			var env  = {
+				data: {
+					bases: {},
+					tags: {}
+				},
+				folders: [],
+				files:   []
+			};
+
 			var temp = this.__main.getTemporaryFolder() + '/lycheeJS_parser';
 
 			if (shell.isDirectory(temp) === true) {
@@ -93,13 +101,30 @@
 
 					if (data !== null) {
 
-console.log('WOAH, it worked!', data);
+						for (var namespace in data.bases) {
+							var arr = [ folder + '/' + data.bases[namespace], './' + namespace ];
+							env.data.bases[namespace] = arr;
+							env.folders.push(arr);
+						}
+
+						for (var tagId in data.tags) {
+							env.data.tags[tagId] = data.tags[tagId];
+						}
+
+
+						var assetdir = folder + '/asset';
+						if (shell.isDirectory(assetdir) === true) {
+							env.folders.push([ assetdir, './asset' ]);
+						}
 
 					}
 
 				}
 
 			}
+
+
+			return env;
 
 		},
 
@@ -119,18 +144,14 @@ console.log('WOAH, it worked!', data);
 
 		},
 
-		getTree: function(folder) {
+		getEnvironment: function(folder) {
 
 			if (shell.isDirectory('./external/lycheeJS') === false) {
 				_install(this.__main.getTemporaryFolder(), './external/lycheeJS');
 			}
 
 
-			var env = this.__getEnvironment(folder);
-
-
-			console.log('ENVIRONMENT', env);
-
+			return this.__getEnvironment(folder);
 
 		}
 

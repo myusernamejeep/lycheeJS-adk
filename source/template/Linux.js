@@ -13,6 +13,10 @@
 
 	adk.template.Linux.prototype = {
 
+		getEnvironment: function(folder, env) {
+			return env;
+		},
+
 		build: function() {
 		},
 
