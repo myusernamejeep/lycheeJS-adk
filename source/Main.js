@@ -47,6 +47,9 @@ this.adk = {
 		debug = debug === true;
 
 
+		this.__help = new adk.Help(this);
+
+
 		var settings = this.__parseArguments(argc, argv);
 
 
@@ -57,11 +60,13 @@ this.adk = {
 
 		if (settings.template === null) {
 			console.error('Unsupported <template>!');
+			this.__help.generate();
 			return this;
 		}
 
 		if (settings.indir === null) {
 			console.error('Unsupported <game-folder>!');
+			this.__help.generate();
 			return this;
 		}
 
@@ -71,6 +76,7 @@ this.adk = {
 
 			if (settings.arch === null) {
 				console.error('Unsupported <architecture>!');
+				this.__help.generate();
 				return this;
 			} else if (debug === true) {
 				console.warn('Using host <architecture> (' + settings.arch + ')');
@@ -81,7 +87,6 @@ this.adk = {
 
 		this.__adapter  = new adk.adapter[settings.flags.adapter](this);
 		this.__debug    = debug;
-		this.__help     = new adk.Help(this);
 		this.__self     = argv[0];
 		this.__settings = settings;
 		this.__template = new adk.template[settings.template](this);
@@ -91,6 +96,8 @@ this.adk = {
 		if (settings.outdir === null) {
 			settings.outdir = './out/' + settings.template + settings.arch;
 		}
+
+		settings.tmpdir = './.temp';
 
 
 		switch(settings.task) {
@@ -246,6 +253,10 @@ this.adk = {
 
 		getSettings: function() {
 			return this.__settings;
+		},
+
+		getTemporaryFolder: function() {
+			return this.__settings.tmpdir;
 		},
 
 		build: function() {

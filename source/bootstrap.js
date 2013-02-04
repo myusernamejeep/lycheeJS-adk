@@ -8,19 +8,63 @@ this.shell = {};
 
 	shell.isDirectory = function(path) {
 
-		var cmd = 'if [ -d "' + path + '" ]; then echo "true"; else echo "false"; fi;';
-		var result = shell.exec(cmd);
+		path = typeof path === 'string' ? path : null;
 
-		return result === 'true';
+
+		if (path !== null) {
+
+			var cmd = 'if [ -d "' + path + '" ]; then echo "true"; else echo "false"; fi;';
+			var result = shell.exec(cmd);
+
+			return result === 'true';
+
+		}
+
+
+		return false;
 
 	};
 
 	shell.isFile = function(path) {
 
-		var cmd = 'if [ -f "' + path + '" ]; then echo "true"; else echo "false"; fi;';
-		var result = shell.exec(cmd);
+		path = typeof path === 'string' ? path : null;
 
-		return result === 'true';
+
+		if (path !== null) {
+
+			var cmd = 'if [ -f "' + path + '" ]; then echo "true"; else echo "false"; fi;';
+			var result = shell.exec(cmd);
+
+			return result === 'true';
+
+		}
+
+
+		return false;
+
+	};
+
+	shell.createDirectory = function(path, parents) {
+
+		path = typeof path === 'string' ? path : null;
+		parents = parents === true;
+
+
+		if (path !== null) {
+
+			var cmd = 'mkdir "' + path + '";';
+			if (parents === true) {
+				cmd = 'mkdir -p "' + path + '";';
+			}
+
+			shell.exec(cmd);
+
+			return shell.isDirectory(path);
+
+		}
+
+
+		return false;
 
 	};
 

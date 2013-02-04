@@ -1,6 +1,16 @@
 
 (function(global, adk, shell) {
 
+	// Routine required for installation
+	var _install = function(temp, path) {
+
+		var cmd = '';
+
+		console.info()
+
+
+	};
+
 	adk.adapter.lycheeJS = function(main) {
 
 		this.__main = main;
@@ -14,6 +24,13 @@
 	adk.adapter.lycheeJS.prototype = {
 
 		getTree: function(directory) {
+
+			var temp = this.__main.getTemporaryFolder();
+
+			if (shell.isDirectory('./external/lycheeJS') === false) {
+				_install(temp, './external/lycheeJS');
+			}
+
 
 			console.log('game directory', directory);
 
