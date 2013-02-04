@@ -78,7 +78,7 @@ this.adk = {
 
 		if (settings.arch === null) {
 
-			settings.arch = this.__getArch();
+			settings.arch = this.getHostArch();
 
 			if (settings.arch === null) {
 				console.error('Unsupported <architecture>!');
@@ -136,7 +136,18 @@ this.adk = {
 		 * PRIVATE API
 		 */
 
-		__getArch: function() {
+		getBuildTarget: function(arch) {
+
+			if (adk.debug === true) {
+//				return arch + '.debug';
+				return arch + '.release';
+			} else {
+				return arch + '.release';
+			}
+
+		},
+
+		getHostArch: function() {
 
 			var arch   = null;
 			var unamep = shell.exec("uname -p");

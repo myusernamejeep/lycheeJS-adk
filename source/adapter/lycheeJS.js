@@ -68,8 +68,11 @@
 			if (shell.createDirectory(temp) === true) {
 
 				var builder = this.__main.getBuilder();
+				var arch    = this.__main.getHostArch();
 
-				builder.build('v8gl', temp + '/v8gl');
+				builder.buildV8GL(arch, temp + '/v8gl');
+
+return;
 
 				shell.copyFile('./source/adapter/raw/lycheeJS/main.js', temp + '/main.js');
 				shell.copyFile(folder + '/init.js', temp + '/init.js');
@@ -127,7 +130,9 @@ console.log('WOAH, it worked!', data);
 
 			var env = this.__getEnvironment(folder);
 
-			console.log('game directory', directory);
+
+			console.log('ENVIRONMENT', env);
+
 
 		}
 
