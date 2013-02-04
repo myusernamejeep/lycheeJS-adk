@@ -117,7 +117,7 @@ namespace lib {
 	void OS::log(char* message) {
 
 #ifdef __ANDROID__
-		__android_log_write(ANDROID_LOG_INFO, "ms.martens.v8gl", message);
+		__android_log_write(ANDROID_LOG_VERBOSE, "ms.martens.v8gl", message);
 #else
 		fprintf(stdout, "%s\n", message);
 #endif
@@ -127,7 +127,7 @@ namespace lib {
 	void OS::info(char* message) {
 
 #ifdef __ANDROID__
-		__android_log_write(ANDROID_LOG_WARN, "ms.martens.v8gl", message);
+		__android_log_write(ANDROID_LOG_INFO, "ms.martens.v8gl", message);
 #else
 		fprintf(stdout, "(i) %s\n", message);
 #endif
