@@ -8,9 +8,11 @@
 		var root = this.__main.getRoot();
 
 		this.__paths = {
-			v8:   root + '/external/v8',
-			v8gl: root + '/v8gl',
-			png:  root + '/external/libpng',
+			'android-ndk': root + '/external/android-ndk',
+			'android-sdk': root + '/external/android-sdk',
+			'v8':          root + '/external/v8',
+			'v8gl':        root + '/v8gl',
+			'png':         root + '/external/libpng',
 		};
 
 	};
@@ -32,10 +34,81 @@
 		 * PUBLIC API
 		 */
 
-		buildPNG: function(arch, path, asLibrary) {
+		buildPNG: function(arch, toFile, asLibrary) {
+
+			arch   = typeof arch === 'string' ? arch : null;
+			toFile = typeof toFile === 'string' ? toFile : null;
+			asLibrary = asLibrary === true;
+
+
+			var cmd = '', path = '', target = '';
+
+
+			// Build PNG
+			path   = this.__getPath('png');
+			target = this.__main.getBuildTarget(arch);
+
+			cmd = 'cd "' + path + '";';
+			if (arch.substr(0, 7) === 'android') {
+				cmd += 'export ANDROID_NDK_ROOT="' + this.__getPath('android-ndk') + '";';
+			}
+			cmd += 'make ' + target + ';';
+
+			shell.exec(cmd);
+
+
+			if (toFile !== null) {
+
+				if (asLibrary === true) {
+					shell.copyFile(path + '/out/' + target + '/libpng.a', toFile);
+				} else {
+					console.error('Can\'t build PNG library as standalone program');
+				}
+
+			}
+
 		},
 
 		buildV8: function(arch, path, asLibrary) {
+
+			arch   = typeof arch === 'string' ? arch : null;
+			toFile = typeof toFile === 'string' ? toFile : null;
+			asLibrary = asLibrary === true;
+
+
+			var cmd = '', path = '', target = '';
+
+
+			// Build PNG
+			path   = this.__getPath('v8');
+			target = this.__main.getBuildTarget(arch);
+
+			cmd = 'cd "' + path + '";';
+			if (arch.substr(0, 7) === 'android') {
+				cmd += 'export ANDROID_NDK_ROOT="' + this.__getPath('android-ndk') + '";';
+			}
+			cmd += 'export snapshot=off;'; // disable v8 snapshots, as they are not supported on most SDKs
+			cmd += 'make ' + target + ';';
+
+			shell.exec(cmd);
+
+
+			if (toFile !== null) {
+
+				if (asLibrary === true) {
+
+					var toFileBase       = toFile.replace('*', 'base');
+					var toFileNoSnapshot = toFile.replace('*', 'nosnapshot');
+
+					shell.copyFile(path + '/out/' + target + '/obj.target/tools/gyp/libv8_base.a',       toFileBase);
+					shell.copyFile(path + '/out/' + target + '/obj.target/tools/gyp/libv8_nosnapshot.a', toFileNoSnapshot);
+
+				} else {
+					console.error('Can\'t build V8 library as standalone program');
+				}
+
+			}
+
 		},
 
 		buildV8GL: function(arch, toFile, asLibrary) {
@@ -45,7 +118,7 @@
 			asLibrary = asLibrary === true;
 
 
-			var path, target;
+			var cmd = '', path = '', target = '';
 
 
 			// Build required libraries
@@ -60,7 +133,13 @@
 			path   = this.__getPath('v8gl');
 			target = this.__main.getBuildTarget(arch);
 
-			shell.exec('cd "' + path + '"; make ' + target + ';');
+			cmd = 'cd "' + path + '";';
+			if (arch.substr(0, 7) === 'android') {
+				cmd += 'export ANDROID_NDK_ROOT="' + this.__getPath('android-ndk') + '";';
+			}
+			cmd += 'make ' + target + ';';
+
+			shell.exec(cmd);
 
 
 			if (toFile !== null) {
