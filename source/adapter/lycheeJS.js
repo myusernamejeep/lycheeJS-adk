@@ -117,6 +117,12 @@
 							env.folders.push([ assetdir, './asset' ]);
 						}
 
+
+						var initjs = folder + '/init.js';
+						if (shell.isFile(initjs) === true) {
+							env.files.push([ initjs, './init.js' ]);
+						}
+
 					}
 
 				}

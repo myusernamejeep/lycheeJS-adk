@@ -316,6 +316,11 @@ this.adk = {
 
 			if (env !== null) {
 
+				// Cleanup old builds
+				if (shell.isDirectory(outdir) === true) {
+					shell.removeDirectory(outdir);
+				}
+
 				shell.createDirectory(outdir, true);
 
 				for (var f = 0, fl = env.folders.length; f < fl; f++) {
@@ -323,7 +328,7 @@ this.adk = {
 				}
 
 				for (var f = 0, fl = env.files.length; f < fl; f++) {
-					shell.copyFile(env.files[f][0], outdir + '/' + target.files[f][1]);
+					shell.copyFile(env.files[f][0], outdir + '/' + env.files[f][1]);
 				}
 
 			}
