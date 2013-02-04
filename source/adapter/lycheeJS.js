@@ -51,6 +51,22 @@
 
 	adk.adapter.lycheeJS.prototype = {
 
+		/*
+		 * Bootstrapping
+		 */
+
+		bootstrap: function() {
+
+			var temp = this.__main.getTemporaryFolder();
+
+			if (shell.isDirectory('./external/lycheeJS') === false) {
+				shell.removeDirectory('./external/lycheeJS');
+			}
+
+			_install(temp, './external/lycheeJS');
+
+		},
+
 		getTree: function(directory) {
 
 			var temp = this.__main.getTemporaryFolder();
@@ -58,7 +74,6 @@
 			if (shell.isDirectory('./external/lycheeJS') === false) {
 				_install(temp, './external/lycheeJS');
 			}
-
 
 			console.log('game directory', directory);
 

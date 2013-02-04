@@ -87,6 +87,54 @@ this.shell = {};
 
 	};
 
+	shell.removeDirectory = function(path) {
+
+		path = typeof path === 'string' ? path : null;
+
+
+		if (
+			path !== null
+			&& shell.isDirectory(path) === true
+		) {
+
+			var cmd = 'rm -rf "' + path + '";';
+
+			os.exec(cmd);
+
+
+			return shell.isDirectory(path) === false;
+
+		}
+
+
+		return false;
+
+	};
+
+	shell.removeFile = function(path) {
+
+		path = typeof path === 'string' ? path : null;
+
+
+		if (
+			path !== null
+			&& shell.isFile(path) === true
+		) {
+
+			var cmd = 'rm "' + path + '";';
+
+			os.exec(cmd);
+
+
+			return shell.isFile(path) === false;
+
+		}
+
+
+		return false;
+
+	};
+
 
 })(this, this.adk, this.shell);
 

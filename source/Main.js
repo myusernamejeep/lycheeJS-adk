@@ -49,24 +49,28 @@ this.adk = {
 		var settings = this.__parseArguments(argc, argv);
 
 
-		this.__help = new adk.Help(this);
+		this.__self     = argv[0];
+		this.__help     = new adk.Help(this);
+		this.__adapter  = new adk.adapter[settings.flags.adapter || 'lycheeJS'](this);
+		this.__template = null;
 
 
-		// defaulted game engine adapter
-		if (settings.flags.adapter === null) {
-			settings.flags.adapter = 'lycheeJS';
-		}
+		if (settings.task !== 'bootstrap') {
 
-		if (settings.template === null) {
-			console.error('Unsupported <template>!');
-			this.__help.generate();
-			return this;
-		}
+			if (settings.template !== null) {
+				this.__template = new adk.template[settings.template](this);
+			} else {
+				console.error('Unsupported <template>!');
+				this.__help.generate();
+				return this;
+			}
 
-		if (settings.indir === null) {
-			console.error('Unsupported <game-folder>!');
-			this.__help.generate();
-			return this;
+			if (settings.indir === null) {
+				console.error('Unsupported <game-folder>!');
+				this.__help.generate();
+				return this;
+			}
+
 		}
 
 		if (settings.arch === null) {
@@ -77,19 +81,11 @@ this.adk = {
 				console.error('Unsupported <architecture>!');
 				this.__help.generate();
 				return this;
-			} else if (debug === true) {
+			} else if (adk.debug === true) {
 				console.warn('Using host <architecture> (' + settings.arch + ')');
 			}
 
 		}
-
-
-		this.__adapter  = new adk.adapter[settings.flags.adapter](this);
-		this.__self     = argv[0];
-		this.__settings = settings;
-		this.__template = new adk.template[settings.template](this);
-
-
 
 		if (settings.outdir === null) {
 			settings.outdir = './out/' + settings.template + settings.arch;
@@ -98,11 +94,14 @@ this.adk = {
 		settings.tmpdir = './.temp';
 
 
+		this.__settings = settings;
+
 		switch(settings.task) {
 
-			case "build": this.build(); break;
-			case "clean": this.clean(); break;
-			case "debug": this.debug(); break;
+			case "bootstrap": this.bootstrap(); break;
+			case "build":     this.build(); break;
+			case "clean":     this.clean(); break;
+			case "debug":     this.debug(); break;
 
 			default:
 				this.__help.generate();
@@ -114,9 +113,10 @@ this.adk = {
 
 
 	adk.Main.TASKS = {
-		build: 'Starts the build process, output depends on the <template>.',
-		clean: 'Cleans up temporary files.',
-		debug: 'Starts the debugger for the built (and installed) app, depends on the <template>.'
+		bootstrap: 'Bootstraps the ADK with externally required files, depends on the adapter.',
+		build:     'Starts the build process, output depends on the <template>.',
+		clean:     'Cleans up temporary files.',
+		debug:     'Starts the debugger for the built (and installed) app, depends on the <template>.'
 	};
 
 
@@ -255,6 +255,16 @@ this.adk = {
 
 		getTemporaryFolder: function() {
 			return this.__settings.tmpdir;
+		},
+
+
+
+		bootstrap: function() {
+
+			if (this.__adapter !== null) {
+				this.__adapter.bootstrap();
+			}
+
 		},
 
 		build: function() {
