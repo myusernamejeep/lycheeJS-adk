@@ -10,10 +10,12 @@ if (typeof global !== 'undefined') {
 (function(lychee, global) {
 
 	var _env = {
+		debug: false,
 		bases: {
 			lychee: './lychee'
 		},
 		tags: {},
+		_build: null
 	};
 
 
@@ -71,6 +73,9 @@ if (typeof global !== 'undefined') {
 	};
 
 	lychee.build = function(callback, scope) {
+
+		_env.debug  = lychee.debug === true;
+		_env._build = callback.toString();
 
 		fs.write('./env.json', JSON.stringify(_env));
 

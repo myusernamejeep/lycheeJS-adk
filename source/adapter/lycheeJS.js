@@ -55,6 +55,40 @@
 		 * Helpers
 		 */
 
+		__generateMain: function(gameenv, buildenv) {
+
+			var temp = this.__main.getTemporaryFolder() + '/main.js';
+
+			// Use the new target folders, which were
+			// linked by the Adapter and updated by
+			// the Template
+			var bases = {};
+			for (var baseId in buildenv.bases) {
+				bases[baseId] = buildenv.bases[baseId][1];
+			}
+
+
+			if (gameenv._build === null) {
+				console.error('Could not parse lychee.build(callback, scope) in init.js');
+				return null;
+			}
+
+
+			var code = '';
+
+			code += 'lychee.debug = ' + gameenv.debug + ';\n';
+			code += 'lychee.rebase(' + JSON.stringify(bases) + ');\n';
+			code += 'lychee.tag(' + JSON.stringify(gameenv.tags) + ');\n';
+			code += 'lychee.build(' + gameenv._build + ', this);\n';
+
+			if (fs.write(temp, code) === true) {
+				return temp;
+			} else {
+				return null;
+			}
+
+		},
+
 		__getEnvironment: function(folder) {
 
 			var env  = {
@@ -117,10 +151,9 @@
 							env.folders.push([ assetdir, './asset' ]);
 						}
 
-
-						var initjs = folder + '/init.js';
-						if (shell.isFile(initjs) === true) {
-							env.files.push([ initjs, './init.js' ]);
+						var mainjs = this.__generateMain(data, env.data);
+						if (mainjs !== null) {
+							env.files.push([ mainjs, './main.js' ]);
 						}
 
 					}
