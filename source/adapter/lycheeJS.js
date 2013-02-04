@@ -2,12 +2,40 @@
 (function(global, adk, shell) {
 
 	// Routine required for installation
+	var _url = 'https://github.com/martensms/lycheeJS/zipball/master';
 	var _install = function(temp, path) {
+
+		if (shell.isDirectory(temp) === false) {
+			shell.createDirectory(temp, true);
+		}
+
 
 		var cmd = '';
 
-		console.info()
+		if (shell.isDirectory(path) === false) {
 
+			shell.createDirectory(path, true);
+
+			cmd = 'wget -O ' + temp + '/lycheeJS.zip ' + _url + ';';
+			shell.exec(cmd);
+
+			if (shell.isFile(temp + '/lycheeJS.zip') === true) {
+
+				cmd = 'unzip ' + temp + '/lycheeJS.zip -d ' + temp + ';';
+				shell.exec(cmd);
+
+				cmd = 'mv ' + temp + '/martensms-lycheeJS-*/* ' + path + ';';
+				shell.exec(cmd);
+
+
+				return true;
+
+			}
+
+		}
+
+
+		return false;
 
 	};
 

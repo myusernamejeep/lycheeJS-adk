@@ -4,6 +4,25 @@ this.shell = {};
 (function(global, adk, shell) {
 
 	// Identical API, so reuse it
+
+	shell.exec = function(command) {
+
+		if (adk.debug === true) {
+
+			if (
+				shell.isFile('./log') === true
+				&& command.charAt(command.length - 1) === ';'
+			) {
+				command = command.substr(0, command.length - 1) + ' >> ./log 2>&1;';
+			}
+
+		}
+
+
+		os.exec(command);
+
+	};
+
 	shell.exec = os.exec;
 
 	shell.isDirectory = function(path) {
@@ -14,7 +33,7 @@ this.shell = {};
 		if (path !== null) {
 
 			var cmd = 'if [ -d "' + path + '" ]; then echo "true"; else echo "false"; fi;';
-			var result = shell.exec(cmd);
+			var result = os.exec(cmd);
 
 			return result === 'true';
 
@@ -33,7 +52,7 @@ this.shell = {};
 		if (path !== null) {
 
 			var cmd = 'if [ -f "' + path + '" ]; then echo "true"; else echo "false"; fi;';
-			var result = shell.exec(cmd);
+			var result = os.exec(cmd);
 
 			return result === 'true';
 
@@ -57,7 +76,7 @@ this.shell = {};
 				cmd = 'mkdir -p "' + path + '";';
 			}
 
-			shell.exec(cmd);
+			os.exec(cmd);
 
 			return shell.isDirectory(path);
 

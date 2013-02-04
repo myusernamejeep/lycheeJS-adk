@@ -30,7 +30,9 @@
 
 		include('./source/Main.js', function() {
 
-			new adk.Main(argc, argv, true);
+			adk.debug = true;
+
+			new adk.Main(argc, argv);
 
 		}, this);
 

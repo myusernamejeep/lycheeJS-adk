@@ -8,6 +8,8 @@ this.adk = {
 
 (function(global, adk, shell) {
 
+	adk.debug = false;
+
 	adk.extend = function(obj) {
 
 		for (var a = 1, al = arguments.length; a < al; a++) {
@@ -42,15 +44,12 @@ this.adk = {
 	]);
 
 
-	adk.Main = function(argc, argv, debug) {
+	adk.Main = function(argc, argv) {
 
-		debug = debug === true;
+		var settings = this.__parseArguments(argc, argv);
 
 
 		this.__help = new adk.Help(this);
-
-
-		var settings = this.__parseArguments(argc, argv);
 
 
 		// defaulted game engine adapter
@@ -86,7 +85,6 @@ this.adk = {
 
 
 		this.__adapter  = new adk.adapter[settings.flags.adapter](this);
-		this.__debug    = debug;
 		this.__self     = argv[0];
 		this.__settings = settings;
 		this.__template = new adk.template[settings.template](this);
@@ -228,7 +226,7 @@ this.adk = {
 
 					}
 
-				} else if (this.__debug === true) {
+				} else if (adk.debug === true) {
 
 					console.warn('Could not interpret argument "' + str + '"');
 
