@@ -76,8 +76,6 @@ if (typeof global !== 'undefined') {
 
 	};
 
-}
-
 })(lychee, typeof global !== 'undefined' ? global : this);
 
 

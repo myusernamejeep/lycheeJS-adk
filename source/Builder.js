@@ -38,18 +38,19 @@
 		buildV8: function(arch, path, asLibrary) {
 		},
 
-		buildV8GL: function(arch, path, asLibrary) {
+		buildV8GL: function(arch, toFile, asLibrary) {
 
-			arch = typeof arch === 'string' ? arch : null;
-			path = typeof path === 'string' ? path : null;
+			arch   = typeof arch === 'string' ? arch : null;
+			toFile = typeof toFile === 'string' ? toFile : null;
 			asLibrary = asLibrary === true;
 
 
-			var cmd, path, target;
+			var path, target;
 
 
 			// Build required libraries
 			path = this.__getPath('v8gl') + '/lib/' + arch;
+
 			this.buildPNG(arch, path + '/libpng.a', true);
 			this.buildV8(arch, path + '/libv8_*.a', true);
 
@@ -59,11 +60,18 @@
 			path   = this.__getPath('v8gl');
 			target = this.__main.getBuildTarget(arch);
 
-console.log('building v8gl now!', target, path, asLibrary);
+			shell.exec('cd "' + path + '"; make ' + target + ';');
 
-			cmd = 'cd "' + path + '"; make ' + target + ';';
-			shell.exec(cmd);
 
+			if (toFile !== null) {
+
+				if (asLibrary === true) {
+					shell.copyFile(path + '/out/' + target + '/libv8gl.a', toFile);
+				} else {
+					shell.copyFile(path + '/out/' + target + '/v8gl', toFile);
+				}
+
+			}
 
 		}
 

@@ -72,8 +72,6 @@
 
 				builder.buildV8GL(arch, temp + '/v8gl');
 
-return;
-
 				shell.copyFile('./source/adapter/raw/lycheeJS/main.js', temp + '/main.js');
 				shell.copyFile(folder + '/init.js', temp + '/init.js');
 
