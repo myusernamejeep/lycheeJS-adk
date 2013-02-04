@@ -83,6 +83,11 @@ build_v8gl() {
 	echo -e "\n\n- - - Building v8gl ($1) - - -\n";
 
 	cd "$V8GL_PATH";
+	mkdir -p lib/${1:0:-8};
+    
+	cp $PNG_PATH/out/$1/* lib/${1:0:-8};
+	cp $V8_PATH/out/$1/obj.target/tools/gyp/* lib/${1:0:-8}/;
+
 	make $1;
 
 	echo -e "Done.";
