@@ -15,6 +15,7 @@
  *
  * MISSING bindings (due to cross-platform conflictions):
  *
+ *
  * - 4. from Window Management:
  *   > glut.setCursor
  *
@@ -48,33 +49,44 @@ namespace binding {
 	 * Initialization
 	 */
 
-	bool _glut_mainLoop = false;
-
-	v8::Handle<v8::Value> GLUT::handleMainLoop(const v8::Arguments& args) {
-
-		if (_glut_mainLoop == false) {
-			glutMainLoop();
-			_glut_mainLoop = true;
-		}
-
-		return v8::Undefined();
-
-	}
-
-	bool _glut_init = false;
-	int* _glut_pargc;
-	char** _glut_argv;
-
 	v8::Handle<v8::Value> GLUT::handleInit(const v8::Arguments& args) {
 
-		if (_glut_init == false) {
-			glutInit((int*) _glut_pargc, (char**) _glut_argv);
-			_glut_init = true;
+		if (
+			args.Length() == 2
+			&& args[0]->IsNumber()
+			&& args[1]->IsArray()
+		) {
+
+			int argc = args[0]->IntegerValue();
+			v8::Local<v8::Object> arr_argv = args[1]->ToObject();
+
+
+			char* argv[argc];
+
+			const v8::Local<v8::Array> props = arr_argv->GetPropertyNames();
+			const uint32_t length = props->Length();
+
+			for (uint32_t a = 0; a < length; a++) {
+
+				v8::Local<v8::Value> key = props->Get(a);
+				v8::String::Utf8Value value(arr_argv->Get(key));
+
+				argv[a] = *value;
+
+			}
+
+			glutInit(&argc, argv);
+
 		}
 
 		return v8::Undefined();
+
 	}
 
+	v8::Handle<v8::Value> GLUT::handleMainLoop(const v8::Arguments& args) {
+		glutMainLoop();
+		return v8::Undefined();
+	}
 
 	v8::Handle<v8::Value> GLUT::handleInitWindowPosition(const v8::Arguments& args) {
 
@@ -929,11 +941,7 @@ namespace binding {
 
 	}
 
-	v8::Handle<v8::ObjectTemplate> GLUT::generate(int* pargc, char** argv) {
-
-		_glut_pargc = pargc;
-		_glut_argv = argv;
-
+	v8::Handle<v8::ObjectTemplate> GLUT::generate() {
 
 		v8::HandleScope scope;
 
