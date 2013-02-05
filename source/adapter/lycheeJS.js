@@ -2,7 +2,7 @@
 (function(global, adk, shell) {
 
 	// Routine required for installation
-	var _url = 'https://github.com/martensms/lycheeJS/zipball/master';
+	var _url = 'https://github.com/martensms/lycheeJS/archive/master.zip';
 	var _install = function(temp, path) {
 
 		if (shell.isDirectory(temp) === false) {
@@ -24,7 +24,7 @@
 				cmd = 'unzip ' + temp + '/lycheeJS.zip -d ' + temp + ';';
 				shell.exec(cmd);
 
-				cmd = 'mv ' + temp + '/martensms-lycheeJS-*/* ' + path + ';';
+				cmd = 'mv ' + temp + '/lycheeJS-master/* ' + path + ';';
 				shell.exec(cmd);
 
 
