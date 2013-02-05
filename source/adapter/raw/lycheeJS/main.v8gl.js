@@ -1,5 +1,4 @@
 
-glut.init();
 glut.createWindow('V8GL runtime');
 
 (function(dependencies) {
@@ -20,6 +19,4 @@ glut.createWindow('V8GL runtime');
 	'./lychee/platform/v8gl/bootstrap.js',
 	'./game/Main.js'
 ]);
-
-glut.mainLoop();
 
