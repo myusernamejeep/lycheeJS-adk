@@ -288,6 +288,10 @@ this.adk = {
 
 
 
+		/*
+		 * Tasks
+		 */
+
 		bootstrap: function() {
 
 			if (this.__adapter !== null) {
@@ -300,6 +304,7 @@ this.adk = {
 
 			var indir  = this.__settings.indir;
 			var outdir = this.__settings.outdir;
+			var arch   = this.__settings.arch;
 
 
 			var env = null;
@@ -307,11 +312,9 @@ this.adk = {
 				env = this.__adapter.getEnvironment(indir);
 			}
 
-
 			if (this.__template !== null) {
 				env = this.__template.getEnvironment(indir, env);
 			}
-
 
 
 			if (env !== null) {
@@ -334,7 +337,9 @@ this.adk = {
 			}
 
 
-			// TODO: Move final build to out/$target folder
+			if (this.__template !== null) {
+				this.__template.build(outdir, arch);
+			}
 
 		},
 

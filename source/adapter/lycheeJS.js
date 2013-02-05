@@ -74,7 +74,7 @@
 			}
 
 
-			var code = '';
+			var code = fs.read('./source/adapter/raw/lycheeJS/main.v8gl.js');
 
 			code += 'lychee.debug = ' + gameenv.debug + ';\n';
 			code += 'lychee.rebase(' + JSON.stringify(bases) + ');\n';
@@ -112,9 +112,9 @@
 				var builder = this.__main.getBuilder();
 				var arch    = this.__main.getHostArch();
 
-				builder.buildV8GL(arch, temp + '/v8gl');
+				builder.buildV8GL(arch, temp + '/v8gl', false);
 
-				shell.copyFile('./source/adapter/raw/lycheeJS/main.js', temp + '/main.js');
+				shell.copyFile('./source/adapter/raw/lycheeJS/main.env.js', temp + '/main.js');
 				shell.copyFile(folder + '/init.js', temp + '/init.js');
 
 				shell.exec('cd "' + temp + '" && ./v8gl;');
