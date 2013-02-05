@@ -30,7 +30,27 @@
 		clean: function() {
 		},
 
-		debug: function() {
+		debug: function(folder, arch) {
+
+			console.log('DEBUGGING...');
+
+			var valgrindlog = this.__main.getRoot() + '/' + this.__main.getTemporaryFolder() + '/valgrind.log';
+
+			var args = [
+				'G_SLICE=always-malloc',
+				'G_DEBUG=gc-friendly',
+				'valgrind -v',
+				'--tool=memcheck',
+				'--leak-check=full',
+				'--num-callers=40',
+				'--log-file=' + valgrindlog,
+				'$(which ./v8gl)'
+			];
+
+
+			var cmd = 'cd ' + folder + ' && ' + args.join(' ') + ';';
+			shell.exec(cmd);
+
 		}
 
 	};

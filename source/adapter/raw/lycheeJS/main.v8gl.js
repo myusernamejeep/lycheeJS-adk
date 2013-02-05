@@ -1,5 +1,5 @@
 
-glut.createWindow('V8GL runtime');
+this.window = glut.createWindow('V8GL runtime');
 
 (function(dependencies) {
 

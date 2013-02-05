@@ -68,13 +68,14 @@ this.adk = {
 				return this;
 			}
 
-			if (settings.indir === null) {
+			if (settings.indir === null && settings.task !== 'debug') {
 				console.error('Unsupported <game-folder>!');
 				this.__help.generate();
 				return this;
 			}
 
 		}
+
 
 		if (settings.arch === null) {
 
@@ -348,6 +349,13 @@ this.adk = {
 		},
 
 		debug: function() {
+
+			var outdir = this.__settings.outdir;
+			var arch   = this.__settings.arch;
+
+			if (this.__template !== null) {
+				this.__template.debug(outdir, arch);
+			}
 
 		}
 
