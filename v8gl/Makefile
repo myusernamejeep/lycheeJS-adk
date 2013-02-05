@@ -70,6 +70,7 @@ OUTDIR = ./out/$@
 
 clean:
 	rm -rf ./out/
+	rm -rf ./lib/
 	rm ./src/js/console.h
 	rm ./src/js/interval.h
 	rm ./src/js/timeout.h
