@@ -32,11 +32,9 @@ The installed OpenGL version should be higher than 2.1. You can verify the OpenG
 string of your graphics card by executing the following line in your shell:
 
 ```bash
-
 $ glxinfo | grep "OpenGL version"
 
 OpenGL version string: 4.2.11627 Compatibility Profile Context
-
 ```
 
 
@@ -70,8 +68,8 @@ headers and such. The setup script will also build the ADK itself (which
 is in fact a V8GL runtime for your machine's architecture).
 
 ```bash
-	cd ~/Desktop/lycheeJS-adk;
-	./setup.sh;
+cd ~/Desktop/lycheeJS-adk;
+./setup.sh;
 ```
 
 
@@ -82,8 +80,8 @@ bootstrapping process for each engine where every required library
 is being installed on your system.
 
 ```bash
-	cd ~/Desktop/lycheeJS-adk;
-	./adk bootstrap --adapter=lycheeJS
+cd ~/Desktop/lycheeJS-adk;
+./adk bootstrap --adapter=lycheeJS
 ```
 
 
@@ -98,12 +96,12 @@ A simple start point of learning how to develop games with lycheeJS is
 to try out the code of the Boilerplate or the Jewelz Game.
 
 ```bash
-	cd ~/Desktop/lycheeJS-adk;
-	./adk build linux.x64 ./external/lycheeJS/game/jewelz --adapter=lycheeJS
+cd ~/Desktop/lycheeJS-adk;
+./adk build linux.x64 ./external/lycheeJS/game/jewelz --adapter=lycheeJS
 
-	# Testing
-	cd ./out/Linux.x64;
-	./v8gl;
+# Testing
+cd ./out/Linux.x64;
+./v8gl;
 ```
 
 For a 32 Bit system, you should build *linux.ia32* instead.
