@@ -13,17 +13,17 @@
 
 	adk.template.Web.prototype = {
 
-		getEnvironment: function(indir, outdir, env) {
+		getEnvironment: function(env, indir, outdir) {
 			return env;
 		},
 
-		build: function(indir, outdir, arch) {
+		build: function(arch, indir, outdir) {
 		},
 
-		clean: function(indir, outdir, arch) {
+		clean: function(arch, indir, outdir) {
 		},
 
-		debug: function(indir, outdir, arch) {
+		debug: function(arch, indir, outdir) {
 		}
 
 	};

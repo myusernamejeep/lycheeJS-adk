@@ -13,24 +13,27 @@
 
 	adk.template.Linux.prototype = {
 
-		getEnvironment: function(indir, outdir, env) {
+		getEnvironment: function(env, indir, outdir) {
 			return env;
 		},
 
-		build: function(indir, outdir, arch) {
+		build: function(arch, indir, outdir) {
+
+			console.group('adk.template.Linux.prototype.build(' + arch + ', ' + indir + ', ' + outdir + ')');
 
 			var builder = this.__main.getBuilder();
 
 			builder.buildV8GL(arch, outdir + '/v8gl', false);
 
+			console.groupEnd();
 
 		},
 
-		clean: function(indir, outdir, arch) {
+		clean: function(arch, indir, outdir) {
 
 		},
 
-		debug: function(indir, outdir, arch) {
+		debug: function(arch, indir, outdir) {
 
 			console.log('DEBUGGING...');
 

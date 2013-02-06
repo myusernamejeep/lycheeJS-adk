@@ -63,6 +63,9 @@
 
 		__generateHTML: function(html, folder, buildenv) {
 
+			console.group('adk.adapter.lycheeJS.prototype.__generateHTML(%html%, ' + folder + ', %buildenv%)');
+
+
 			var lines = html.split('\n');
 			var temp = this.__main.getTemporaryFolder() + '/index.html';
 
@@ -75,6 +78,8 @@
 
 
 			var code = '';
+
+			console.log('> Parsing ' + lines.length + ' lines of HTML...');
 
 			for (var l = 0, ll = lines.length; l < ll; l++) {
 
@@ -96,11 +101,15 @@
 
 						}
 
+						var value = 'src="' + content + '"';
+
 						if (base !== null) {
-							return 'src="' + buildenv.bases[id][1] + content.substr(base.length, content.length - base.length) + '"';
-						} else {
-							return 'src="' + content + '"';
+							value = 'src="' + buildenv.bases[id][1] + content.substr(base.length, content.length - base.length) + '"';
 						}
+
+						console.log('> Parsed <script> with ' + value + '.');
+
+						return value;
 
 					});
 
@@ -122,11 +131,15 @@
 
 						}
 
+						var value = 'href="' + content + '"';
+
 						if (base !== null) {
-							return 'href="' + buildenv.bases[id][1] + content.substr(base.length, content.length - base.length) + '"';
-						} else {
-							return 'href="' + content + '"';
+							value = 'href="' + buildenv.bases[id][1] + content.substr(base.length, content.length - base.length) + '"';
 						}
+
+						console.log('> Parsed <link> with ' + value + '.');
+
+						return value;
 
 					});
 
@@ -139,10 +152,14 @@
 			}
 
 
-			fs.write(temp, code);
+			console.groupEnd();
 
+			if (fs.write(temp, code) === true) {
 
-			return temp;
+				return temp;
+			} else {
+				return null;
+			}
 
 		},
 
@@ -187,7 +204,25 @@
 
 		},
 
-		__getEnvironment: function(folder) {
+
+
+		/*
+		 * Interaction with adk.Main
+		 */
+
+		getEnvironment: function(arch, indir, outdir) {
+
+			if (shell.isFile(indir + '/init.js') === false) {
+				return null;
+			}
+
+
+			console.group('adk.adapter.lycheeJS.prototype.getEnvironment(' + arch + ', ' + indir + ', ' + outdir + ')');
+
+			if (shell.isDirectory('./external/lycheeJS') === false) {
+				_install(this.__main.getTemporaryFolder(), './external/lycheeJS');
+			}
+
 
 			var env  = {
 				data: {
@@ -213,7 +248,7 @@
 				builder.buildV8GL(arch, temp + '/v8gl', false);
 
 				shell.copyFile('./source/adapter/raw/lycheeJS/main.env.js', temp + '/main.js');
-				shell.copyFile(folder + '/init.js', temp + '/init.js');
+				shell.copyFile(indir + '/init.js', temp + '/init.js');
 
 				shell.exec('cd "' + temp + '" && ./v8gl;');
 
@@ -233,23 +268,28 @@
 
 					if (data !== null) {
 
-						if (adk.debug === true) {
-							data.debug = true;
-						}
+						console.info('> Environment tracking from init.js succeeded.');
 
-						for (var namespace in data.bases) {
-							var arr = [ folder + '/' + data.bases[namespace], './' + namespace ];
-							env.data.bases[namespace] = arr;
+						for (var baseId in data.bases) {
+
+							console.log('> Parsing base "' + baseId + '".');
+							var arr = [ indir + '/' + data.bases[baseId], './' + baseId ];
+							env.data.bases[baseId] = arr;
+
+							console.log('> Adding folder "' + arr[0] + '" as "' + arr[1] + '".');
 							env.folders.push(arr);
+
 						}
 
 						for (var tagId in data.tags) {
+							console.log('> Setting tag "' + tagId + '" with value "' + data.tags[tagId] + '".');
 							env.data.tags[tagId] = data.tags[tagId];
 						}
 
 
-						var assetdir = folder + '/asset';
+						var assetdir = indir + '/asset';
 						if (shell.isDirectory(assetdir) === true) {
+							console.log('> Adding folder "' + assetdir + '" as "./asset".');
 							env.folders.push([ assetdir, './asset' ]);
 						}
 
@@ -260,12 +300,14 @@
 							if (template instanceof adk.template.Web) {
 
 								data.tags.platform = [ 'webgl', 'html' ];
+								console.log('> Changing tag "platform" to value "' + data.tags.platform.toString() + '".');
 
-								var html = fs.read(folder + '/index.html');
+								var html = fs.read(indir + '/index.html');
 								if (html !== null) {
 
-									var indexhtml = this.__generateHTML(html, folder, env.data);
+									var indexhtml = this.__generateHTML(html, indir, env.data);
 									if (indexhtml !== null) {
+										console.log('> Adding file "' + indexhtml + '" as "./index.html".');
 										env.files.push([ indexhtml, './index.html' ]);
 									}
 
@@ -273,15 +315,18 @@
 
 								var mainjs = this.__generateMain(data, env.data, false);
 								if (mainjs !== null) {
+									console.log('> Adding file "' + mainjs + '" as "./init.js".');
 									env.files.push([ mainjs, './init.js' ]);
 								}
 
 							} else {
 
 								data.tags.platform = [ 'v8gl' ];
+								console.log('> Changing tag "platform" to value "' + data.tags.platform.toString() + '".');
 
 								var mainjs = this.__generateMain(data, env.data, true);
 								if (mainjs !== null) {
+									console.log('> Adding file "' + mainjs + '" as "./main.js".');
 									env.files.push([ mainjs, './main.js' ]);
 								}
 
@@ -291,20 +336,25 @@
 
 					}
 
+				} else {
+
+					env = null;
+					console.error('> Environment tracking from init.js failed. Probably there\'s a JavaScript Parsing error thrown inside.');
+
 				}
 
 			}
 
 
+			console.groupEnd();
+
 			return env;
 
 		},
 
-		/*
-		 * Bootstrapping
-		 */
-
 		bootstrap: function() {
+
+			console.group('adk.adapter.lycheeJS.prototype.bootstrap()');
 
 			var temp = this.__main.getTemporaryFolder();
 
@@ -314,19 +364,7 @@
 
 			_install(temp, './external/lycheeJS');
 
-		},
-
-		getEnvironment: function(folder) {
-
-			if (shell.isDirectory('./external/lycheeJS') === false) {
-				_install(this.__main.getTemporaryFolder(), './external/lycheeJS');
-			}
-
-			if (shell.isFile(folder + '/init.js') === false) {
-				return null;
-			} else {
-				return this.__getEnvironment(folder);
-			}
+			console.groupEnd();
 
 		}
 

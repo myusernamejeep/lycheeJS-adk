@@ -92,7 +92,6 @@
 			var values = [];
 			for (var id in adk.adapter) { values.push(id); }
 			str += space + 'adapter' + this.__getWhitespace('adapter') + 'The engine adapter, accepted values: ' + values.join(',') + '\n';
-			str += space + 'debug' + this.__getWhitespace('debug') + 'Activates debug mode, dumps more information to stdout if set to "true".\n';
 
 
 			console.log(str);

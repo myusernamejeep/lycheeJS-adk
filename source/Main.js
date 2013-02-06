@@ -8,8 +8,6 @@ this.adk = {
 
 (function(global, adk, shell) {
 
-	adk.debug = false;
-
 	adk.extend = function(obj) {
 
 		for (var a = 1, al = arguments.length; a < al; a++) {
@@ -57,11 +55,6 @@ this.adk = {
 		this.__adapter  = new adk.adapter[settings.flags.adapter || 'lycheeJS'](this);
 		this.__template = null;
 
-		if (settings.flags.debug) {
-			console.info('DEBUG MODE ACTIVE');
-			adk.debug = true;
-		}
-
 
 		if (settings.task === null) {
 			this.__help.generate();
@@ -93,7 +86,7 @@ this.adk = {
 			if (settings.arch === null) {
 				console.error('Unsupported <architecture>!');
 				return this;
-			} else if (adk.debug === true) {
+			} else {
 				console.warn('Using host <architecture> (' + settings.arch + ')');
 			}
 
@@ -147,7 +140,7 @@ this.adk = {
 
 		getBuildTarget: function(arch) {
 
-			if (adk.debug === true) {
+			if (this.__settings.task === 'debug') {
 // TODO: Enable this after all Makefiles are supporting debug symbol variants
 //				return arch + '.debug';
 				return arch + '.release';
@@ -252,7 +245,7 @@ this.adk = {
 
 					}
 
-				} else if (adk.debug === true) {
+				} else {
 
 					console.warn('Could not interpret argument "' + str + '"');
 
@@ -324,13 +317,13 @@ this.adk = {
 
 			var env = null;
 			if (this.__adapter !== null) {
-				env = this.__adapter.getEnvironment(indir, outdir, arch);
+				env = this.__adapter.getEnvironment(arch, indir, outdir);
 			} else {
 				console.warn('No valid <adapter> selected!');
 			}
 
 			if (this.__template !== null) {
-				env = this.__template.getEnvironment(indir, outdir, env);
+				env = this.__template.getEnvironment(env, indir, outdir);
 			} else {
 				console.warn('No valid <template> selected!');
 			}
@@ -361,7 +354,7 @@ this.adk = {
 
 
 			if (this.__template !== null) {
-				this.__template.build(indir, outdir, arch);
+				this.__template.build(arch, indir, outdir);
 			}
 
 		},
@@ -377,7 +370,7 @@ this.adk = {
 			var arch   = this.__settings.arch;
 
 			if (this.__template !== null) {
-				this.__template.debug(indir, outdir, arch);
+				this.__template.debug(arch, indir, outdir);
 			}
 
 		}

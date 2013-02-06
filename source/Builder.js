@@ -36,6 +36,8 @@
 
 		buildPNG: function(arch, toFile, asLibrary) {
 
+			console.group('adk.Builder.prototype.buildPNG(' + arch + ', ' + toFile + ', ' + asLibrary + ')');
+
 			arch   = typeof arch === 'string' ? arch : null;
 			toFile = typeof toFile === 'string' ? toFile : null;
 			asLibrary = asLibrary === true;
@@ -54,6 +56,7 @@
 			}
 			cmd += 'make ' + target + ';';
 
+			console.log('> shell.exec(' + cmd + ')');
 			shell.exec(cmd);
 
 
@@ -67,9 +70,13 @@
 
 			}
 
+			console.groupEnd();
+
 		},
 
-		buildV8: function(arch, path, asLibrary) {
+		buildV8: function(arch, toFile, asLibrary) {
+
+			console.group('adk.Builder.prototype.buildV8(' + arch + ', ' + toFile + ', ' + asLibrary + ')');
 
 			arch   = typeof arch === 'string' ? arch : null;
 			toFile = typeof toFile === 'string' ? toFile : null;
@@ -90,6 +97,7 @@
 			cmd += 'export snapshot=off;'; // disable v8 snapshots, as they are not supported on most SDKs
 			cmd += 'make ' + target + ';';
 
+			console.log('> shell.exec(' + cmd + ')');
 			shell.exec(cmd);
 
 
@@ -109,9 +117,13 @@
 
 			}
 
+			console.groupEnd();
+
 		},
 
 		buildV8GL: function(arch, toFile, asLibrary) {
+
+			console.group('adk.Builder.prototype.buildV8GL(' + arch + ', ' + toFile + ', ' + asLibrary + ')');
 
 			arch   = typeof arch === 'string' ? arch : null;
 			toFile = typeof toFile === 'string' ? toFile : null;
@@ -139,6 +151,7 @@
 			}
 			cmd += 'make ' + target + ';';
 
+			console.log('> shell.exec(' + cmd + ')');
 			shell.exec(cmd);
 
 
@@ -151,6 +164,8 @@
 				}
 
 			}
+
+			console.groupEnd();
 
 		}
 
