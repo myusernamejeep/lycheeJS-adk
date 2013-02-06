@@ -13,24 +13,24 @@
 
 	adk.template.Linux.prototype = {
 
-		getEnvironment: function(folder, env) {
-			// Don't modify the paths, keep them as the Adapter requested it
+		getEnvironment: function(indir, outdir, env) {
 			return env;
 		},
 
-		build: function(folder, arch) {
+		build: function(indir, outdir, arch) {
 
 			var builder = this.__main.getBuilder();
 
-			builder.buildV8GL(arch, folder + '/v8gl', false);
+			builder.buildV8GL(arch, outdir + '/v8gl', false);
 
 
 		},
 
-		clean: function() {
+		clean: function(indir, outdir, arch) {
+
 		},
 
-		debug: function(folder, arch) {
+		debug: function(indir, outdir, arch) {
 
 			console.log('DEBUGGING...');
 

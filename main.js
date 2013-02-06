@@ -29,11 +29,7 @@
 		include('./source/bootstrap.js');
 
 		include('./source/Main.js', function() {
-
-			adk.debug = true;
-
 			new adk.Main(argc, argv);
-
 		}, this);
 
 	};

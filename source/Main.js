@@ -57,20 +57,29 @@ this.adk = {
 		this.__adapter  = new adk.adapter[settings.flags.adapter || 'lycheeJS'](this);
 		this.__template = null;
 
+		if (settings.flags.debug) {
+			console.info('DEBUG MODE ACTIVE');
+			adk.debug = true;
+		}
+
+
+		if (settings.task === null) {
+			this.__help.generate();
+			return this;
+		}
+
 
 		if (settings.task !== 'bootstrap') {
 
 			if (settings.template !== null) {
 				this.__template = new adk.template[settings.template](this);
 			} else {
-				console.error('Unsupported <template>!');
-				this.__help.generate();
+				console.error('Invalid <template>!');
 				return this;
 			}
 
 			if (settings.indir === null && settings.task !== 'debug') {
-				console.error('Unsupported <game-folder>!');
-				this.__help.generate();
+				console.error('Invalid <game-folder>!');
 				return this;
 			}
 
@@ -83,7 +92,6 @@ this.adk = {
 
 			if (settings.arch === null) {
 				console.error('Unsupported <architecture>!');
-				this.__help.generate();
 				return this;
 			} else if (adk.debug === true) {
 				console.warn('Using host <architecture> (' + settings.arch + ')');
@@ -238,6 +246,8 @@ this.adk = {
 
 						if (tmp[0] === 'adapter' && adk.adapter[tmp[1]] !== undefined) {
 							data.flags[tmp[0]] = tmp[1];
+						} else {
+							data.flags[tmp[0]] = tmp[1];
 						}
 
 					}
@@ -277,6 +287,10 @@ this.adk = {
 			return this.__settings;
 		},
 
+		getTemplate: function() {
+			return this.__template;
+		},
+
 		getTemporaryFolder: function() {
 
 			if (shell.isDirectory(this.__settings.tmpdir) === false) {
@@ -310,11 +324,15 @@ this.adk = {
 
 			var env = null;
 			if (this.__adapter !== null) {
-				env = this.__adapter.getEnvironment(indir);
+				env = this.__adapter.getEnvironment(indir, outdir, arch);
+			} else {
+				console.warn('No valid <adapter> selected!');
 			}
 
 			if (this.__template !== null) {
-				env = this.__template.getEnvironment(indir, env);
+				env = this.__template.getEnvironment(indir, outdir, env);
+			} else {
+				console.warn('No valid <template> selected!');
 			}
 
 
@@ -327,6 +345,7 @@ this.adk = {
 
 				shell.createDirectory(outdir, true);
 
+
 				for (var f = 0, fl = env.folders.length; f < fl; f++) {
 					shell.copyDirectory(env.folders[f][0], outdir + '/' + env.folders[f][1]);
 				}
@@ -335,11 +354,14 @@ this.adk = {
 					shell.copyFile(env.files[f][0], outdir + '/' + env.files[f][1]);
 				}
 
+			} else {
+				console.error('Could not determine game environment.');
+				return;
 			}
 
 
 			if (this.__template !== null) {
-				this.__template.build(outdir, arch);
+				this.__template.build(indir, outdir, arch);
 			}
 
 		},
@@ -350,11 +372,12 @@ this.adk = {
 
 		debug: function() {
 
+			var indir  = this.__settings.indir;
 			var outdir = this.__settings.outdir;
 			var arch   = this.__settings.arch;
 
 			if (this.__template !== null) {
-				this.__template.debug(outdir, arch);
+				this.__template.debug(indir, outdir, arch);
 			}
 
 		}

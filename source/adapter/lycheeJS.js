@@ -39,6 +39,8 @@
 
 	};
 
+
+
 	adk.adapter.lycheeJS = function(main) {
 
 		this.__main = main;
@@ -55,7 +57,99 @@
 		 * Helpers
 		 */
 
-		__generateMain: function(gameenv, buildenv) {
+		__trim: function(str) {
+			return str.replace(/^\s+/,'').replace(/\s+$/,'');
+		},
+
+		__generateHTML: function(html, folder, buildenv) {
+
+			var lines = html.split('\n');
+			var temp = this.__main.getTemporaryFolder() + '/index.html';
+
+
+			var bases = {};
+			for (var id in buildenv.bases) {
+				var url = buildenv.bases[id][0];
+				bases[id] = url.substr(folder.length + 1, url.length - (folder.length + 1));
+			}
+
+
+			var code = '';
+
+			for (var l = 0, ll = lines.length; l < ll; l++) {
+
+				var line   = lines[l];
+				var trline = this.__trim(line);
+				if (trline.substr(0, '<script'.length) === '<script') {
+
+					line = line.replace(/src=\"(.*)\"/, function(match, content, offset, str) {
+
+						var base = null;
+						var id   = null;
+						for (var bid in bases) {
+
+							if (content.substr(0, bases[bid].length) === bases[bid]) {
+								base = bases[bid];
+								id = bid;
+								break;
+							}
+
+						}
+
+						if (base !== null) {
+							return 'src="' + buildenv.bases[id][1] + content.substr(base.length, content.length - base.length) + '"';
+						} else {
+							return 'src="' + content + '"';
+						}
+
+					});
+
+					code += line + '\n';
+
+				} else if (trline.substr(0, '<link'.length) === '<link') {
+
+					line = line.replace(/href=\"(.*)\"/, function(match, content, offset, str) {
+
+						var base = null;
+						var id   = null;
+						for (var bid in bases) {
+
+							if (content.substr(0, bases[bid].length) === bases[bid]) {
+								base = bases[bid];
+								id = bid;
+								break;
+							}
+
+						}
+
+						if (base !== null) {
+							return 'href="' + buildenv.bases[id][1] + content.substr(base.length, content.length - base.length) + '"';
+						} else {
+							return 'href="' + content + '"';
+						}
+
+					});
+
+					code += line + '\n';
+
+				} else {
+					code += line + '\n';
+				}
+
+			}
+
+
+			fs.write(temp, code);
+
+
+			return temp;
+
+		},
+
+		__generateMain: function(gameenv, buildenv, isV8GL) {
+
+			isV8GL = isV8GL === true;
+
 
 			var temp = this.__main.getTemporaryFolder() + '/main.js';
 
@@ -74,12 +168,16 @@
 			}
 
 
-			var code = fs.read('./source/adapter/raw/lycheeJS/main.v8gl.js');
+			var code = '';
+			if (isV8GL === true) {
+				code = fs.read('./source/adapter/raw/lycheeJS/main.v8gl.js');
+			}
 
 			code += 'lychee.debug = ' + gameenv.debug + ';\n';
 			code += 'lychee.rebase(' + JSON.stringify(bases) + ');\n';
 			code += 'lychee.tag(' + JSON.stringify(gameenv.tags) + ');\n';
 			code += 'lychee.build(' + gameenv._build + ', this);\n';
+
 
 			if (fs.write(temp, code) === true) {
 				return temp;
@@ -135,6 +233,10 @@
 
 					if (data !== null) {
 
+						if (adk.debug === true) {
+							data.debug = true;
+						}
+
 						for (var namespace in data.bases) {
 							var arr = [ folder + '/' + data.bases[namespace], './' + namespace ];
 							env.data.bases[namespace] = arr;
@@ -151,9 +253,40 @@
 							env.folders.push([ assetdir, './asset' ]);
 						}
 
-						var mainjs = this.__generateMain(data, env.data);
-						if (mainjs !== null) {
-							env.files.push([ mainjs, './main.js' ]);
+
+						var template = this.__main.getTemplate();
+						if (template !== null) {
+
+							if (template instanceof adk.template.Web) {
+
+								data.tags.platform = [ 'webgl', 'html' ];
+
+								var html = fs.read(folder + '/index.html');
+								if (html !== null) {
+
+									var indexhtml = this.__generateHTML(html, folder, env.data);
+									if (indexhtml !== null) {
+										env.files.push([ indexhtml, './index.html' ]);
+									}
+
+								}
+
+								var mainjs = this.__generateMain(data, env.data, false);
+								if (mainjs !== null) {
+									env.files.push([ mainjs, './init.js' ]);
+								}
+
+							} else {
+
+								data.tags.platform = [ 'v8gl' ];
+
+								var mainjs = this.__generateMain(data, env.data, true);
+								if (mainjs !== null) {
+									env.files.push([ mainjs, './main.js' ]);
+								}
+
+							}
+
 						}
 
 					}
@@ -189,8 +322,11 @@
 				_install(this.__main.getTemporaryFolder(), './external/lycheeJS');
 			}
 
-
-			return this.__getEnvironment(folder);
+			if (shell.isFile(folder + '/init.js') === false) {
+				return null;
+			} else {
+				return this.__getEnvironment(folder);
+			}
 
 		}
 

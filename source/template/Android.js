@@ -13,13 +13,18 @@
 
 	adk.template.Android.prototype = {
 
-		build: function() {
+		getEnvironment: function(indir, outdir, env) {
+			// Don't modify the paths, keep them as the Adapter requested it
+			return env;
 		},
 
-		clean: function() {
+		build: function(indir, outdir, arch) {
 		},
 
-		debug: function() {
+		clean: function(indir, outdir, arch) {
+		},
+
+		debug: function(indir, outdir, arch) {
 		}
 
 	};
