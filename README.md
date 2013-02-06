@@ -69,6 +69,7 @@ is in fact a V8GL runtime for your machine's architecture).
 
 ```bash
 cd ~/Desktop/lycheeJS-adk;
+chmod +x ./setup.sh; # In case you downloaded the zip file
 ./setup.sh;
 ```
 
