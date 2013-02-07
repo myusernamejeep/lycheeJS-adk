@@ -52,8 +52,15 @@ this.adk = {
 		this.__root     = shell.exec('cd "$(dirname "' + this.__self + '")"; pwd;');
 		this.__builder  = new adk.Builder(this);
 		this.__help     = new adk.Help(this);
-		this.__adapter  = new adk.adapter[settings.flags.adapter || 'lycheeJS'](this);
+		this.__adapter  = null;
 		this.__template = null;
+
+
+		if (adk.adapter[settings.flags.adapter] !== undefined) {
+			this.__adapter = new adk.adapter[settings.flags.adapter](this);
+		} else {
+			this.__adapter = new adk.adapter.lycheeJS(this);
+		}
 
 
 		// Dispatch shell log

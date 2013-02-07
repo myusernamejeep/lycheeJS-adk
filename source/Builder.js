@@ -28,6 +28,17 @@
 			return this.__paths[what] || null;
 		},
 
+		__preparePath: function(path) {
+
+			var tmp = path.split('/');
+			tmp.pop();
+
+			var path2 = tmp.join('/');
+			if (shell.isDirectory(path2) === false) {
+				shell.createDirectory(path2, true);
+			}
+
+		},
 
 
 		/*
@@ -63,7 +74,14 @@
 			if (toFile !== null) {
 
 				if (asLibrary === true) {
-					shell.copyFile(path + '/out/' + target + '/libpng.a', toFile);
+
+					if (shell.isFile(path + '/out/' + target + '/libpng.a') === true) {
+						this.__preparePath(toFile);
+						shell.copyFile(path + '/out/' + target + '/libpng.a', toFile);
+					} else {
+						console.error('Could not compile PNG for ' + target + '. A compiler error occured.');
+					}
+
 				} else {
 					console.error('Can\'t build PNG library as standalone program');
 				}
@@ -86,7 +104,6 @@
 			var cmd = '', path = '', target = '';
 
 
-			// Build PNG
 			path   = this.__getPath('v8');
 			target = this.__main.getBuildTarget(arch);
 
@@ -105,11 +122,21 @@
 
 				if (asLibrary === true) {
 
+					this.__preparePath(toFile);
+
 					var toFileBase       = toFile.replace('*', 'base');
 					var toFileNoSnapshot = toFile.replace('*', 'nosnapshot');
 
-					shell.copyFile(path + '/out/' + target + '/obj.target/tools/gyp/libv8_base.a',       toFileBase);
-					shell.copyFile(path + '/out/' + target + '/obj.target/tools/gyp/libv8_nosnapshot.a', toFileNoSnapshot);
+
+					if (
+						shell.isFile(path + '/out/' + target + '/obj.target/tools/gyp/libv8_base.a') === true
+						&& shell.isFile(path + '/out/' + target + '/obj.target/tools/gyp/libv8_nosnapshot.a') === true
+					) {
+						shell.copyFile(path + '/out/' + target + '/obj.target/tools/gyp/libv8_base.a', toFileBase);
+						shell.copyFile(path + '/out/' + target + '/obj.target/tools/gyp/libv8_nosnapshot.a', toFileNoSnapshot);
+					} else {
+						console.error('Could not compile V8 for ' + target + '. A compiler error occured.');
+					}
 
 				} else {
 					console.error('Can\'t build V8 library as standalone program');
@@ -158,9 +185,23 @@
 			if (toFile !== null) {
 
 				if (asLibrary === true) {
-					shell.copyFile(path + '/out/' + target + '/libv8gl.a', toFile);
+
+					if (shell.isFile(path + '/out/' + target + '/libv8gl.a') === true) {
+						this.__preparePath(toFile);
+						shell.copyFile(path + '/out/' + target + '/libv8gl.a', toFile);
+					} else {
+						console.error('Could not compile V8GL for ' + target + '. A compiler error occured.');
+					}
+
 				} else {
-					shell.copyFile(path + '/out/' + target + '/v8gl', toFile);
+
+					if (shell.isFile(path + '/out/' + target + '/v8gl') === true) {
+						this.__preparePath(toFile);
+						shell.copyFile(path + '/out/' + target + '/v8gl', toFile);
+					} else {
+						console.error('Could not compile V8GL for ' + target + '. A compiler error occured.');
+					}
+
 				}
 
 			}

@@ -3,8 +3,6 @@ this.shell = {};
 
 (function(global, adk, shell) {
 
-	// Identical API, so reuse it
-
 	shell.log = null;
 
 	shell.exec = function(command) {
