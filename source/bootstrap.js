@@ -5,25 +5,27 @@ this.shell = {};
 
 	// Identical API, so reuse it
 
+	shell.log = null;
+
 	shell.exec = function(command) {
 
-		if (adk.debug === true) {
+		if (
+			shell.log !== null
+			&& shell.isFile(shell.log) === true
+			&& command.charAt(command.length - 1) === ';'
+			&& command.match(/make/)
+		) {
 
-			if (
-				shell.isFile('./log') === true
-				&& command.charAt(command.length - 1) === ';'
-			) {
-				command = command.substr(0, command.length - 1) + ' >> ./log 2>&1;';
+			if (command.match(/make/)) {
+				command = command.substr(0, command.length - 1) + ' >> ' + shell.log + ' 2>&1;';
 			}
 
 		}
 
 
-		os.exec(command);
+		return os.exec(command);
 
 	};
-
-	shell.exec = os.exec;
 
 	shell.isDirectory = function(path) {
 

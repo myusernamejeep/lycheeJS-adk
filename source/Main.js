@@ -56,6 +56,10 @@ this.adk = {
 		this.__template = null;
 
 
+		// Dispatch shell log
+		shell.log = this.getRoot() + '/log';
+
+
 		if (settings.task === null) {
 			this.__help.generate();
 			return this;
