@@ -1,6 +1,4 @@
 
-# TODO: support ${ARCHES.$MODE} builds
-
 ARCHES = ia32 x64 arm
 MODES = release debug
 ANDROID_ARCHES = android_ia32 android_arm
@@ -30,7 +28,6 @@ LDFLAGS = $(STATIC_LIBRARIES) $(SHARED_LIBRARIES)
 # V8GL game runtime
 #
 
-PROG_NAME = v8gl
 CFLAGS = -D__V8GL__ -D__WEBGL__
 
 HEADER_FILES = src/v8gl.h \
@@ -41,6 +38,7 @@ HEADER_FILES = src/v8gl.h \
 	src/lib/fs.h \
 	src/lib/os.h \
 	src/api/arraybuffer.h \
+	src/api/navigator.h \
 	src/api/script.h \
 	src/api/text.h \
 	src/api/texture.h
@@ -58,7 +56,6 @@ SRC_FILES = src/v8gl.cpp \
 	src/api/script.cpp \
 	src/api/text.cpp \
 	src/api/texture.cpp
- 
 
 
 LIB_ARCH = $(basename $(build))
@@ -107,7 +104,7 @@ $(BUILDS): builtin-js $(HEADER_FILES)
 
 $(ANDROID_ARCHES): $(addprefix $$@.,$(MODES))
 
-$(ANDROID_BUILDS): must-set-ANDROID_NDK_ROOT Makefile.android
+$(ANDROID_BUILDS): builtin-js must-set-ANDROID_NDK_ROOT Makefile.android
 	mkdir -p $(OUTDIR)
 	@$(MAKE) -f Makefile.android $(subst .,,$(suffix $@)) \
 		ARCH="$(basename $@)" \
